@@ -29,6 +29,7 @@ const Chrome = (function () {
     const g = greet() + ' \u{1F44B}'; if (gEl.textContent !== g) gEl.textContent = g;
     const a = ($('asof') && $('asof').textContent || '').trim(); if (aEl.textContent !== a) aEl.textContent = a;
     head.hidden = !t || !!($('pgNav') && $('pgNav').hidden);
+    if (typeof Buddy !== 'undefined' && Buddy.update) Buddy.update();
   }
   function start() {
     const bar = document.querySelector('header.bar'), inner = bar && bar.querySelector('.bar-in');

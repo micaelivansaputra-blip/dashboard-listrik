@@ -23,6 +23,23 @@ async function handleFile(file){
 }
 document.getElementById('updBtn').addEventListener('click',()=>document.getElementById('fileIn').click());
 document.getElementById('fileIn').addEventListener('change',e=>handleFile(e.target.files[0]));
+/* Refresh: pull the newest saved data without uploading a file. On the published page this reads the shared copy
+   (the same one Update data writes to); on a plain static copy it reloads the page, which fetches the newest file. */
+async function refreshData(){
+  const b=document.getElementById('refBtn'); if(b.disabled) return; b.disabled=true; b.classList.add('spin');
+  const t0=Date.now(), pause=()=>new Promise(r=>setTimeout(r,Math.max(0,700-(Date.now()-t0))));
+  try{
+    if(!DB){ msg('Reloading the latest version…'); await pause(); location.reload(); return; }
+    const s=await DB.collection('dashboard').doc('latest').get(); let d=null;
+    if(s&&s.exists){try{d=JSON.parse(s.data().json);}catch(e){}}
+    const cur=(DATA.meta&&DATA.meta.generatedAt)||''; await pause();
+    if(d&&d.sites&&d.meta&&d.meta.generatedAt>cur){applyData(d);msg(`Refreshed: data through ${dm(d.meta.last)} 2026, ${d.sites.length} sites.`,'ok');}
+    else{const n=new Date(); msg(`Already up to date: data through ${dm(DATA.meta.last)} 2026. Checked ${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}.`,'ok');}
+  }catch(e){msg('Could not refresh: '+((e&&e.message)||e),'err');}
+  b.disabled=false; b.classList.remove('spin');
+}
+document.getElementById('refBtn').addEventListener('click',refreshData);
+
 (function(){const dv=document.getElementById('dropv');let n=0;const hasF=e=>e.dataTransfer&&[...e.dataTransfer.types].includes('Files');
   addEventListener('dragenter',e=>{if(!hasF(e))return;e.preventDefault();n++;dv.hidden=false;});
   addEventListener('dragover',e=>{if(hasF(e))e.preventDefault();});
@@ -38,3 +55,4 @@ if(APP==='pay'){setApp('pay');}else render();
 Router.start();
 Chrome.start();
 Motion.start();
+Buddy.start();

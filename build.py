@@ -7,7 +7,7 @@ rd = lambda p: (SRC / p).read_text(encoding='utf8')
 
 # Order matters: every file shares one script scope, so a layer may only use layers above it.
 APP_FILES = [
-    'core/app.js', 'core/router.js', 'core/pager.js', 'core/motion.js', 'core/chrome.js',
+    'core/app.js', 'core/router.js', 'core/pager.js', 'core/motion.js', 'core/chrome.js', 'core/buddy.js',
     'legacy/00-state.js', 'legacy/10-mascots.js', 'legacy/20-site-modal.js', 'legacy/30-weekly-zones.js',
     'legacy/40-hero-kpis.js', 'legacy/50-charts.js', 'legacy/60-sites-concern.js',
     'legacy/70-month-to-month.js', 'legacy/75-site-explorer.js',
