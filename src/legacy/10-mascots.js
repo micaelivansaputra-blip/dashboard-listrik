@@ -35,7 +35,7 @@ function bulby(on,zzz){
    <circle cx="50" cy="52" r="36" fill="url(#${u}g)" stroke="#fff" stroke-opacity=".6" stroke-width="2"/>
    <path d="M26 34 Q34 20 50 17" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="3.2" stroke-linecap="round"/>
    <rect x="31" y="42" width="38" height="18" rx="9" fill="#0B1226"/>${eyes}
-   ${zzz?`<text x="76" y="20" font-family="DM Sans,sans-serif" font-weight="700" font-size="20" fill="${INK}" opacity=".6">z</text><text x="88" y="6" font-family="DM Sans,sans-serif" font-weight="700" font-size="14" fill="${INK}" opacity=".6">z</text>`:''}</svg>`;
+   ${zzz?`<text x="76" y="20" font-family="-apple-system,BlinkMacSystemFont,Inter,sans-serif" font-weight="700" font-size="20" fill="${INK}" opacity=".6">z</text><text x="88" y="6" font-family="-apple-system,BlinkMacSystemFont,Inter,sans-serif" font-weight="700" font-size="14" fill="${INK}" opacity=".6">z</text>`:''}</svg>`;
 }
 function mini(c){
   const m={up:'M8 18 Q13 13 18 18',down:'M8 15 Q13 20.5 18 15',flat:'M8 17 H18'}[c];

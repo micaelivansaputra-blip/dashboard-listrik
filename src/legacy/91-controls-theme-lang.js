@@ -25,7 +25,7 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>render(
   function paint(){ const d=cur()==='dark'; btn.innerHTML=d?SUN:MOON; const t=d?'Switch to light mode':'Switch to dark mode'; btn.setAttribute('aria-label',t); btn.title=t; }
   try{ const t=localStorage.getItem('theme'); if(t==='dark'||t==='light') root.dataset.theme=t; }catch(e){}
   paint();
-  btn.addEventListener('click',()=>{ const n=cur()==='dark'?'light':'dark'; root.dataset.theme=n; try{localStorage.setItem('theme',n);}catch(e){} paint(); render(); });
+  btn.addEventListener('click',()=>{ const n=cur()==='dark'?'light':'dark'; Motion.themeSwitch(btn,()=>{ root.dataset.theme=n; try{localStorage.setItem('theme',n);}catch(e){} paint(); render(); }); });
   mq.addEventListener('change',()=>paint());
 })();
 

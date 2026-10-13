@@ -7,7 +7,7 @@ rd = lambda p: (SRC / p).read_text(encoding='utf8')
 
 # Order matters: every file shares one script scope, so a layer may only use layers above it.
 APP_FILES = [
-    'core/app.js', 'core/router.js', 'core/pager.js',
+    'core/app.js', 'core/router.js', 'core/pager.js', 'core/motion.js',
     'legacy/00-state.js', 'legacy/10-mascots.js', 'legacy/20-site-modal.js', 'legacy/30-weekly-zones.js',
     'legacy/40-hero-kpis.js', 'legacy/50-charts.js', 'legacy/60-sites-concern.js',
     'legacy/70-month-to-month.js', 'legacy/75-site-explorer.js',
@@ -23,7 +23,7 @@ for m in sorted((SRC / 'modules').glob('*/manifest.json')):
 APP_FILES += MODULE_FILES + ['legacy/94-boot.js']
 
 def build():
-    css = '\n'.join([rd('styles/legacy.css')] + [p.read_text(encoding='utf8') for p in sorted((SRC / 'styles').glob('mod-*.css'))])
+    css = '\n'.join([rd('styles/legacy.css')] + [p.read_text(encoding='utf8') for p in sorted((SRC / 'styles').glob('mod-*.css'))] + [rd('styles/theme-apple.css')])
     app = '\n'.join(rd(f) for f in APP_FILES)
     i18n = rd('core/i18n.js').replace('/*I18NDICT*/', rd('i18n/dict.json')).replace('/*I18NRULES*/', rd('core/i18n-rules.js.txt'))
     html = rd('index.template.html')

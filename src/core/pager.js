@@ -51,12 +51,12 @@ const Pager = (function () {
     const g = groupOf(app, c);
     const mains = groups.filter(x => x.items.some(ok)).map(x => {
       const open = x.items.includes(c) ? c : (x.items.includes(last[app + x.id]) && ok(last[app + x.id]) ? last[app + x.id] : x.items.find(ok));
-      return { label: x.label, to: open, on: x === g };
+      return { label: x.label, to: open, on: x === g, g: x.id };
     });
     const subs = g.items.filter(ok).map(id => ({ id, label: label(id), on: id === c }));
     const s = JSON.stringify([app, mains, subs]);
     if (s === sig) return; sig = s;
-    nav.innerHTML = mains.map(m => `<button type="button" data-pg="${m.to}" aria-current="${m.on}">${m.label}</button>`).join('');
+    nav.innerHTML = mains.map(m => `<button type="button" data-pg="${m.to}" data-g="${m.g}" aria-current="${m.on}"><span>${m.label}</span></button>`).join('');
     sub.hidden = subs.length < 2;
     sub.innerHTML = subs.length < 2 ? '' : subs.map(x => `<button type="button" data-pg="${x.id}" aria-current="${x.on}">${x.label}</button>`).join('');
   }

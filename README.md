@@ -18,7 +18,8 @@ A layer may only use layers listed before it.
 | `src/core/` | App shell: `engine.js` (electricity maths), `i18n.js`, `app.js` (module registry), `router.js` (deep links, opening sheets), `pager.js` (page navigation) |
 | `src/modules/<name>/` | Self-contained **VIPER** modules. Each has a `manifest.json` listing its files |
 | `src/legacy/` | The original screens, split by section but unchanged. Migrate one at a time into `modules/` |
-| `src/styles/` | `legacy.css` plus one `mod-<name>.css` per module |
+| `src/styles/` | `legacy.css`, one `mod-<name>.css` per module, and `theme-apple.css` (the Apple-style skin, loaded last) |
+| `src/core/motion.js` | All animation: gliding segmented controls, count-up numbers, scroll reveal, circular theme switch. Respects reduced motion |
 | `src/data/`, `src/i18n/` | Embedded electricity data and translation dictionaries |
 | `tests/` | Node tests, no browser needed |
 

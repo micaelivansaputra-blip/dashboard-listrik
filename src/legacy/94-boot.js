@@ -36,3 +36,4 @@ document.getElementById('fileIn').addEventListener('change',e=>handleFile(e.targ
 }catch(e){}})();
 if(APP==='pay'){setApp('pay');}else render();
 Router.start();
+Motion.start();

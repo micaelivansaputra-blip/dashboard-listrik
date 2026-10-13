@@ -117,7 +117,7 @@ const AdmitsView = function (root, platform) {
     const corner = {
       id: 'admCorner',
       afterDraw(ch) {
-        const a = ch.chartArea, c = ch.ctx; if (a.right - a.left < 360) return; c.save(); c.font = "700 11.5px 'DM Sans',sans-serif";
+        const a = ch.chartArea, c = ch.ctx; if (a.right - a.left < 360) return; c.save(); c.font = "700 11.5px -apple-system,BlinkMacSystemFont,'SF Pro Text','Inter',sans-serif";
         const put = (txt, x, y, al, col) => { c.textAlign = al; c.textBaseline = y < a.top + 20 ? 'top' : 'bottom'; c.lineJoin = 'round'; c.lineWidth = 4; c.strokeStyle = P.css('--surface'); c.strokeText(P.tr(txt), x, y); c.fillStyle = col; c.fillText(P.tr(txt), x, y); };
         put('Admits down, kWh up', a.left + 8, a.top + 8, 'left', P.css('--up-ink'));
         put('Admits up, kWh up', a.right - 8, a.top + 8, 'right', mu);
@@ -134,7 +134,7 @@ const AdmitsView = function (root, platform) {
     const cfg = P.chartCfg({
       type: 'scatter', data: { datasets: sets }, plugins: [corner],
       options: {
-        responsive: true, maintainAspectRatio: false, animation: false, layout: { padding: { top: 4, right: 6 } },
+        responsive: true, maintainAspectRatio: false, animation: ANIM, layout: { padding: { top: 4, right: 6 } },
         scales: { x: axis(sc.xTitle, sc.capX), y: axis(sc.yTitle, sc.capY) },
         plugins: {
           legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, boxHeight: 8, color: mu, padding: 14 } },

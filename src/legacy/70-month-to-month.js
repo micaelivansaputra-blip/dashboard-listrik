@@ -79,7 +79,7 @@ function renderMom(){
   o.plugins.tooltip.callbacks.label=c=>' '+c.dataset.label+': '+fmt(c.parsed.y)+' kWh/day';
   o.onClick=(e,els,ch)=>{const h=ch.getElementsAtEventForMode(e,'nearest',{intersect:true},true)[0]; if(!h) return; const m=m26[h.index], i=m26.indexOf(m); MOM.A=m.k; MOM.B=(m26[i-1]||m26[i+1]).k; fillMonthSelects(); renderMom();};
   const col=m26.map(m=>m.k===MOM.A?amber:m.k===MOM.B?blue:A(blue,.28));
-  const lab={id:'lab',afterDatasetsDraw(ch){const c=ch.ctx;c.save();c.fillStyle=ink;c.font="700 12px 'DM Sans',sans-serif";c.textAlign='center';ch.getDatasetMeta(0).data.forEach((b,i)=>{if(innerWidth>640||m26[i].k===MOM.A||m26[i].k===MOM.B)c.fillText(fmt(vals[i]),b.x,b.y-7);});c.restore();}};
+  const lab={id:'lab',afterDatasetsDraw(ch){const c=ch.ctx;c.save();c.fillStyle=ink;c.font="700 12px -apple-system,BlinkMacSystemFont,'SF Pro Text','Inter',sans-serif";c.textAlign='center';ch.getDatasetMeta(0).data.forEach((b,i)=>{if(innerWidth>640||m26[i].k===MOM.A||m26[i].k===MOM.B)c.fillText(fmt(vals[i]),b.x,b.y-7);});c.restore();}};
   mk('cMom',{type:'bar',data:{labels:m26.map(m=>m.label),datasets:[{label:'2026',data:vals,backgroundColor:col,borderRadius:{topLeft:10,topRight:10},borderSkipped:'bottom',maxBarThickness:46,order:2},{type:'line',label:'Same month 2025',data:ly,borderColor:flat,backgroundColor:flat,borderWidth:2.5,pointRadius:5,pointHoverRadius:7,pointBorderColor:css('--surface'),pointBorderWidth:2,showLine:false,order:1}]},options:o,plugins:[lab]});
   /* day by day */
   const o2=makeOpts().opts; o2.plugins.legend={display:true,position:'bottom',align:'start',labels:{usePointStyle:true,boxWidth:8,boxHeight:8,color:mu,padding:14}};

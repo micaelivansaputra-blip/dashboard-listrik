@@ -110,7 +110,7 @@ const DriversView = function (root, platform) {
     const labels = {
       id: 'drvLabels',
       afterDatasetsDraw(ch) {
-        const c = ch.ctx, meta = ch.getDatasetMeta(0); c.save(); c.font = "700 12px 'DM Sans',sans-serif"; c.textBaseline = 'middle'; c.fillStyle = ink;
+        const c = ch.ctx, meta = ch.getDatasetMeta(0); c.save(); c.font = "700 12px -apple-system,BlinkMacSystemFont,'SF Pro Text','Inter',sans-serif"; c.textBaseline = 'middle'; c.fillStyle = ink;
         br.bars.forEach((b, i) => { const el = meta.data[i]; if (!el) return; const x = Math.max(el.x, el.base) + 8; c.textAlign = 'left'; c.fillText(b.text, x, el.y); });
         c.restore();
       }
@@ -119,7 +119,7 @@ const DriversView = function (root, platform) {
       type: 'bar', plugins: [labels],
       data: { labels: br.bars.map(b => b.label), datasets: [{ label: 'kWh', data: br.bars.map(b => [b.from, b.to]), backgroundColor: br.bars.map(col), borderRadius: 4, borderSkipped: false, barThickness: 22 }] },
       options: {
-        indexAxis: 'y', responsive: true, maintainAspectRatio: false, animation: false, layout: { padding: { right: 18 } },
+        indexAxis: 'y', responsive: true, maintainAspectRatio: false, animation: ANIM, layout: { padding: { right: 18 } },
         scales: {
           x: { grace: '18%', title: { display: true, text: br.title, color: mu, font: { size: 12, weight: '600' } }, border: { display: false }, grid: { color: c => c.tick.value === 0 ? P.css('--flat') : grid, lineWidth: c => c.tick.value === 0 ? 2 : 1 },
                ticks: { color: mu, maxTicksLimit: 7, callback: v => (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v / 1000) + 'k' } },

@@ -1,7 +1,8 @@
+<meta charset="utf-8">
 <title>Electricity Usage Monitor</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 /*STYLES*/
 
 <div class="wrap">
@@ -20,7 +21,7 @@
       <nav class="nav nav-src" id="navPay" aria-label="Payroll section navigation" hidden><button data-t="p-mtd" id="navMtd" aria-current="true">MTD Oct</button><button data-t="p-sum">Payroll Summary</button><button data-t="p-mon">Month by Month</button><button data-t="p-wk">Weekly Admits &amp; MHDW</button><button data-t="p-site">Site Productivity</button><button data-t="p-cost">Cost Breakdown</button><button data-t="p-how">How It's Calculated</button></nav>
     </div>
   </header>
-  <div class="pgbar" id="pgbar" hidden><nav class="nav pgnav" id="pgNav" aria-label="Pages"></nav><nav class="subnav" id="pgSub" aria-label="Sections" hidden></nav></div>
+  <div id="pgSentinel" aria-hidden="true"></div><div class="pgbar" id="pgbar" hidden><nav class="nav pgnav" id="pgNav" aria-label="Pages"></nav><nav class="subnav" id="pgSub" aria-label="Sections" hidden></nav></div>
 
   <div class="updmsg" id="updMsg" role="status" hidden></div>
   <div id="v-elec">
