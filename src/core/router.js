@@ -11,6 +11,7 @@ const Router = (function () {
     /** Make `#key` in the address bar scroll to a section. */
     register(key, sectionId) { routes[key] = sectionId; },
     scrollTo(id) {
+      if (typeof Pager !== 'undefined' && Pager.has(id)) { Pager.show(id); return; }   // pages are shown, not scrolled to
       const el = document.getElementById(id);
       if (el) el.scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'start' });
     },

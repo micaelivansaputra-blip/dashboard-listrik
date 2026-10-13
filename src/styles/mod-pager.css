@@ -1,0 +1,21 @@
+/* ---------- Pager: main bar, sub bar, hidden pages ---------- */
+.nav-src{display:none!important}
+.pg-off{display:none!important}
+.bar{position:static}
+.pgbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;margin-inline:-20px;padding:10px 20px 0;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);margin-bottom:6px}
+.pgbar[hidden]{display:none}
+.pgbar .nav{padding-bottom:10px}
+.pgbar .subnav{border-top:0;margin-top:-4px}
+@media (max-width:640px){.pgbar{margin-inline:-16px;padding-inline:16px}}
+.subnav{display:flex;gap:4px 22px;overflow-x:auto;scrollbar-width:none}
+.subnav::-webkit-scrollbar{display:none}
+.subnav[hidden]{display:none}
+.subnav button{flex:none;font:inherit;font-size:14px;font-weight:600;color:var(--muted);background:none;border:0;border-bottom:3px solid transparent;padding:9px 2px 8px;cursor:pointer;transition:color .15s,border-color .15s}
+.subnav button:hover{color:var(--ink)}
+.subnav button[aria-current="true"]{color:var(--ink);border-bottom-color:var(--volt)}
+.subnav button:focus-visible,.pgnav button:focus-visible{outline:3px solid var(--blue);outline-offset:2px;border-radius:8px}
+#s-admits{margin-top:0}
+/* one page at a time: tighten the gap under the page bar */
+#v-elec>section,#payBody>section{margin-top:0!important;padding-top:0}
+#v-elec>#s-ringkasan .hero{margin-top:0}
+#v-elec>section>.sec-head:first-child,#payBody>section>.sec-head:first-child{margin-top:18px!important}

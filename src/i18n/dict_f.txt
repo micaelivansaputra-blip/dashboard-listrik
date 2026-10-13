@@ -77,3 +77,12 @@ A second LWBP meter (CT 50) appears from Jul 2026 and adds about 8,300 kWh a mon
 Two meters are billed (CT 80 and CT 100). The daily file reads only one of them. || Dua meter ditagih (CT 80 dan CT 100). File harian hanya membaca salah satunya. || Se facturan dos medidores (CT 80 y CT 100). El archivo diario solo lee uno.
 Regular admits are missing in the source sheet (#REF!). Rebuilt from the daily numbers, with the blank day (8 Sep) filled at the average. || Admits Regular hilang di sheet sumber (#REF!). Dihitung ulang dari angka harian, dengan hari kosong (8 Sep) diisi rata-rata. || Los admits Regular faltan en la hoja de origen (#REF!). Reconstruidos con los números diarios, y el día en blanco (8 sep) rellenado con el promedio.
 No September 2025 invoice, so kWh cannot be compared. Admits exist for both years. || Tidak ada invoice September 2025, jadi kWh tidak bisa dibandingkan. Admits ada untuk kedua tahun. || No hay factura de septiembre 2025, así que los kWh no se pueden comparar. Hay admits de ambos años.
+# Page navigation
+Overview || Ringkasan || Resumen
+Compare || Bandingkan || Comparar
+Sites || Site || Sitios
+Concerns || Perhatian || Alertas
+Trends || Tren || Tendencias
+Costs || Biaya || Costos
+Pages || Halaman || Páginas
+Sections || Bagian || Secciones

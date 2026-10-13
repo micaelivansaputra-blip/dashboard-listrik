@@ -24,6 +24,7 @@ function applyPayView(){
   const info=mtdInfo(), lab=info?'MTD '+info.mon:'MTD';
   document.getElementById('pViewMtd').textContent=lab; document.getElementById('pViewMtd').hidden=!hasM; document.getElementById('navMtd').textContent=lab;
   document.querySelectorAll('#pView button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===v));
+  Pager.sync();
 }
 function renderPayMtd(){
   const I=mtdInfo(); if(!I) return;

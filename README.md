@@ -15,7 +15,7 @@ A layer may only use layers listed before it.
 
 | Folder | Role |
 |---|---|
-| `src/core/` | App shell: `engine.js` (electricity maths), `i18n.js`, `app.js` (module registry), `router.js` (navigation) |
+| `src/core/` | App shell: `engine.js` (electricity maths), `i18n.js`, `app.js` (module registry), `router.js` (deep links, opening sheets), `pager.js` (page navigation) |
 | `src/modules/<name>/` | Self-contained **VIPER** modules. Each has a `manifest.json` listing its files |
 | `src/legacy/` | The original screens, split by section but unchanged. Migrate one at a time into `modules/` |
 | `src/styles/` | `legacy.css` plus one `mod-<name>.css` per module |
@@ -36,10 +36,17 @@ A layer may only use layers listed before it.
 Data flows one way: `View event -> Presenter -> Interactor -> Entity`, then `Presenter -> ViewModel -> View.render`.
 Because Entity, Interactor and Presenter are plain JavaScript, `tests/admits.test.js` covers them without a browser.
 
+### Navigation
+
+`core/pager.js` shows one section at a time: a main bar with a few page groups and a sub bar for the sections in the active group.
+Groups are listed at the top of the file (`GROUPS`). A section that does not exist for the current data (for example Month to Month without
+history) disappears from the bar on its own, because the pager reads the `hidden` flag of the original section buttons.
+`#admits`, `#sites` and similar addresses open that page directly.
+
 ### Adding a module
 
 1. Create `src/modules/<name>/` with the five parts, `builder.js` and a `manifest.json`.
-2. Add a `<section id="s-<name>"></section>` and a nav button in `src/index.template.html`.
+2. Add a `<section id="s-<name>"></section>` and a hidden source button in `#nav` in `src/index.template.html`, then list the section in `Pager` `GROUPS`.
 3. Call `App.register({ name, refresh })` from the builder so the module redraws on theme, language and data changes.
 4. Add translations to `src/i18n/dict_*.txt` and run `tools/mkdict.py`.
 
