@@ -4,7 +4,15 @@ function fillRegions(){const regs=['All',...[...new Set(DATA.sites.map(s=>s.r))]
 fillRegions(); if(hasHist()){fillMonthSelects();} wireMomExplore(); wireWeekly(); wirePay(); loadPayLocal();
 document.getElementById('region').addEventListener('change',e=>{REGION=e.target.value;render();});
 document.getElementById('q').addEventListener('input',e=>{QUERY=e.target.value;renderSites(selected());});
-document.querySelectorAll('#mode button').forEach(b=>b.addEventListener('click',()=>{setMode(b.dataset.m);SORTKEY=MKEY[b.dataset.m];SORT='desc';renderSites(selected());}));
+(function(){const $=id=>document.getElementById(id), re=()=>{fillPS();renderSites(selected());};
+  $('psA').addEventListener('change',e=>{PS.A=e.target.value;re();});
+  $('psB').addEventListener('change',e=>{PS.B=e.target.value;re();});
+  $('psType').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;PS.type=b.dataset.k;re();});
+  $('psQuick').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const ks=monthKeys().map(m=>m.k),q=b.dataset.q;
+    if(q==='swap'){[PS.A,PS.B]=[PS.B,PS.A];}
+    else if(q==='prev'){const v=ks.filter(k=>k[0]==='v'),i=v.indexOf(PS.A.replace(/^y/,'v'));if(i>0){PS.A=v[i];PS.B=v[i-1];}}
+    else if(q==='yoy'){const y='y:2025-'+PS.A.slice(7);if(PS.A[0]==='v'&&ks.includes(y))PS.B=y;else{const n=$('psNote');n.textContent='Last year is only available for August, September and October.';return;}}
+    re();});})();
 document.getElementById('counts').addEventListener('click',e=>{const b=e.target.closest('[data-st]');if(!b)return;STATUS=(b.dataset.st==='all'||STATUS===b.dataset.st)?'all':b.dataset.st;renderSites(selected());});
 document.addEventListener('click',e=>{const c=e.target.closest('[data-n]');if(c&&!c.closest('#modal')){openSite(c.dataset.n);return;}if(e.target.closest('[data-close]'))closeSite();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!document.getElementById('modal').hidden)closeSite();
@@ -12,7 +20,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!document.getElemen
 document.getElementById('mascot').addEventListener('click',say);
 document.getElementById('tiles').addEventListener('click',e=>{const b=e.target.closest('th button');if(!b)return;e.stopPropagation();const k=b.dataset.k;
   if(SORTKEY===k)SORT=SORT==='desc'?'asc':'desc';else{SORTKEY=k;SORT=k==='name'?'asc':'desc';}
-  if(KMODE[k])setMode(KMODE[k]);renderSites(selected());});
+  renderSites(selected());});
 document.getElementById('more').addEventListener('click',e=>{if(e.target.closest('[data-more]')){EXPAND=!EXPAND;renderSites(selected());}});
 document.getElementById('dailyTog').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;SHOW[b.dataset.k]=!SHOW[b.dataset.k];b.setAttribute('aria-pressed',SHOW[b.dataset.k]);renderCharts(periods(selected()));});
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>render());

@@ -89,14 +89,16 @@
   <section id="s-site">
     <div class="sec-head"><h2>Perform Site <small id="siteSub"></small></h2></div>
     <div class="card">
-      <div class="tools">
-        <div class="f">Compare October with
-          <div class="seg" id="mode" role="group" aria-label="Comparison">
-            <button data-m="mom" aria-pressed="true">September</button><button data-m="agu" aria-pressed="false">August</button><button data-m="yoy" aria-pressed="false" id="yoyBtn">Oct 2025</button>
-          </div>
+      <div class="ctl">
+        <label class="f" for="psA">Month<select id="psA"></select></label>
+        <label class="f" for="psB">Compare with<select id="psB"></select></label>
+        <div class="f wide">Days
+          <div class="seg" id="psType" role="group" aria-label="Day type"><button type="button" data-k="all" aria-pressed="true">All days</button><button type="button" data-k="wd" aria-pressed="false">Weekdays</button><button type="button" data-k="we" aria-pressed="false">Weekends</button></div>
         </div>
         <label class="f" for="q">Search site<input id="q" type="search" placeholder="e.g. Manado"></label>
+        <div class="qchips" id="psQuick" aria-label="Quick comparisons"><button type="button" class="ghost" data-q="prev">vs previous month</button><button type="button" class="ghost" data-q="yoy">vs same month last year</button><button type="button" class="ghost" data-q="swap">Swap</button></div>
       </div>
+      <div class="hint" id="psNote" role="status"></div>
       <div class="counts" id="counts"></div>
       <p class="hint">Tap a column header to sort, a status pill to filter, or a row to open its daily chart. The highlighted column is the comparison used for status and counts.</p>
       <div class="tbl-wrap" id="tiles"></div><div class="more" id="more"></div>

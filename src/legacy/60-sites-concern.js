@@ -1,31 +1,49 @@
 /* ---------- sites ---------- */
-let STATUS='all', SORTKEY='mom', SORT='desc', EXPAND=false;
-const MKEY={mom:'mom',agu:'vsAgu',yoy:'yoy'}, KMODE={mom:'mom',vsAgu:'agu',yoy:'yoy'};
+let STATUS='all', SORTKEY='p', SORT='desc', EXPAND=false;
+const PS={A:null,B:null,type:'all'};
+const MKEY={mom:'mom',agu:'vsAgu',yoy:'yoy'}, KMODE={};
 function spark(s,c){const m=ma7(s.v),vs=m.filter(x=>x!=null),lo=Math.min(...vs),hi=Math.max(...vs);
   const pts=m.map((v,i)=>v==null?null:[i/(s.v.length-1)*96,23-(v-lo)/(hi-lo||1)*20]).filter(Boolean);
   return `<svg viewBox="0 0 96 26" aria-hidden="true"><polyline fill="none" stroke="var(--${c})" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="${pts.map(p=>p.map(n=>n.toFixed(1)).join(',')).join(' ')}"/></svg>`;}
-function setMode(m){MODE=m;document.querySelectorAll('#mode button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.m===m));}
+function setMode(){}
+function fillPS(){
+  if(!hasHist()) return;
+  const ks=monthKeys(), v=ks.filter(m=>m.k[0]==='v'), opt=k=>`<option value="${k.k}">${k.label}</option>`;
+  for(const id of ['psA','psB']) document.getElementById(id).innerHTML=[...ks].reverse().map(opt).join('');
+  const have=k=>ks.some(m=>m.k===k);
+  if(!have(PS.A)) PS.A=v[v.length-1].k;
+  if(!have(PS.B)||PS.B===PS.A){const i=v.findIndex(m=>m.k===PS.A);PS.B=(v[i-1]||v[0]).k;}
+  document.getElementById('psA').value=PS.A; document.getElementById('psB').value=PS.B;
+  document.querySelectorAll('#psType button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===PS.type));
+}
 function renderSites(list){
-  const rows=list.map(s=>({s,a:siteAvg(s)}));
-  const key=MKEY[MODE], q=QUERY.trim().toLowerCase();
-  const all=rows.map(r=>r.a[key]);
-  const nu=all.filter(v=>v>TH).length, nd=all.filter(v=>v<-TH).length, nf=all.length-nu-nd;
-  const name={mom:'September',agu:'August',yoy:'Oct 2025'}[MODE];
+  const box=document.getElementById('tiles');
+  if(!hasHist()){box.innerHTML='<div class="empty">Monthly history is not available in this file.</div>';return;}
+  if(!document.getElementById('psA').options.length) fillPS();
+  const q=QUERY.trim().toLowerCase(), LA=shortLbl(PS.A), LB=shortLbl(PS.B);
+  const all=list.map(s=>{const a=siteMonth(s,PS.A,PS.type), b=siteMonth(s,PS.B,PS.type); return {s,a,b,d:a-b,p:a/b-1,ok:Number.isFinite(a)&&Number.isFinite(b)&&b>0};});
+  const rows=all.filter(r=>r.ok), miss=all.length-rows.length;
+  const nu=rows.filter(r=>r.p>TH).length, nd=rows.filter(r=>r.p<-TH).length, nf=rows.length-nu-nd;
   const seg=(c,l,n)=>`<button type="button" class="seg2 ${c}" data-st="${c}" aria-pressed="${STATUS===c}" style="flex:${Math.max(n,1)} 1 0"><b>${n}</b><span>${l}</span></button>`;
   document.getElementById('counts').innerHTML=`<div class="dist">${seg('up','Up >5%',nu)}${seg('flat','Stable',nf)}${seg('down','Down >5%',nd)}</div>`+(STATUS!=='all'?'<button type="button" class="chipbtn" data-st="all">Show all</button>':'');
-  let f=rows.filter(r=>(!q||r.s.n.toLowerCase().includes(q))&&(STATUS==='all'||cls(r.a[key])===STATUS));
+  let f=rows.filter(r=>(!q||r.s.n.toLowerCase().includes(q))&&(STATUS==='all'||cls(r.p)===STATUS));
   const d=SORT==='desc'?1:-1;
-  f.sort((x,y)=>SORTKEY==='name'?x.s.n.localeCompare(y.s.n)*(SORT==='asc'?1:-1):(y.a[SORTKEY]-x.a[SORTKEY])*d);
+  f.sort((x,y)=>SORTKEY==='name'?x.s.n.localeCompare(y.s.n)*(SORT==='asc'?1:-1):(y[SORTKEY]-x[SORTKEY])*d);
   const lim=12, shown=(EXPAND||q||STATUS!=='all')?f:f.slice(0,lim);
-  document.getElementById('siteSub').textContent=`${f.length} of ${list.length} sites · status vs ${name}`;
-  const mxO=Math.max(...rows.map(r=>r.a.okt));
-  const th=(k,l,cl='')=>`<th class="${cl} ${SORTKEY===k?'sorted':''} ${KMODE[k]===MODE?'actc':''}" aria-sort="${SORTKEY===k?(SORT==='asc'?'ascending':'descending'):'none'}"><button type="button" data-k="${k}">${l}${SORTKEY===k?(SORT==='asc'?' ▲':' ▼'):''}</button></th>`;
-  const pc=(v,k)=>`<span class="cell ${cls(v)} ${key===k?'on':''}">${pct(v)}</span>`;
-  const body=shown.map(({s,a})=>{const c=cls(a[key]);return `<tr class="row" data-n="${s.n}" tabindex="0">
+  const tn=PS.type==='all'?'':(PS.type==='wd'?' (weekdays)':' (weekends)');
+  document.getElementById('siteSub').textContent=`${f.length} sites · ${lblOf(PS.A)} vs ${lblOf(PS.B)}${tn}`;
+  const ks=monthKeys(), part=[PS.A,PS.B].map(k=>ks.find(m=>m.k===k)).filter(m=>m&&m.part).map(m=>m.label);
+  document.getElementById('psNote').textContent=(part.length?'Partial month: only some days of the month are in the data. Averages are kWh per day, so they can be compared, but a short month may have a different mix of weekdays and weekends. ':'')+(miss?`${miss} site${miss>1?'s have':' has'} no usable data for one of the two months and ${miss>1?'are':'is'} left out.`:'');
+  const mx=Math.max(...rows.map(r=>Math.max(r.a,r.b)),1);
+  const th=(k,l,cl='')=>`<th class="${cl} ${SORTKEY===k?'sorted':''} ${k==='p'?'actc':''}" aria-sort="${SORTKEY===k?(SORT==='asc'?'ascending':'descending'):'none'}"><button type="button" data-k="${k}">${l}${SORTKEY===k?(SORT==='asc'?' ▲':' ▼'):''}</button></th>`;
+  const sgn=v=>(v>=0?'+':'−')+fmt(Math.abs(v));
+  const body=shown.map(({s,a,b,d:dd,p})=>{const c=cls(p);return `<tr class="row" data-n="${s.n}" tabindex="0">
     <td><div class="sn"><span class="sd ${c}"></span><span><b>${short(s.n)}${s.partial?' *':''}</b><small>${s.r}</small></span></div></td>
-    <td><div class="okt"><span>${fmt(a.okt)}</span><i style="width:${Math.max(4,a.okt/mxO*72)}px"></i></div></td>
-    <td>${pc(a.mom,'mom')}</td><td class="hs">${pc(a.vsAgu,'vsAgu')}</td><td>${pc(a.yoy,'yoy')}</td><td class="sp hs">${spark(s,c==='flat'?'flat':c)}</td></tr>`;}).join('');
-  document.getElementById('tiles').innerHTML=`<table class="ptable"><thead><tr>${th('name','Site')}${th('okt','Oct kWh/day')}${th('mom','vs Sep')}${th('vsAgu','vs Aug','hs')}${th('yoy','vs Oct 2025')}<th class="hs">Trend</th></tr></thead><tbody>${body||'<tr><td colspan="6" class="empty">No matching sites.</td></tr>'}</tbody></table>`;
+    <td><div class="okt"><span>${fmt(a)}</span><i style="width:${Math.max(4,a/mx*72)}px"></i></div></td>
+    <td class="hs"><div class="okt"><span>${fmt(b)}</span><i style="width:${Math.max(4,b/mx*72)}px;opacity:.55"></i></div></td>
+    <td class="hs"><span class="cell ${c}">${sgn(dd)}</span></td>
+    <td><span class="cell ${c} on">${pct(p)}</span></td><td class="sp hs">${spark(s,c==='flat'?'flat':c)}</td></tr>`;}).join('');
+  box.innerHTML=`<table class="ptable"><thead><tr>${th('name','Site')}${th('a',LA+' kWh/day')}${th('b',LB+' kWh/day','hs')}${th('d','Change kWh/day','hs')}${th('p','Change %')}<th class="hs">Trend</th></tr></thead><tbody>${body||'<tr><td colspan="6" class="empty">No matching sites.</td></tr>'}</tbody></table>`;
   document.getElementById('more').innerHTML=(!q&&STATUS==='all'&&f.length>lim)?`<button type="button" class="chipbtn" data-more aria-pressed="true">${EXPAND?'Show top '+lim:'Show all '+f.length+' sites'}</button>`:'';
 }
 
