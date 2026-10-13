@@ -717,6 +717,38 @@ button:focus-visible{outline:3px solid color-mix(in srgb,var(--blue) 60%,transpa
 @media print{[data-rv]{opacity:1!important;transform:none!important}#pgNav{position:static!important}.pgbar{position:static}}
 @media (max-width:640px){.kpi .delta{font-size:12px;flex-wrap:wrap;row-gap:0;border-radius:14px;max-width:100%}.kpi .delta svg{flex:none}}
 
+/* ============================================================================
+   Colour atmosphere: no flat black. Deep midnight-indigo in dark, soft pastel wash in light,
+   with slow-drifting colour glows behind the content.
+   ========================================================================== */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0C1226; --surface:#161E3A; --surface-2:#202A4D; --line:#2B3560; --grid:#27315A; --hair:rgba(160,180,255,.14);
+  --muted:#A3ACCB; --blue:#4F9DFF; --blue-soft:#15305E; --shadow:0 1px 2px rgba(3,6,20,.5),0 18px 40px -16px rgba(3,6,20,.65);
+  --glow1:rgba(64,120,255,.34); --glow2:rgba(150,90,255,.28); --glow3:rgba(0,200,200,.18);
+}}
+:root[data-theme="dark"]{
+  --bg:#0C1226; --surface:#161E3A; --surface-2:#202A4D; --line:#2B3560; --grid:#27315A; --hair:rgba(160,180,255,.14);
+  --muted:#A3ACCB; --blue:#4F9DFF; --blue-soft:#15305E; --shadow:0 1px 2px rgba(3,6,20,.5),0 18px 40px -16px rgba(3,6,20,.65);
+  --glow1:rgba(64,120,255,.34); --glow2:rgba(150,90,255,.28); --glow3:rgba(0,200,200,.18);
+}
+:root{--glow1:rgba(0,113,227,.16);--glow2:rgba(175,82,222,.12);--glow3:rgba(255,159,10,.10)}
+:root:not([data-theme="dark"]){--bg:#F3F5FB}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0C1226}}
+body{position:relative}
+body::before{content:"";position:fixed;inset:-10vmax;z-index:-1;pointer-events:none;
+  background:
+   radial-gradient(42vmax 36vmax at 12% 8%,var(--glow1),transparent 70%),
+   radial-gradient(38vmax 34vmax at 90% 14%,var(--glow2),transparent 70%),
+   radial-gradient(44vmax 38vmax at 70% 96%,var(--glow3),transparent 70%)}
+@media (prefers-reduced-motion:no-preference){body::before{animation:drift 26s ease-in-out infinite alternate}}
+@keyframes drift{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(-3vmax,2vmax,0) scale(1.08)}}
+/* cards catch the light from above */
+.card{background-image:linear-gradient(180deg,color-mix(in srgb,#fff 5%,transparent),transparent 55%)}
+.kpi.hl{background-image:linear-gradient(155deg,#0A84FF,#5E5CE6)!important;color:#fff;border-color:transparent}
+.kpi.hl .l,.kpi.hl .u{color:rgba(255,255,255,.78)}
+.kpi.hl .v{color:#fff}
+.pgnav,.seg,.apptabs{box-shadow:inset 0 0 0 1px var(--hair)}
+
 </style>
 
 <div class="wrap">
