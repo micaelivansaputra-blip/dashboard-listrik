@@ -199,7 +199,7 @@ body{overflow-x:clip}
 .bar.stuck{box-shadow:none}
 .bar.stuck::before{box-shadow:0 10px 30px -20px rgba(0,0,0,.45)}
 @media (max-width:640px){
-  .bar{position:static}
+  .bar{position:relative}
   .brand{order:1}.thbtn{order:2;margin-left:auto}
   .brand h1{max-width:170px;font-size:15px}
   .apptabs{order:3;margin-left:0}.langseg{order:4;margin-left:auto}
@@ -209,3 +209,35 @@ body{overflow-x:clip}
   .bar .pgbar #pgSub{background:none;-webkit-backdrop-filter:none;backdrop-filter:none;margin-inline:0;padding-inline:0;border-bottom:1px solid var(--hair)}
 }
 @media (max-width:640px){.ph-dot{display:none}.ph-line{gap:2px 10px;flex-direction:column;align-items:flex-start}}
+
+/* ============================================================================
+   Palette: black dominant, blue highlight (matches the GSAT dashboard).
+   ========================================================================== */
+:root{--tab:#0A66E8;--thumb:#fff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#050609; --surface:#101114; --surface-2:#1A1C21; --line:#24262D; --grid:#22242B; --hair:rgba(255,255,255,.09);
+  --muted:#9CA1AD; --blue:#4D7CFF; --blue-soft:#13224A; --tab:#3558D6; --thumb:#2B2E36;
+  --shadow:0 1px 2px rgba(0,0,0,.6),0 18px 40px -16px rgba(0,0,0,.8);
+  --glow1:rgba(40,90,230,.34); --glow2:rgba(0,0,0,0); --glow3:rgba(0,0,0,0);
+}}
+:root[data-theme="dark"]{
+  --bg:#050609; --surface:#101114; --surface-2:#1A1C21; --line:#24262D; --grid:#22242B; --hair:rgba(255,255,255,.09);
+  --muted:#9CA1AD; --blue:#4D7CFF; --blue-soft:#13224A; --tab:#3558D6; --thumb:#2B2E36;
+  --shadow:0 1px 2px rgba(0,0,0,.6),0 18px 40px -16px rgba(0,0,0,.8);
+  --glow1:rgba(40,90,230,.34); --glow2:rgba(0,0,0,0); --glow3:rgba(0,0,0,0);
+}
+:root:not([data-theme="dark"]){--glow2:rgba(0,113,227,.07);--glow3:rgba(0,0,0,0)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--glow2:rgba(0,0,0,0);--glow3:rgba(0,0,0,0)}}
+/* glow sits top-left, fades into black */
+body::before{background:radial-gradient(60vmax 46vmax at 4% -4%,var(--glow1),transparent 72%),radial-gradient(40vmax 30vmax at 96% 0%,var(--glow2),transparent 70%)}
+.seg .thumb,.apptabs .thumb{background:var(--thumb)}
+.seg.th.th-on>button[aria-pressed="true"]{color:var(--ink)}
+.pgnav .thumb{background:var(--tab);box-shadow:0 6px 16px -6px color-mix(in srgb,var(--tab) 80%,transparent)}
+.pgnav button[aria-current="true"]{color:#fff}
+.apptabs .thumb{background:var(--tab)}
+.apptabs button[aria-pressed="true"],.apptabs.th.th-on>button[aria-pressed="true"]{color:#fff}
+.subnav .thumb{background:var(--tab)}
+.updbtn{background:var(--tab);box-shadow:0 8px 20px -8px color-mix(in srgb,var(--tab) 85%,transparent)}
+.kpi.hl{background-image:linear-gradient(155deg,var(--tab),color-mix(in srgb,var(--tab) 62%,#000))!important}
+.card{background-image:linear-gradient(180deg,color-mix(in srgb,#fff 3%,transparent),transparent 50%)}
+@media (max-width:640px){#pgNav .thumb{background:color-mix(in srgb,var(--tab) 22%,transparent);box-shadow:none}#pgNav button[aria-current="true"]{color:var(--blue)}}
