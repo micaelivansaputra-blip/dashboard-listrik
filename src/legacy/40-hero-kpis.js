@@ -18,13 +18,18 @@ function renderHero(P,list){
   else if(dSep<-0.01){c='flat';chip='Down vs Sep';title=`Electricity usage is down ${ap(dSep)} vs September`;}
   else {c='flat';chip='Level';title='Electricity usage is level with September';}
   const lowest = P.sep.raw<P.agu.raw && P.sep.raw<P.okt.raw;
+  // The note about the October window is computed from the days actually in the data.
+  const oDays=range(days,IDX.okt), wkEnd=oDays.filter(d=>{const w=dow(d);return w===0||w===6;}).length, wkDay=oDays.length-wkEnd;
+  const weekNote = oDays.length===7
+    ? `${octLbl} is one full week (${wkDay} weekdays + ${wkEnd} weekend days), so it compares fairly with full months. Data is preliminary.`
+    : `${octLbl} covers ${oDays.length} days (${wkDay} weekdays + ${wkEnd} weekend days), so the comparison with full months is approximate. Data is preliminary.`;
   document.getElementById('verdict').innerHTML =
    `<span class="chip ${c}">${chip}</span><h2 style="margin-top:12px">${title}</h2>
     <p style="margin-top:10px">October is ${pct(dSep)} vs September${lowest?' (the lowest month so far)':''}, ${pct(dAgu)} vs August and ${pct(yoy)} vs Oct 2025.</p>
     <ul class="basis" style="margin-top:14px">
      <li>${hot?`${hot} of ${nOkt} October days ran above the normal range for their weekday.`:`All ${nOkt} October days are within the normal range for their weekday.`}</li>
      <li>${up} sites up and ${dn} down vs Oct 2025; 5 sites account for ${Math.round(top5*100)}% of the increase.</li>
-     <li>${octLbl} is one full week (5 weekdays + 2 weekend days), so it compares fairly with full months. Data is preliminary.</li></ul>`;
+     <li>${weekNote}</li></ul>`;
   const mood=c==='flat'?'happy':c==='up'?'worried':'meh';
   const msg=dSep>0.01?`Usage is up ${ap(dSep)} vs Sep. Keep an eye on me!`:dSep<-0.01?'Usage is down vs Sep. Nice!':'Holding steady.';
   renderMascots(mood,msg);
