@@ -432,6 +432,10 @@ input[type=date]{font:inherit;font-size:14px;letter-spacing:0;text-transform:non
 .ctl .seg{max-width:100%}
 @media (max-width:640px){.zt{min-width:0}.zt th{white-space:normal;font-size:10.5px;letter-spacing:.03em;padding:9px 6px}.zt td{padding:10px 6px}.zt td.nm{white-space:normal;min-width:0}.zt td.nm b{font-size:12.5px;line-height:1.25}.zt td.eff{min-width:0}}
 
+
+.thbtn{flex:none;width:38px;height:38px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0}
+.thbtn:hover{background:var(--surface-2)}
+.thbtn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 /* payroll calculation panels */
 .kpi.hl .sub2{color:inherit;opacity:.85}
 .chev{flex:none;width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(-45deg);transition:transform .15s;margin-right:2px}
@@ -469,7 +473,7 @@ input[type=date]{font:inherit;font-size:14px;letter-spacing:0;text-transform:non
         <button class="mascot" id="mascot" type="button" aria-label="Volty the mascot. Tap for a tip"></button>
         <div><h1 id="appTitle">Electricity Usage Monitoring</h1><div class="sub" id="asof"></div></div><div class="quip" id="quip" role="status" hidden></div>
       </div>
-      <div class="apptabs" id="appTabs" role="group" aria-label="Dashboard"><button type="button" data-app="elec" aria-pressed="true">Electricity</button><button type="button" data-app="pay" aria-pressed="false">Payroll</button></div>
+      <button type="button" class="thbtn" id="themeBtn" aria-label="Switch to dark mode" title="Switch to dark mode"></button><div class="apptabs" id="appTabs" role="group" aria-label="Dashboard"><button type="button" data-app="elec" aria-pressed="true">Electricity</button><button type="button" data-app="pay" aria-pressed="false">Payroll</button></div>
       <div class="filters"><label class="f" for="region" id="regionLbl">Region<select id="region"></select></label>
         <div class="upd"><button type="button" class="updbtn" id="updBtn">Update data</button><input id="fileIn" type="file" accept=".xlsx,.xlsm" hidden></div></div>
       <nav class="nav" id="nav" aria-label="Section navigation">
@@ -2302,6 +2306,19 @@ document.getElementById('tiles').addEventListener('click',e=>{const b=e.target.c
 document.getElementById('more').addEventListener('click',e=>{if(e.target.closest('[data-more]')){EXPAND=!EXPAND;renderSites(selected());}});
 document.getElementById('dailyTog').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;SHOW[b.dataset.k]=!SHOW[b.dataset.k];b.setAttribute('aria-pressed',SHOW[b.dataset.k]);renderCharts(periods(selected()));});
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>render());
+/* light / dark switch: follows the system until the user picks one */
+(function(){
+  const root=document.documentElement, btn=document.getElementById('themeBtn'), mq=matchMedia('(prefers-color-scheme: dark)');
+  const SUN='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+  const MOON='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
+  const cur=()=>root.dataset.theme||(mq.matches?'dark':'light');
+  function paint(){ const d=cur()==='dark'; btn.innerHTML=d?SUN:MOON; const t=d?'Switch to light mode':'Switch to dark mode'; btn.setAttribute('aria-label',t); btn.title=t; }
+  try{ const t=localStorage.getItem('theme'); if(t==='dark'||t==='light') root.dataset.theme=t; }catch(e){}
+  paint();
+  btn.addEventListener('click',()=>{ const n=cur()==='dark'?'light':'dark'; root.dataset.theme=n; try{localStorage.setItem('theme',n);}catch(e){} paint(); render(); });
+  mq.addEventListener('change',()=>paint());
+})();
+
 new MutationObserver(()=>render()).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
 /* ---------- update from Excel ---------- */
 const XLSX_SRC='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
