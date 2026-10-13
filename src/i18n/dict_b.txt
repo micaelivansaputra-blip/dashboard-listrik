@@ -1,0 +1,102 @@
+Data through 7 Oct 2026 · 35 sites || Data sampai 7 Oct 2026 · 35 site || Datos hasta el 7 Oct 2026 · 35 sitios
+Electricity usage is up 3.6% vs September || Penggunaan listrik naik 3.6% dibanding September || El consumo de electricidad sube 3.6% frente a septiembre
+October is +3.6% vs September (the lowest month so far), −2.0% vs August and +6.4% vs Oct 2025. || October +3.6% dibanding September (bulan terendah sejauh ini), −2.0% dibanding August dan +6.4% dibanding Oct 2025. || October está +3.6% frente a September (el mes más bajo hasta ahora), −2.0% frente a August y +6.4% frente a Oct 2025.
+All 7 October days are within the normal range for their weekday. || Semua 7 hari October berada dalam kisaran normal untuk harinya. || Los 7 días de October están dentro del rango normal para su día de la semana.
+18 sites up and 7 down vs Oct 2025; 5 sites account for 51% of the increase. || 18 site naik dan 7 turun dibanding Oct 2025; 5 site menyumbang 51% dari kenaikan. || 18 sitios suben y 7 bajan frente a Oct 2025; 5 sitios explican el 51% del aumento.
+1–7 Oct is one full week (5 weekdays + 2 weekend days), so it compares fairly with full months. Data is preliminary. || 1–7 Oct adalah satu minggu penuh (5 hari kerja + 2 hari akhir pekan), jadi cukup adil dibandingkan dengan bulan penuh. Data masih awal. || 1–7 Oct es una semana completa (5 días entre semana + 2 de fin de semana), por lo que se compara de forma justa con meses completos. Los datos son preliminares.
+Usage is up 3.6% vs Sep. Keep an eye on me! || Pemakaian naik 3.6% dibanding Sep. Awasi aku ya! || El consumo sube 3.6% frente a Sep. ¡Mantén un ojo en mí!
+Oct 2026 vs this || Oct 2026 vs ini || Oct 2026 vs este
+Wed 7 Oct: 41,741 kWh · September Wed average 41,212 || Wed 7 Oct: 41,741 kWh · rata-rata Wed September 41,212 || Wed 7 Oct: 41,741 kWh · promedio de Wed de September 41,212
+Every day is within the normal range for its weekday (highest z-score 1.4) || Setiap hari berada dalam kisaran normal untuk harinya (z-score tertinggi 1.4) || Todos los días están dentro del rango normal para su día de la semana (z-score más alto 1.4)
+kWh per day · axis starts at 35,000 || kWh per hari · sumbu mulai dari 35,000 || kWh por día · el eje comienza en 35,000
+35 of 35 sites · status vs August || 35 dari 35 site · status vs August || 35 de 35 sitios · estado vs August
+778 kWh/day || 778 kWh/hari || 778 kWh/día
+R3 · 1,632 kWh/day · Oct 2025 +16% · Sep +2% || R3 · 1,632 kWh/hari · Oct 2025 +16% · Sep +2% || R3 · 1,632 kWh/día · Oct 2025 +16% · Sep +2%
+kWh/day above national growth || kWh/hari di atas pertumbuhan nasional || kWh/día por encima del crecimiento nacional
+Red · up in 3 of 3 || Merah · naik di 3 dari 3 || Rojo · sube en 3 de 3
+Yellow · up in 1 of 3 || Kuning · naik di 1 dari 3 || Amarillo · sube en 1 de 3
+9.3 pts better than other sites || 9.3 poin lebih baik dari site lain || 9.3 pts mejor que otros sitios
+0.5 pts worse than other sites || 0.5 poin lebih buruk dari site lain || 0.5 pts peor que otros sitios
+LWBP only, data to 26 Sep || Hanya LWBP, data sampai 26 Sep || Solo LWBP, datos hasta el 26 Sep
+WBP + LWBP · readings are noisy || WBP + LWBP · pembacaan berfluktuasi || WBP + LWBP · las lecturas son ruidosas
+The daily report has no active meter readings for this site, so it cannot be measured yet. It will appear here once readings are added. || Laporan harian belum memiliki pembacaan meter aktif untuk site ini, sehingga belum bisa diukur. Akan muncul di sini setelah pembacaan ditambahkan. || El reporte diario no tiene lecturas de medidor activas para este sitio, por lo que aún no se puede medir. Aparecerá aquí cuando se agreguen lecturas.
+4 of 6 sites beat the others || 4 dari 6 site mengalahkan yang lain || 4 de 6 sitios superan a los demás
+= average kWh/day from 1 to 18 Aug. || = rata-rata kWh/hari dari 1 sampai 18 Aug. || = promedio de kWh/día del 1 al 18 Aug.
+* Partial meter coverage (only some meters included): Lippo Plaza Medan, Malang Town Square, Lippo Plaza Lubuk Linggau. || * Cakupan meter sebagian (hanya sebagian meter yang disertakan): Lippo Plaza Medan, Malang Town Square, Lippo Plaza Lubuk Linggau. || * Cobertura parcial de medidores (solo se incluyen algunos): Lippo Plaza Medan, Malang Town Square, Lippo Plaza Lubuk Linggau.
+Data check: 24 sites are not included || Pemeriksaan data: 24 site tidak disertakan || Revisión de datos: 24 sitios no están incluidos
+: too many odd readings (zero, negative or jumps); zero or negative days remain after repair; unusual daily swings (Aug 26); average below 100 kWh/day (CT or unit may be wrong) || : terlalu banyak pembacaan janggal (nol, negatif, atau lonjakan); masih ada hari nol atau negatif setelah perbaikan; fluktuasi harian tidak wajar (Aug 26); rata-rata di bawah 100 kWh/hari (CT atau satuan mungkin salah) || : demasiadas lecturas atípicas (cero, negativas o saltos); quedan días en cero o negativos tras la reparación; oscilaciones diarias inusuales (Aug 26); promedio bajo 100 kWh/día (el CT o la unidad pueden estar mal)
+: LWBP meter last updated 2026-09-22 || : meter LWBP terakhir diperbarui 2026-09-22 || : medidor LWBP actualizado por última vez el 2026-09-22
+: WBP meter last updated 2026-10-06; LWBP meter last updated 2026-10-06 || : meter WBP terakhir diperbarui 2026-10-06; meter LWBP terakhir diperbarui 2026-10-06 || : medidor WBP actualizado por última vez el 2026-10-06; medidor LWBP actualizado por última vez el 2026-10-06
+: too many odd readings (zero, negative or jumps) || : terlalu banyak pembacaan janggal (nol, negatif, atau lonjakan) || : demasiadas lecturas atípicas (cero, negativas o saltos)
+: too many odd readings (zero, negative or jumps); zero or negative days remain after repair || : terlalu banyak pembacaan janggal (nol, negatif, atau lonjakan); masih ada hari nol atau negatif setelah perbaikan || : demasiadas lecturas atípicas (cero, negativas o saltos); quedan días en cero o negativos tras la reparación
+: WBP meter last updated 2026-10-05 || : meter WBP terakhir diperbarui 2026-10-05 || : medidor WBP actualizado por última vez el 2026-10-05
+: no active meter data in the report || : tidak ada data meter aktif di laporan || : sin datos de medidor activos en el reporte
+: 2026 vs 2025 level not plausible (227.5x; meter or CT change?) || : level 2026 vs 2025 tidak masuk akal (227.5x; ganti meter atau CT?) || : el nivel 2026 vs 2025 no es plausible (227.5x; ¿cambio de medidor o CT?)
+: meter readings look estimated (constant daily increase, then a drop) || : pembacaan meter tampak estimasi (kenaikan harian konstan, lalu turun) || : las lecturas del medidor parecen estimadas (aumento diario constante y luego una caída)
+Oct 2026 (1–7 Oct) vs Sep 2026 · 35 sites || Oct 2026 (1–7 Oct) vs Sep 2026 · 35 site || Oct 2026 (1–7 Oct) vs Sep 2026 · 35 sitios
+3 up · 23 down || 3 naik · 23 turun || 3 suben · 23 bajan
+9 stable (within ±5%) || 9 stabil (dalam ±5%) || 9 estables (dentro de ±5%)
+Oct 2026 (1–7 Oct) covers 7 of 31 days, so it is compared by average per day, and its weekday mix differs from a full month. || Oct 2026 (1–7 Oct) mencakup 7 dari 31 hari, sehingga dibandingkan lewat rata-rata per hari, dan komposisi hari kerjanya berbeda dari bulan penuh. || Oct 2026 (1–7 Oct) cubre 7 de 31 días, por lo que se compara por promedio diario, y su mezcla de días difiere de la de un mes completo.
+kWh per day, 35 sites that have data in every month. Tap a bar to compare it with the month before. || kWh per hari, 35 site yang punya data di setiap bulan. Ketuk batang untuk membandingkannya dengan bulan sebelumnya. || kWh por día, 35 sitios con datos en todos los meses. Toca una barra para compararla con el mes anterior.
+−154 kWh/day · −21.9% || −154 kWh/hari · −21.9% || −154 kWh/día · −21.9%
+35 sites · Oct 2026 (1–7 Oct) vs Sep 2026 || 35 site · Oct 2026 (1–7 Oct) vs Sep 2026 || 35 sitios · Oct 2026 (1–7 Oct) vs Sep 2026
+1 Mar – 7 Oct · 221 days || 1 Mar – 7 Oct · 221 hari || 1 Mar – 7 Oct · 221 días
+vs previous 221 days || vs 221 hari sebelumnya || vs los 221 días anteriores
+27 spike days || 27 hari lonjakan || 27 días pico
+1 spike day || 1 hari lonjakan || 1 día pico
+30 Sep – 6 Oct · Wed–Tue week · from the By Weekly sheet || 30 Sep – 6 Oct · minggu Wed–Tue · dari sheet By Weekly || 30 Sep – 6 Oct · semana Wed–Tue · de la hoja By Weekly
+52 sites with 5+ days of readings || 52 site dengan pembacaan 5+ hari || 52 sitios con 5+ días de lecturas
+of 52 sites || dari 52 site || de 52 sitios
+fewer than 5 of 7 days || kurang dari 5 dari 7 hari || menos de 5 de 7 días
+6/7 days || 6/7 hari || 6/7 días
+Adjusted to 6 days. The sheet shows -20%. || Disesuaikan ke 6 hari. Sheet menunjukkan -20%. || Ajustado a 6 días. La hoja muestra -20%.
+Left out because the readings look unreliable: || Dikeluarkan karena pembacaan tampak tidak andal: || Excluidos porque las lecturas parecen poco fiables:
+to include them. || untuk menyertakannya. || para incluirlos.
+Fewer than 7 shown: only 4 sites in the Green Zone are more than 3% below target. || Kurang dari 7 ditampilkan: hanya 4 site di Zona Hijau yang lebih dari 3% di bawah target. || Se muestran menos de 7: solo 4 sitios de la Zona Verde están más de 3% por debajo de la meta.
+Oct 2026 (1–7 Oct) vs Sep 2026 (weekdays) · 35 sites || Oct 2026 (1–7 Oct) vs Sep 2026 (hari kerja) · 35 site || Oct 2026 (1–7 Oct) vs Sep 2026 (entre semana) · 35 sitios
+kWh per day (weekdays) || kWh per hari (hari kerja) || kWh por día (entre semana)
+kWh per day (weekdays), 35 sites that have data in every month. Tap a bar to compare it with the month before. || kWh per hari (hari kerja), 35 site yang punya data di setiap bulan. Ketuk batang untuk membandingkannya dengan bulan sebelumnya. || kWh por día (entre semana), 35 sitios con datos en todos los meses. Toca una barra para compararla con el mes anterior.
+Oct 2026 (1–7 Oct) vs Sep 2026 (weekends) · 35 sites || Oct 2026 (1–7 Oct) vs Sep 2026 (akhir pekan) · 35 site || Oct 2026 (1–7 Oct) vs Sep 2026 (fines de semana) · 35 sitios
+kWh per day (weekends) || kWh per hari (akhir pekan) || kWh por día (fines de semana)
+kWh per day (weekends), 35 sites that have data in every month. Tap a bar to compare it with the month before. || kWh per hari (akhir pekan), 35 site yang punya data di setiap bulan. Ketuk batang untuk membandingkannya dengan bulan sebelumnya. || kWh por día (fines de semana), 35 sitios con datos en todos los meses. Toca una barra para compararla con el mes anterior.
+Oct 2025 (2–9 Oct) vs Oct 2026 (1–7 Oct) (weekends) · 35 sites || Oct 2025 (2–9 Oct) vs Oct 2026 (1–7 Oct) (akhir pekan) · 35 site || Oct 2025 (2–9 Oct) vs Oct 2026 (1–7 Oct) (fines de semana) · 35 sitios
+35 sites · Oct 2025 (2–9 Oct) vs Oct 2026 (1–7 Oct) || 35 site · Oct 2025 (2–9 Oct) vs Oct 2026 (1–7 Oct) || 35 sitios · Oct 2025 (2–9 Oct) vs Oct 2026 (1–7 Oct)
+Copied. Paste it into Excel or Google Sheets. || Tersalin. Tempel ke Excel atau Google Sheets. || Copiado. Pégalo en Excel o Google Sheets.
+Site ▲ || Site ▲ || Sitio ▲
+Site ▼ || Site ▼ || Sitio ▼
+Change % || Perubahan % || Cambio %
+Change kWh ▼ || Perubahan kWh ▼ || Cambio kWh ▼
+Change kWh ▲ || Perubahan kWh ▲ || Cambio kWh ▲
+Change % ▲ || Perubahan % ▲ || Cambio % ▲
+35 of 35 sites · status vs Oct 2025 || 35 dari 35 site · status vs Oct 2025 || 35 de 35 sitios · estado vs Oct 2025
+Oct kWh/day ▼ || kWh/hari Oct ▼ || kWh/día Oct ▼
+Oct kWh/day ▲ || kWh/hari Oct ▲ || kWh/día Oct ▲
+More than 60% below target: check the meter or CT || Lebih dari 60% di bawah target: periksa meter atau CT || Más de 60% por debajo de la meta: revisa el medidor o el CT
+Same reading on 5 or more days in a row || Pembacaan sama selama 5 hari berturut-turut atau lebih || Misma lectura durante 5 o más días seguidos
+The dashboard's own meter data is +15% vs this sheet on the same days || Data meter dasbor sendiri +15% dibanding sheet ini pada hari yang sama || Los datos de medidor del propio tablero están +15% frente a esta hoja en los mismos días
+One day is far from the rest of the week || Satu hari jauh berbeda dari hari lain dalam minggu itu || Un día se aleja mucho del resto de la semana
+Before August the data is only lightly cleaned, so single-day spikes can be meter noise. || Sebelum August data hanya dibersihkan ringan, jadi lonjakan sehari bisa jadi noise meter. || Antes de August los datos solo tienen una limpieza ligera, así que los picos de un solo día pueden ser ruido del medidor.
+Index: each site is shown relative to its own average in the period (100 = average), so sites of different sizes can be compared by shape. || Indeks: setiap site ditampilkan relatif terhadap rata-ratanya sendiri pada periode itu (100 = rata-rata), sehingga site berukuran berbeda bisa dibandingkan dari bentuk polanya. || Índice: cada sitio se muestra relativo a su propio promedio del período (100 = promedio), para poder comparar por forma sitios de distinto tamaño.
+Jul 2026 vs Jun 2026 (weekends) · 35 sites || Jul 2026 vs Jun 2026 (akhir pekan) · 35 site || Jul 2026 vs Jun 2026 (fines de semana) · 35 sitios
+March to July readings are only lightly cleaned (zero and extreme values removed), so they can be noisier than August onwards. || Pembacaan March sampai July hanya dibersihkan ringan (nilai nol dan ekstrem dihapus), sehingga bisa lebih berfluktuasi daripada August dan seterusnya. || Las lecturas de March a July solo tienen una limpieza ligera (se quitaron valores en cero y extremos), por lo que pueden ser más ruidosas que de August en adelante.
+35 sites · Jul 2026 vs Jun 2026 || 35 site · Jul 2026 vs Jun 2026 || 35 sitios · Jul 2026 vs Jun 2026
+R1 · 68 days of data || R1 · 68 hari data || R1 · 68 días de datos
+R4 · 68 days of data · ZOEC project site || R4 · 68 hari data · site proyek ZOEC || R4 · 68 días de datos · sitio del proyecto ZOEC
+October avg || Rata-rata October || Promedio de October
+Thin line = daily kWh. Thick line = 7-day average. Dashed green line = ZOEC start (19 Aug). || Garis tipis = kWh harian. Garis tebal = rata-rata 7 hari. Garis hijau putus-putus = mulai ZOEC (19 Aug). || Línea fina = kWh diario. Línea gruesa = promedio de 7 días. Línea verde discontinua = inicio de ZOEC (19 Aug).
+Reading payroll_oct.xlsx. This takes a few seconds… || Membaca payroll_oct.xlsx. Butuh beberapa detik… || Leyendo payroll_oct.xlsx. Tardará unos segundos…
+Budget vs Actual + Forecast · actual through Oct 7–13 · Productivity 14 || Budget vs Aktual + Forecast · aktual sampai Oct 7–13 · Produktivitas 14 || Presupuesto vs Real + Pronóstico · real hasta Oct 7–13 · Productividad 14
+1–13 Oct · 13 days · Productivity 14 || 1–13 Oct · 13 hari · Produktivitas 14 || 1–13 Oct · 13 días · Productividad 14
+Oct so far, admits run 30.7% below the budget pace, and MHDW use is down 20% per day || Oct sejauh ini, admits 30.7% di bawah laju budget, dan pemakaian MHDW turun 20% per hari || Oct hasta ahora, los admits van 30.7% por debajo del ritmo del presupuesto, y el uso de MHDW baja 20% por día
+Admits: 291,314 in 13 days, 22,409 per day. That is −30.7% against the Oct budget pace (32,329 per day) and −14.1% against Sep per day (26,099). || Admits: 291,314 dalam 13 hari, 22,409 per hari. Itu −30.7% terhadap laju budget Oct (32,329 per hari) dan −14.1% terhadap Sep per hari (26,099). || Admits: 291,314 en 13 días, 22,409 por día. Eso es −30.7% frente al ritmo del presupuesto de Oct (32,329 por día) y −14.1% frente a Sep por día (26,099).
+MHDW: 2,977 hours, 229 per day (−19.8% vs Sep per day, 285). Lower is better. || MHDW: 2,977 jam, 229 per hari (−19.8% vs Sep per hari, 285). Makin rendah makin baik. || MHDW: 2,977 horas, 229 por día (−19.8% vs Sep por día, 285). Menos es mejor.
+Productivity: 7.2 admits per man-hour against a target of 14 (−48.4%), −12.6% vs Sep. || Produktivitas: 7.2 admits per jam kerja terhadap target 14 (−48.4%), −12.6% vs Sep. || Productividad: 7.2 admits por hora-hombre frente a una meta de 14 (−48.4%), −12.6% vs Sep.
+Full Oct outlook: payroll Rp 4,882 Mio against a budget of Rp 5,766 Mio (−15.3%), taking 10.8% of revenue versus 9.7% in the budget (+1.0 pt). 3 weeks of Oct are still forecast, so this will move as you update Admits and MHDW. || Proyeksi Oct penuh: payroll Rp 4,882 Mio terhadap budget Rp 5,766 Mio (−15.3%), mengambil 10.8% dari pendapatan versus 9.7% di budget (+1.0 pt). 3 minggu Oct masih forecast, jadi angka ini akan bergerak saat kamu memperbarui Admits dan MHDW. || Proyección completa de Oct: nómina de Rp 4,882 Mio frente a un presupuesto de Rp 5,766 Mio (−15.3%), equivalente a 10.8% de los ingresos frente a 9.7% en el presupuesto (+1.0 pt). 3 semanas de Oct siguen en pronóstico, así que esto cambiará al actualizar Admits y MHDW.
+22,409 per day · −14.1% vs Sep || 22,409 per hari · −14.1% vs Sep || 22,409 por día · −14.1% vs Sep
+Target 14 · Sep 8.3 || Target 14 · Sep 8.3 || Meta 14 · Sep 8.3
+10.8% of revenue · budget 9.7% || 10.8% dari pendapatan · budget 9.7% || 10.8% de los ingresos · presupuesto 9.7%
+59 sites with admits in 1–13 Oct || 59 site dengan admits pada 1–13 Oct || 59 sitios con admits en 1–13 Oct
+The 8 sites with the most MHDW account for 53% of all Oct MHDW so far. Productivity is admits per man-hour, using the workbook's own formula. Tap a site to see how it is calculated. || 8 site dengan MHDW terbanyak menyumbang 53% dari seluruh MHDW Oct sejauh ini. Produktivitas adalah admits per jam kerja, memakai rumus workbook sendiri. Ketuk site untuk melihat cara menghitungnya. || Los 8 sitios con más MHDW suman el 53% de todo el MHDW de Oct hasta ahora. La productividad son admits por hora-hombre, con la fórmula del propio libro. Toca un sitio para ver cómo se calcula.
+Total payroll (Actual + Forecast) is Rp 63,497 Mio against a budget of Rp 70,842 Mio (−10.4%). Operations payroll is −10.9% and admin payroll −8.7% versus budget. || Total payroll (Aktual + Forecast) Rp 63,497 Mio terhadap budget Rp 70,842 Mio (−10.4%). Payroll operasional −10.9% dan payroll admin −8.7% terhadap budget. || La nómina total (Real + Pronóstico) es de Rp 63,497 Mio frente a un presupuesto de Rp 70,842 Mio (−10.4%). La nómina operativa está −10.9% y la administrativa −8.7% frente al presupuesto.
+Admits are −21.7% and revenue −19.8% versus budget, so payroll takes 9.8% of revenue against 8.7% in the budget (+1.0 pt). || Admits −21.7% dan pendapatan −19.8% terhadap budget, sehingga payroll mengambil 9.8% dari pendapatan terhadap 8.7% di budget (+1.0 pt). || Los admits están −21.7% y los ingresos −19.8% frente al presupuesto, por lo que la nómina ocupa 9.8% de los ingresos frente a 8.7% en el presupuesto (+1.0 pt).
+9 of 12 months are more than 0.5 pt above the budget ratio; the largest gap is Feb (18.4% vs 15.7%). || 9 dari 12 bulan lebih dari 0.5 pt di atas rasio budget; selisih terbesar ada di Feb (18.4% vs 15.7%). || 9 de 12 meses están más de 0.5 pt por encima de la proporción del presupuesto; la mayor brecha es Feb (18.4% vs 15.7%).

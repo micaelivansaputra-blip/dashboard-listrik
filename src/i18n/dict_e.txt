@@ -1,0 +1,32 @@
+Follow-up || Follow-up || Seguimiento
++ Add follow-up || + Tambah follow-up || + Agregar seguimiento
+Open || Terbuka || Abierto
+Following up || Sedang di-follow up || En seguimiento
+Resolved || Selesai || Resuelto
+Not started || Belum dimulai || Sin iniciar
+7 not started || 7 belum dimulai || 7 sin iniciar
+0 open || 0 terbuka || 0 abiertos
+1 following up || 1 sedang di-follow up || 1 en seguimiento
+0 resolved || 0 selesai || 0 resueltos
+Reason from the CM for this increase. Everyone with edit access sees the same notes. || Alasan dari CM untuk kenaikan ini. Semua yang punya akses edit melihat catatan yang sama. || Motivo del CM para este aumento. Todos con acceso de edición ven las mismas notas.
+Status || Status || Estado
+CM name || Nama CM || Nombre del CM
+Next follow-up || Follow-up berikutnya || Próximo seguimiento
+Your name || Nama Anda || Tu nombre
+Reason from the CM || Alasan dari CM || Motivo del CM
+Name of the CM || Nama CM || Nombre del CM
+Who is updating || Siapa yang memperbarui || Quién actualiza
+Why is usage up? For example: extra shows, AC schedule changed, renovation, meter issue || Kenapa pemakaian naik? Contoh: tambahan jam tayang, jadwal AC berubah, renovasi, masalah meter || ¿Por qué subió el consumo? Por ejemplo: funciones extra, cambió el horario del AC, remodelación, problema del medidor
+Save follow-up || Simpan follow-up || Guardar seguimiento
+History || Riwayat || Historial
+Saving… || Menyimpan… || Guardando…
+Saved. Your team can see it now. || Tersimpan. Tim Anda sudah bisa melihatnya. || Guardado. Tu equipo ya puede verlo.
+Please add your name first. || Isi nama Anda dulu. || Primero agrega tu nombre.
+You have view-only access, so you cannot edit these notes. || Anda hanya punya akses lihat, jadi tidak bisa mengedit catatan ini. || Solo tienes acceso de lectura, así que no puedes editar estas notas.
+Not saved: you only have view access. Ask the owner to make you a Contributor. || Tidak tersimpan: Anda hanya punya akses lihat. Minta pemilik menjadikan Anda Contributor. || No se guardó: solo tienes acceso de lectura. Pide al propietario que te haga Contributor.
+Last updated today || Terakhir diperbarui hari ini || Última actualización hoy
+Last updated yesterday || Terakhir diperbarui kemarin || Última actualización ayer
+Last updated 3 days ago || Terakhir diperbarui 3 hari lalu || Última actualización hace 3 días
+today || hari ini || hoy
+yesterday || kemarin || ayer
+by || oleh || por

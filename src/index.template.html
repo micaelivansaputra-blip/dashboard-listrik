@@ -1,0 +1,263 @@
+<title>Electricity Usage Monitor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap">
+/*STYLES*/
+
+<div class="wrap">
+  <header class="bar">
+    <div class="bar-in">
+      <div class="brand">
+        <button class="mascot" id="mascot" type="button" aria-label="Volty the mascot. Tap for a tip"></button>
+        <div><h1 id="appTitle">Electricity Usage Monitoring</h1><div class="sub" id="asof"></div></div><div class="quip" id="quip" role="status" hidden></div>
+      </div>
+      <select class="langsel" id="langSel" data-notr aria-label="Language"><option value="en">English</option><option value="id">Indonesia</option><option value="es">Español (MX)</option></select><button type="button" class="thbtn" id="themeBtn" aria-label="Switch to dark mode" title="Switch to dark mode"></button><div class="apptabs" id="appTabs" role="group" aria-label="Dashboard"><button type="button" data-app="elec" aria-pressed="true">Electricity</button><button type="button" data-app="pay" aria-pressed="false">Payroll</button></div>
+      <div class="filters"><label class="f" for="region" id="regionLbl">Region<select id="region"></select></label>
+        <div class="upd"><button type="button" class="updbtn" id="updBtn">Update data</button><input id="fileIn" type="file" accept=".xlsx,.xlsm" hidden></div></div>
+      <nav class="nav" id="nav" aria-label="Section navigation">
+        <button data-t="s-ringkasan" aria-current="true">MTD Oct</button><button data-t="s-tren">Trend</button><button data-t="s-mom">Month to Month</button><button data-t="s-hari">Weekday vs Weekend</button><button data-t="s-site">Perform Site</button><button data-t="s-week">Weekly Zones</button><button data-t="s-explore">Site Explorer</button><button data-t="s-cek">Site Concern</button><button data-t="s-admits">Admits vs kWh</button><button data-t="s-program">Project ZOEC</button>
+      </nav>
+      <nav class="nav" id="navPay" aria-label="Payroll section navigation" hidden><button data-t="p-mtd" id="navMtd" aria-current="true">MTD Oct</button><button data-t="p-sum">Payroll Summary</button><button data-t="p-mon">Month by Month</button><button data-t="p-wk">Weekly Admits &amp; MHDW</button><button data-t="p-site">Site Productivity</button><button data-t="p-cost">Cost Breakdown</button><button data-t="p-how">How It's Calculated</button></nav>
+    </div>
+  </header>
+
+  <div class="updmsg" id="updMsg" role="status" hidden></div>
+  <div id="v-elec">
+  <div id="s-ringkasan" style="scroll-margin-top:120px">
+    <div class="hero">
+      <div class="card verdict"><div id="verdict"></div><div class="hero-m" id="heroM"></div></div>
+    </div>
+
+    <div class="sec-head" style="margin-top:34px"><h2>MTD Oct &amp; Daily Usage <small>kWh per day</small></h2></div>
+    <div class="kpis" id="kpis"></div>
+    <div class="legend"><span><i style="background:var(--up)"></i>Up &gt;5%</span><span><i style="background:var(--flat)"></i>Stable (within ±5%)</span><span><i style="background:var(--down)"></i>Down &gt;5%</span></div>
+    <div class="card strip-card">
+      <div class="strip-top"><h3>Each October day</h3><div class="sub" id="stripNote"></div></div>
+      <div class="strip" id="strip"></div>
+      <div class="sw"><span><i style="background:var(--blue)"></i>Weekday</span><span><i style="background:var(--amber)"></i>Weekend</span><span><i class="dash"></i>September average for the same weekday</span></div>
+    </div>
+  </div>
+
+  <section id="s-tren">
+    <div class="sec-head"><h2>Trend Electricity Usage</h2></div>
+    <div class="grid2">
+      <div class="card"><div class="ch"><h3>Average per month</h3><span class="sub" id="monSub"></span></div><div class="chartbox"><canvas id="cMonthly" role="img" aria-label="Average kWh per day: August, September, October to date and October 2025"></canvas></div></div>
+      <div class="card"><div class="ch"><h3>Average per week</h3><span class="sub">kWh per day, weeks start on Monday</span></div><div class="chartbox"><canvas id="cWeekly" role="img" aria-label="Weekly trend of average kWh per day"></canvas></div></div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <div class="ch"><div><h3>Daily usage</h3><span class="sub">National kWh per day with 7-day average</span></div><div class="tog" id="dailyTog" role="group" aria-label="Chart layers"><button type="button" class="chipbtn" data-k="d" aria-pressed="true">Daily</button><button type="button" class="chipbtn" data-k="a" aria-pressed="true">7-day average</button><button type="button" class="chipbtn" data-k="w" aria-pressed="true">Weekends</button><button type="button" class="chipbtn" data-k="z" aria-pressed="true">ZOEC start</button></div></div>
+      <div class="chartbox tall"><canvas id="cDaily" role="img" aria-label="Daily usage and 7-day average"></canvas></div></div>
+  </section>
+
+
+  <section id="s-mom">
+    <div class="sec-head"><h2>Month to Month <small id="momSub"></small></h2></div>
+    <div class="card">
+      <div class="ctl">
+        <label class="f" for="mA">Month<select id="mA"></select></label>
+        <label class="f" for="mB">Compare with<select id="mB"></select></label>
+        <div class="f wide">Days
+          <div class="seg" id="mType" role="group" aria-label="Day type"><button data-k="all" aria-pressed="true">All days</button><button data-k="wd" aria-pressed="false">Weekdays</button><button data-k="we" aria-pressed="false">Weekends</button></div>
+        </div>
+        <div class="qchips" id="mQuick" aria-label="Quick comparisons"><button type="button" class="ghost" data-q="prev">vs previous month</button><button type="button" class="ghost" data-q="yoy">vs same month last year</button><button type="button" class="ghost" data-q="swap">Swap</button></div>
+      </div>
+      <div class="mkpis" id="mKpis"></div>
+      <div class="note" id="momNote"></div>
+    </div>
+    <div class="grid2" style="margin-top:14px">
+      <div class="card"><div class="ch"><div><h3>Average per month</h3><span class="sub" id="mBarSub"></span></div></div><div class="chartbox"><canvas id="cMom" role="img" aria-label="Average kWh per day for each month from March 2026"></canvas></div></div>
+      <div class="card"><div class="ch"><div><h3>Day by day</h3><span class="sub">Selected months aligned by day of month</span></div></div><div class="chartbox"><canvas id="cMomDay" role="img" aria-label="Daily kWh of the two selected months"></canvas></div></div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <div class="ch"><div><h3>Top movers</h3><span class="sub" id="mvSub">Change in kWh per day. Tap a site to open its daily chart.</span></div></div>
+      <div class="mvgrid" id="movers"></div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <div class="ch"><div><h3>All sites</h3><span class="sub" id="mTblSub"></span></div><div class="qchips"><button type="button" class="ghost" id="mCopy">Copy table</button></div></div>
+      <div class="tools"><label class="f" for="mq">Search site<input id="mq" type="search" placeholder="e.g. Manado"></label></div>
+      <div class="tbl-wrap" id="mTable"></div><div class="more" id="mMore"></div><div class="cmsg" id="mCopyMsg" role="status"></div>
+    </div>
+  </section>
+
+  <section id="s-hari">
+    <div class="sec-head"><h2>Avg Weekday vs Weekend</h2></div>
+    <div class="card"><div class="ch"><h3>Weekday vs weekend</h3><span class="sub">Average kWh per day</span></div><div class="chartbox"><canvas id="cWd" role="img" aria-label="Average weekday and weekend usage by period"></canvas></div></div>
+  </section>
+
+  <section id="s-site">
+    <div class="sec-head"><h2>Perform Site <small id="siteSub"></small></h2></div>
+    <div class="card">
+      <div class="tools">
+        <div class="f">Compare October with
+          <div class="seg" id="mode" role="group" aria-label="Comparison">
+            <button data-m="mom" aria-pressed="true">September</button><button data-m="agu" aria-pressed="false">August</button><button data-m="yoy" aria-pressed="false" id="yoyBtn">Oct 2025</button>
+          </div>
+        </div>
+        <label class="f" for="q">Search site<input id="q" type="search" placeholder="e.g. Manado"></label>
+      </div>
+      <div class="counts" id="counts"></div>
+      <p class="hint">Tap a column header to sort, a status pill to filter, or a row to open its daily chart. The highlighted column is the comparison used for status and counts.</p>
+      <div class="tbl-wrap" id="tiles"></div><div class="more" id="more"></div>
+    </div>
+  </section>
+
+
+  <section id="s-week">
+    <div class="sec-head"><h2>Weekly Zones <small id="zwSub"></small></h2></div>
+    <div class="ctl"><div class="f">Sites per zone<div class="seg" id="zwN" role="group" aria-label="Sites per zone"><button type="button" data-n="4" aria-pressed="false">4</button><button type="button" data-n="5" aria-pressed="true">5</button><button type="button" data-n="6" aria-pressed="false">6</button><button type="button" data-n="7" aria-pressed="false">7</button></div></div><div class="f">Readings<div class="seg" id="zwMode" role="group" aria-label="Which readings to rank"><button type="button" data-m="clean" aria-pressed="true">Reliable only</button><button type="button" data-m="all" aria-pressed="false">All sites</button></div></div></div>
+    <div class="mkpis" id="zwKpis"></div>
+    <div class="card zcard"><div class="ch"><div><h3><span class="zdot g"></span>Green Zone</h3><span class="sub">Sites furthest below their weekly electricity target</span></div></div><div class="tbl-wrap" id="zwGreen"></div></div>
+    <div class="card zcard" style="margin-top:14px"><div class="ch"><div><h3><span class="zdot r"></span>Red Zone</h3><span class="sub">Sites furthest above their weekly electricity target</span></div></div><div class="tbl-wrap" id="zwRed"></div></div>
+    <div id="zwLeft" class="hint" style="margin-top:14px"></div>
+    <p class="note" id="zwNote"></p>
+  </section>
+
+  <section id="s-explore">
+    <div class="sec-head"><h2>Site Explorer <small>pick up to 5 sites and compare them</small></h2></div>
+    <div class="card">
+      <div class="ctl">
+        <div class="xsearch f"><label for="xq">Add a site</label><input id="xq" type="search" placeholder="Type a site name…" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="xres"><div class="xres" id="xres" role="listbox" hidden></div></div>
+        <div class="f">Quick picks
+          <div class="qchips" id="xQuick"><button type="button" class="ghost" data-p="up">Top 3 increases</button><button type="button" class="ghost" data-p="big">Largest 3</button><button type="button" class="ghost" data-p="zoec">ZOEC sites</button><button type="button" class="ghost" data-p="clear">Clear</button></div>
+        </div>
+      </div>
+      <div class="xchips" id="xChips"></div>
+      <div class="ctl">
+        <div class="f wide">Period
+          <div class="seg" id="xRange" role="group" aria-label="Period"><button data-r="14">Last 14 days</button><button data-r="30" aria-pressed="true">Last 30 days</button><button data-r="zoec">Since 19 Aug</button><button data-r="all">Since March</button></div>
+        </div>
+        <label class="f" for="xFrom">From<input id="xFrom" type="date"></label>
+        <label class="f" for="xTo">To<input id="xTo" type="date"></label>
+        <div class="f wide">Show
+          <div class="seg" id="xView" role="group" aria-label="Line type"><button data-v="daily" aria-pressed="true">Daily</button><button data-v="ma7" aria-pressed="false">7-day average</button></div>
+        </div>
+        <div class="f wide">Scale
+          <div class="seg" id="xScale" role="group" aria-label="Scale"><button data-s="abs" aria-pressed="true">kWh per day</button><button data-s="idx" aria-pressed="false">Index (avg = 100)</button></div>
+        </div>
+        <div class="qchips"><button type="button" class="chipbtn" id="xLy" aria-pressed="false">Same days last year</button></div>
+      </div>
+      <div class="xlegend" id="xLegend"></div>
+      <div class="chartbox tall"><canvas id="cEx" role="img" aria-label="Daily kWh of the selected sites"></canvas></div>
+      <div class="cmsg" id="xNote"></div>
+    </div>
+    <div class="grid2" style="margin-top:14px">
+      <div class="card"><div class="ch"><div><h3>Weekday profile</h3><span class="sub">How each weekday differs from the site's own average</span></div></div><div class="chartbox"><canvas id="cExWd" role="img" aria-label="Weekday profile of the selected sites"></canvas></div></div>
+      <div class="card"><div class="ch"><div><h3>Spike days</h3><span class="sub">Days more than 25% above the previous 14-day median</span></div></div><div id="xSpikes"></div></div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <div class="ch"><div><h3>Selected sites in numbers</h3><span class="sub" id="xStatSub"></span></div><div class="qchips"><button type="button" class="ghost" id="xCopy">Copy daily data</button></div></div>
+      <div class="tbl-wrap" id="xStats"></div><div class="cmsg" id="xCopyMsg" role="status"></div>
+    </div>
+  </section>
+
+  <section id="s-cek">
+    <div class="sec-head"><h2>Site Concern <small>excess kWh per day vs national growth</small></h2></div>
+    <div class="card">
+      <div class="howto"><span><i style="background:var(--up)"></i>Red: up &gt;5% in 2 or 3 of the comparisons</span><span><i style="background:var(--amber)"></i>Yellow: up in 1 comparison, keep watching</span></div>
+      <div class="fusum" id="fuSum" hidden></div>
+      <div class="cc" id="concern"></div>
+    </div>
+  </section>
+
+  <section id="s-admits"></section>
+
+  <section id="s-program">
+    <div class="sec-head"><h2>Project Zero Occupancy Energy Control <small>before vs after 19 August</small></h2></div>
+    <div class="prog" id="prog"></div>
+    <div class="note" id="progNote"></div>
+  </section>
+
+  <div class="foot" id="foot"></div>
+
+  </div>
+  <div id="v-pay" hidden>
+    <div class="card pempty" id="payEmpty">
+      <span class="pchip forecast">Payroll</span>
+      <h2>Upload the payroll workbook to see this view</h2>
+      <p>Use the same <b>Update data</b> button. The dashboard reads the SUMMARY sheet (Budget vs Actual + Forecast per month) and the PROD sheets (weekly Admits and MHDW per site). After you update Admits and total MHDW in Excel, upload the file again and everything here refreshes.</p>
+      <p>For privacy, payroll numbers are <b>not</b> stored in this page or shared with other viewers. They are read in your browser and kept only on this device.</p>
+      <button type="button" class="updbtn" id="payUp">Choose payroll file</button>
+    </div>
+    <div id="payBody" hidden>
+      <div class="ctl ptop"><div class="f">View<div class="seg" id="pView" role="group" aria-label="Payroll view"><button type="button" data-v="mtd" id="pViewMtd" aria-pressed="true">MTD Oct</button><button type="button" data-v="year" aria-pressed="false">Full year</button></div></div><div class="f wide">Scenario<div class="seg" id="pScen" role="group" aria-label="Productivity scenario"></div></div></div>
+      <section id="p-mtd">
+        <div class="sec-head"><h2 id="mtdH">MTD Oct <small id="mtdSub"></small></h2></div>
+        <div class="card pverdict" id="mtdVerdict"></div>
+        <div class="pkpis" id="mtdKpis"></div>
+        <div class="xlegend" id="mtdLeg" style="margin-top:16px"></div>
+        <div class="grid2">
+          <div class="card"><div class="ch"><div><h3>Admits per day</h3><span class="sub" id="mtdSubA">Weekly average per day. Line = budget pace.</span></div></div><div class="chartbox"><canvas id="cMtdA" role="img" aria-label="Admits per day by week, this month against last month"></canvas></div></div>
+          <div class="card"><div class="ch"><div><h3>MHDW per day</h3><span class="sub">Man-hours of daily workers per day, all sites. Lower is better.</span></div></div><div class="chartbox"><canvas id="cMtdM" role="img" aria-label="MHDW per day by week, this month against last month"></canvas></div></div>
+        </div>
+        <div class="card" style="margin-top:14px">
+          <div class="ch"><div><h3>Sites to watch</h3><span class="sub" id="mtdSiteSub"></span></div></div>
+          <div class="ctl"><div class="f">Rank by<div class="seg" id="mtdSort" role="group" aria-label="Rank sites by"><button type="button" data-s="prod" aria-pressed="true">Lowest productivity</button><button type="button" data-s="mhdw" aria-pressed="false">Most MHDW</button><button type="button" data-s="adm" aria-pressed="false">Admits drop</button></div></div><label class="f" for="mtdQ">Search site<input id="mtdQ" type="search" placeholder="e.g. Binjai"></label></div>
+          <p class="hint" id="mtdHint"></p>
+          <div class="tbl-wrap" id="mtdTable"></div><div class="more" id="mtdMore"></div>
+        </div>
+      </section>
+      <section id="p-sum">
+        <div class="sec-head"><h2>Payroll Summary <small id="pSub"></small></h2></div>
+        <div class="card pverdict" id="pVerdict"></div>
+        <div class="pkpis" id="pKpis"></div>
+      </section>
+      <section id="p-mon">
+        <div class="sec-head"><h2>Month by Month <small>Budget vs Actual + Forecast</small></h2></div>
+        <div class="grid2">
+          <div class="card"><div class="ch"><div><h3>Total payroll</h3><span class="sub">Rp Mio per month. Lighter bars are months that are still forecast.</span></div></div><div class="chartbox"><canvas id="cPayM" role="img" aria-label="Total payroll per month, budget versus actual plus forecast"></canvas></div></div>
+          <div class="card"><div class="ch"><div><h3>Payroll as % of revenue</h3><span class="sub">Lower is better</span></div></div><div class="chartbox"><canvas id="cPayPct" role="img" aria-label="Payroll as a percentage of revenue per month"></canvas></div></div>
+        </div>
+        <div class="card" style="margin-top:14px"><div class="ch"><div><h3>Variance vs budget</h3><span class="sub">Admits and revenue below budget are bad; payroll below budget is good. Compare the three bars.</span></div></div><div class="chartbox"><canvas id="cPayVar" role="img" aria-label="Variance versus budget for admits, revenue and payroll per month"></canvas></div></div>
+        <div class="card" style="margin-top:14px"><div class="ch"><div><h3>Summary table</h3><span class="sub">Same numbers as the SUMMARY sheet, Rp Mio</span></div><div class="qchips"><button type="button" class="ghost" id="pCopy">Copy table</button></div></div><div class="tbl-wrap" id="pTable"></div><div class="cmsg" id="pCopyMsg" role="status"></div></div>
+      </section>
+      <section id="p-wk">
+        <div class="sec-head"><h2>Weekly Admits &amp; MHDW <small id="wkSub"></small></h2></div>
+        <div class="mkpis" id="wKpis"></div>
+        <div class="xlegend"><span><i style="background:var(--blue)"></i>Actual week</span><span><i style="background:color-mix(in srgb,var(--blue) 50%,var(--surface))"></i>Forecast week</span></div>
+        <div class="grid2">
+          <div class="card"><div class="ch"><div><h3>Admits per week</h3><span class="sub">All sites</span></div></div><div class="chartbox"><canvas id="cWkA" role="img" aria-label="Weekly admits"></canvas></div></div>
+          <div class="card"><div class="ch"><div><h3>MHDW per week</h3><span class="sub">Man-hours of daily workers, all sites</span></div></div><div class="chartbox"><canvas id="cWkM" role="img" aria-label="Weekly MHDW"></canvas></div></div>
+        </div>
+        <div class="card" style="margin-top:14px"><div class="ch"><div><h3>Productivity</h3><span class="sub">Admits per man-hour (permanent + daily workers). Dashed line = target.</span></div></div><div class="chartbox"><canvas id="cWkP" role="img" aria-label="Weekly productivity against target"></canvas></div></div>
+      </section>
+      <section id="p-site">
+        <div class="sec-head"><h2>Site Productivity <small id="psSub"></small></h2></div>
+        <div class="card">
+          <div class="ctl"><label class="f" for="psWk">Week<select id="psWk"></select></label><div class="f">Compare with<div class="seg" id="psRef" role="group" aria-label="Reference"><button data-r="target" aria-pressed="true">Target</button><button data-r="avg" aria-pressed="false">Average</button></div></div><label class="f" for="psQ">Search site<input id="psQ" type="search" placeholder="e.g. Binjai"></label></div>
+          <p class="hint" id="psHint"></p>
+          <div class="tbl-wrap" id="psTable"></div><div class="more" id="psMore"></div>
+        </div>
+      </section>
+      <section id="p-cost">
+        <div class="sec-head"><h2>Cost Breakdown <small id="costSub"></small></h2></div>
+        <div class="ctl"><div class="f">Month<div class="seg" id="costMon" role="group" aria-label="Month"></div></div></div>
+        <div class="pkpis" id="costKpis"></div>
+        <div class="grid2" style="margin-top:14px">
+          <div class="card"><div class="ch"><div><h3>Payroll build-up by month</h3><span class="sub">Rp Mio, all sites. Lighter bars are months that still contain forecast weeks.</span></div></div><div class="chartbox"><canvas id="cCostM" role="img" aria-label="Operational payroll per month, stacked by cost group"></canvas></div></div>
+          <div class="card" id="costShare"></div>
+        </div>
+        <div class="card" style="margin-top:14px">
+          <div class="ch"><div><h3>Cost per site</h3><span class="sub" id="costTSub"></span></div></div>
+          <div class="ctl"><div class="f">Rank by<div class="seg" id="costSort" role="group" aria-label="Rank sites by"><button type="button" data-s="rpa" aria-pressed="true">Rp per admit</button><button type="button" data-s="opr" aria-pressed="false">Payroll</button><button type="button" data-s="dw" aria-pressed="false">Daily workers</button><button type="button" data-s="adm" aria-pressed="false">Fewest admits</button></div></div><label class="f" for="costQ">Search site<input id="costQ" type="search" placeholder="e.g. Binjai"></label></div>
+          <p class="hint" id="costHint"></p>
+          <div class="tbl-wrap" id="costTable"></div><div class="more" id="costMore"></div>
+        </div>
+      </section>
+      <section id="p-how">
+        <div class="sec-head"><h2>How It's Calculated <small>Every number traced to a cell in your workbook</small></h2></div>
+        <div id="howBody"></div>
+      </section>
+      <div class="foot" id="payFoot"></div>
+    </div>
+  </div>
+</div>
+
+<div class="dropv" id="dropv" hidden><div>Drop the Excel file to update the dashboard</div></div>
+<div class="modal" id="modal" hidden><div class="mback" data-close></div><div class="msheet" role="dialog" aria-modal="true" aria-labelledby="mTitle"><button class="mclose" data-close type="button" aria-label="Close">×</button><div id="mBody"></div></div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>/*I18NCORE*/</script>
+<script>/*ENGINE*/</script>
+<script>/*PAYENGINE*/</script>
+<script>
+/*APP*/
+</script>

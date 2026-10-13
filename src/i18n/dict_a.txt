@@ -1,0 +1,316 @@
+Volty the mascot. Tap for a tip || Volty si maskot. Ketuk untuk tips || Volty, la mascota. Toca para ver un consejo
+Electricity Usage Monitoring || Monitoring Penggunaan Listrik || Monitoreo de Consumo Eléctrico
+Payroll Monitoring || Monitoring Payroll || Monitoreo de Nómina
+Switch to dark mode || Ganti ke mode gelap || Cambiar a modo oscuro
+Switch to light mode || Ganti ke mode terang || Cambiar a modo claro
+Dashboard || Dasbor || Tablero
+Electricity || Listrik || Electricidad
+Payroll || Payroll || Nómina
+Region || Wilayah || Región
+All || Semua || Todas
+Update data || Perbarui data || Actualizar datos
+Section navigation || Navigasi bagian || Navegación por secciones
+Payroll section navigation || Navigasi bagian payroll || Navegación de nómina
+MTD § || MTD § || MTD §
+Trend || Tren || Tendencia
+Month to Month || Bulan ke Bulan || Mes a Mes
+Weekday vs Weekend || Hari Kerja vs Akhir Pekan || Entre Semana vs Fin de Semana
+Perform Site || Kinerja Site || Desempeño por Sitio
+Weekly Zones || Zona Mingguan || Zonas Semanales
+Site Explorer || Penjelajah Site || Explorador de Sitios
+Site Concern || Site Perhatian || Sitios en Alerta
+Project ZOEC || Proyek ZOEC || Proyecto ZOEC
+Payroll Summary || Ringkasan Payroll || Resumen de Nómina
+Month by Month || Bulan demi Bulan || Mes por Mes
+Weekly Admits & MHDW || Admits & MHDW Mingguan || Admits y MHDW Semanales
+Site Productivity || Produktivitas Site || Productividad por Sitio
+Cost Breakdown || Rincian Biaya || Desglose de Costos
+How It's Calculated || Cara Perhitungannya || Cómo se Calcula
+MTD § & Daily Usage || MTD § & Pemakaian Harian || MTD § y Consumo Diario
+kWh per day || kWh per hari || kWh por día
+Stable (within ±§) || Stabil (dalam ±§) || Estable (dentro de ±§)
+Down >§ || Turun >§ || Baja >§
+Each § day || Setiap hari § || Cada día §
+Weekday || Hari kerja || Entre semana
+Weekend || Akhir pekan || Fin de semana
+§ average for the same weekday || Rata-rata § untuk hari yang sama || Promedio § del mismo día de la semana
+Trend Electricity Usage || Tren Penggunaan Listrik || Tendencia del Consumo Eléctrico
+Average per month || Rata-rata per bulan || Promedio por mes
+Average per week || Rata-rata per minggu || Promedio por semana
+kWh per day, weeks start on Monday || kWh per hari, minggu dimulai hari Senin || kWh por día, las semanas inician en lunes
+Daily usage || Pemakaian harian || Consumo diario
+National kWh per day with §-day average || kWh nasional per hari dengan rata-rata §-hari || kWh nacional por día con promedio de § días
+Chart layers || Lapisan grafik || Capas del gráfico
+Daily || Harian || Diario
+§-day average || Rata-rata §-hari || Promedio de § días
+Weekends || Akhir pekan || Fines de semana
+ZOEC start || Mulai ZOEC || Inicio de ZOEC
+Month || Bulan || Mes
+Compare with || Bandingkan dengan || Comparar con
+Days || Hari || Días
+Day type || Jenis hari || Tipo de día
+All days || Semua hari || Todos los días
+Weekdays || Hari kerja || Entre semana
+Quick comparisons || Perbandingan cepat || Comparaciones rápidas
+vs previous month || vs bulan sebelumnya || vs mes anterior
+vs same month last year || vs bulan yang sama tahun lalu || vs el mismo mes del año pasado
+Swap || Tukar || Intercambiar
+Day by day || Hari demi hari || Día por día
+Selected months aligned by day of month || Bulan terpilih disejajarkan menurut tanggal || Meses seleccionados alineados por día del mes
+Top movers || Perubahan terbesar || Mayores cambios
+Change in kWh per day. Tap a site to open its daily chart. || Perubahan kWh per hari. Ketuk site untuk membuka grafik hariannya. || Cambio en kWh por día. Toca un sitio para abrir su gráfico diario.
+All sites || Semua site || Todos los sitios
+Copy table || Salin tabel || Copiar tabla
+Search site || Cari site || Buscar sitio
+e.g. Manado || mis. Manado || p. ej. Manado
+e.g. Binjai || mis. Binjai || p. ej. Binjai
+Avg Weekday vs Weekend || Rata-rata Hari Kerja vs Akhir Pekan || Prom. Entre Semana vs Fin de Semana
+Weekday vs weekend || Hari kerja vs akhir pekan || Entre semana vs fin de semana
+Average kWh per day || Rata-rata kWh per hari || Promedio de kWh por día
+Compare § with || Bandingkan § dengan || Comparar § con
+Comparison || Perbandingan || Comparación
+Tap a column header to sort, a status pill to filter, or a row to open its daily chart. The highlighted column is the comparison used for status and counts. || Ketuk judul kolom untuk mengurutkan, label status untuk memfilter, atau baris untuk membuka grafik hariannya. Kolom yang disorot adalah perbandingan yang dipakai untuk status dan hitungan. || Toca el encabezado de una columna para ordenar, una etiqueta de estado para filtrar, o una fila para abrir su gráfico diario. La columna resaltada es la comparación usada para el estado y los conteos.
+Sites per zone || Site per zona || Sitios por zona
+Readings || Pembacaan || Lecturas
+Which readings to rank || Pembacaan mana yang diperingkat || Qué lecturas clasificar
+Reliable only || Hanya yang andal || Solo confiables
+Green Zone || Zona Hijau || Zona Verde
+Sites furthest below their weekly electricity target || Site yang paling jauh di bawah target listrik mingguan || Sitios más por debajo de su meta semanal de electricidad
+Red Zone || Zona Merah || Zona Roja
+Sites furthest above their weekly electricity target || Site yang paling jauh di atas target listrik mingguan || Sitios más por encima de su meta semanal de electricidad
+pick up to § sites and compare them || pilih hingga § site dan bandingkan || elige hasta § sitios y compáralos
+Add a site || Tambah site || Agregar un sitio
+Type a site name… || Ketik nama site… || Escribe el nombre de un sitio…
+Quick picks || Pilihan cepat || Selecciones rápidas
+Top § increases || § kenaikan terbesar || Los § mayores aumentos
+Largest § || § terbesar || Los § más grandes
+ZOEC sites || Site ZOEC || Sitios ZOEC
+Clear || Hapus || Limpiar
+Period || Periode || Período
+Last § days || § hari terakhir || Últimos § días
+Since § § || Sejak § § || Desde § §
+Since § || Sejak § || Desde §
+From || Dari || Desde
+Show || Tampilkan || Mostrar
+Line type || Jenis garis || Tipo de línea
+Scale || Skala || Escala
+Index (avg = §) || Indeks (rata-rata = §) || Índice (promedio = §)
+Same days last year || Hari yang sama tahun lalu || Mismos días del año pasado
+Weekday profile || Profil hari || Perfil por día de la semana
+How each weekday differs from the site's own average || Seberapa berbeda tiap hari dari rata-rata site itu sendiri || Cómo difiere cada día de la semana del promedio del propio sitio
+Spike days || Hari lonjakan || Días pico
+Days more than § above the previous §-day median || Hari yang lebih dari § di atas median § hari sebelumnya || Días más de § por encima de la mediana de los § días anteriores
+Selected sites in numbers || Site terpilih dalam angka || Sitios seleccionados en cifras
+Copy daily data || Salin data harian || Copiar datos diarios
+excess kWh per day vs national growth || kelebihan kWh per hari vs pertumbuhan nasional || exceso de kWh por día vs crecimiento nacional
+Red: up >§ in § or § of the comparisons || Merah: naik >§ pada § atau § perbandingan || Rojo: sube >§ en § o § de las comparaciones
+Yellow: up in § comparison, keep watching || Kuning: naik pada § perbandingan, terus dipantau || Amarillo: sube en § comparación, seguir vigilando
+Project Zero Occupancy Energy Control || Project Zero Occupancy Energy Control || Project Zero Occupancy Energy Control
+before vs after § § || sebelum vs sesudah § § || antes vs después de § §
+Upload the payroll workbook to see this view || Unggah workbook payroll untuk melihat tampilan ini || Sube el libro de nómina para ver esta vista
+Use the same || Gunakan tombol || Usa el mismo botón
+button. The dashboard reads the SUMMARY sheet (Budget vs Actual + Forecast per month) and the PROD sheets (weekly Admits and MHDW per site). After you update Admits and total MHDW in Excel, upload the file again and everything here refreshes. || . Dasbor membaca sheet SUMMARY (Budget vs Actual + Forecast per bulan) dan sheet PROD (Admits dan MHDW mingguan per site). Setelah kamu memperbarui Admits dan total MHDW di Excel, unggah ulang filenya dan semuanya di sini ikut diperbarui. || . El tablero lee la hoja SUMMARY (Budget vs Actual + Forecast por mes) y las hojas PROD (Admits y MHDW semanales por sitio). Después de actualizar Admits y el MHDW total en Excel, vuelve a subir el archivo y todo se actualiza.
+For privacy, payroll numbers are || Demi privasi, angka payroll || Por privacidad, las cifras de nómina
+not || tidak || no
+stored in this page or shared with other viewers. They are read in your browser and kept only on this device. || disimpan di halaman ini atau dibagikan ke pengunjung lain. Angka dibaca di browser kamu dan hanya disimpan di perangkat ini. || se guardan en esta página ni se comparten con otros visitantes. Se leen en tu navegador y solo se conservan en este dispositivo.
+Choose payroll file || Pilih file payroll || Elegir archivo de nómina
+View || Tampilan || Vista
+Payroll view || Tampilan payroll || Vista de nómina
+Full year || Setahun penuh || Año completo
+Scenario || Skenario || Escenario
+Productivity scenario || Skenario produktivitas || Escenario de productividad
+Admits per day || Admits per hari || Admits por día
+Weekly average per day. Line = budget pace. || Rata-rata mingguan per hari. Garis = laju budget. || Promedio semanal por día. Línea = ritmo del presupuesto.
+MHDW per day || MHDW per hari || MHDW por día
+Man-hours of daily workers per day, all sites. Lower is better. || Jam kerja pekerja harian per hari, semua site. Makin rendah makin baik. || Horas-hombre de trabajadores diarios por día, todos los sitios. Menos es mejor.
+Sites to watch || Site yang perlu dipantau || Sitios a vigilar
+Rank by || Urutkan berdasarkan || Ordenar por
+Rank sites by || Urutkan site berdasarkan || Ordenar sitios por
+Lowest productivity || Produktivitas terendah || Menor productividad
+Most MHDW || MHDW terbanyak || Más MHDW
+Admits drop || Admits turun || Caída de admits
+Budget vs Actual + Forecast || Budget vs Aktual + Forecast || Presupuesto vs Real + Pronóstico
+Total payroll || Total payroll || Nómina total
+Rp Mio per month. Lighter bars are months that are still forecast. || Rp Mio per bulan. Batang lebih terang adalah bulan yang masih forecast. || Rp millones por mes. Las barras más claras son meses aún en pronóstico.
+Payroll as % of revenue || Payroll sebagai % dari pendapatan || Nómina como % de los ingresos
+Lower is better || Makin rendah makin baik || Menos es mejor
+Variance vs budget || Selisih vs budget || Variación vs presupuesto
+Admits and revenue below budget are bad; payroll below budget is good. Compare the three bars. || Admits dan pendapatan di bawah budget itu buruk; payroll di bawah budget itu baik. Bandingkan ketiga batang. || Admits e ingresos por debajo del presupuesto son malos; nómina por debajo del presupuesto es buena. Compara las tres barras.
+Summary table || Tabel ringkasan || Tabla resumen
+Same numbers as the SUMMARY sheet, Rp Mio || Angka sama dengan sheet SUMMARY, Rp Mio || Mismas cifras que la hoja SUMMARY, Rp millones
+Actual week || Minggu aktual || Semana real
+Forecast week || Minggu forecast || Semana de pronóstico
+Admits per week || Admits per minggu || Admits por semana
+MHDW per week || MHDW per minggu || MHDW por semana
+Man-hours of daily workers, all sites || Jam kerja pekerja harian, semua site || Horas-hombre de trabajadores diarios, todos los sitios
+Productivity || Produktivitas || Productividad
+Admits per man-hour (permanent + daily workers). Dashed line = target. || Admits per jam kerja (karyawan tetap + pekerja harian). Garis putus-putus = target. || Admits por hora-hombre (permanentes + trabajadores diarios). Línea discontinua = meta.
+Week || Minggu || Semana
+Reference || Acuan || Referencia
+Target || Target || Meta
+Average || Rata-rata || Promedio
+Payroll build-up by month || Komposisi payroll per bulan || Composición de la nómina por mes
+Rp Mio, all sites. Lighter bars are months that still contain forecast weeks. || Rp Mio, semua site. Batang lebih terang adalah bulan yang masih berisi minggu forecast. || Rp millones, todos los sitios. Las barras más claras son meses que aún incluyen semanas de pronóstico.
+Cost per site || Biaya per site || Costo por sitio
+Rp per admit || Rp per admit || Rp por admit
+Daily workers || Pekerja harian || Trabajadores diarios
+Fewest admits || Admits tersedikit || Menos admits
+Every number traced to a cell in your workbook || Setiap angka dilacak ke sel di workbook kamu || Cada cifra rastreada a una celda de tu libro
+Drop the Excel file to update the dashboard || Lepas file Excel untuk memperbarui dasbor || Suelta el archivo de Excel para actualizar el tablero
+Close || Tutup || Cerrar
+Same month § || Bulan yang sama § || Mismo mes §
+Mon || Sen || lun
+Tue || Sel || mar
+Wed || Rab || mié
+Thu || Kam || jue
+Fri || Jum || vie
+Sat || Sab || sáb
+Sun || Min || dom
+Monday || Senin || lunes
+Tuesday || Selasa || martes
+Wednesday || Rabu || miércoles
+Thursday || Kamis || jueves
+Friday || Jumat || viernes
+Saturday || Sabtu || sábado
+Sunday || Minggu || domingo
+Stable || Stabil || Estable
+Site || Site || Sitio
+Show all § sites || Tampilkan semua § site || Mostrar los § sitios
+Show top § || Tampilkan § teratas || Mostrar los § principales
+Show all || Tampilkan semua || Mostrar todos
+Show worst § || Tampilkan § terburuk || Mostrar los § peores
+WBP + LWBP || WBP + LWBP || WBP + LWBP
+Before § || Sebelum § || Antes de §
+After § || Sesudah § || Después de §
+No meter data yet || Belum ada data meter || Aún sin datos de medidor
+LWBP meter only || Hanya meter LWBP || Solo medidor LWBP
+Scoreboard || Papan skor || Marcador
+Points vs other sites. Negative (green) = fell more than non-program sites. || Poin vs site lain. Negatif (hijau) = turun lebih banyak dari site di luar program. || Puntos vs otros sitios. Negativo (verde) = bajó más que los sitios fuera del programa.
+Before || Sebelum || Antes
+After || Sesudah || Después
+Change || Perubahan || Cambio
+§ kWh per day || § kWh per hari || § kWh por día
+Sites || Site || Sitios
+Biggest increases || Kenaikan terbesar || Mayores aumentos
+Biggest decreases || Penurunan terbesar || Mayores disminuciones
+Change kWh || Perubahan kWh || Cambio kWh
+Change % ▼ || Perubahan % ▼ || Cambio % ▼
+Lowest day || Hari terendah || Día más bajo
+Highest day || Hari tertinggi || Día más alto
+Weekday avg || Rata-rata hari kerja || Prom. entre semana
+Weekend avg || Rata-rata akhir pekan || Prom. fin de semana
+Network vs weekly target || Jaringan vs target mingguan || Red vs meta semanal
+Sites over target (>§) || Site di atas target (>§) || Sitios sobre la meta (>§)
+Sites under target (>§) || Site di bawah target (>§) || Sitios bajo la meta (>§)
+Sites without enough readings || Site tanpa pembacaan cukup || Sitios sin suficientes lecturas
+Cinema || Bioskop || Cine
+Weekly target || Target mingguan || Meta semanal
+Weekly actual || Aktual mingguan || Real semanal
+Total show || Total show || Total de funciones
+Total close screen || Total tutup layar || Total de pantallas cerradas
+Efficiency (Screen close) || Efisiensi (Tutup layar) || Eficiencia (Cierre de pantallas)
+Efficiency (Listrik) || Efisiensi (Listrik) || Eficiencia (Electricidad)
+Daily vs target || Harian vs target || Diario vs meta
+Weekly actual ÷ weekly target − § || Aktual mingguan ÷ target mingguan − § || Real semanal ÷ meta semanal − §
+Calculated on the § days that have readings || Dihitung pada § hari yang memiliki pembacaan || Calculado con los § días que tienen lecturas
+Very low || Sangat rendah || Muy bajo
+Same value daily || Nilai sama tiap hari || Mismo valor cada día
+Meter data differs || Data meter berbeda || Los datos del medidor difieren
+Odd day || Hari janggal || Día atípico
+No spike days in this period. || Tidak ada hari lonjakan pada periode ini. || Sin días pico en este período.
+Thin line = daily kWh. Thick line = §-day average. || Garis tipis = kWh harian. Garis tebal = rata-rata §-hari. || Línea fina = kWh diario. Línea gruesa = promedio de § días.
+Before ZOEC || Sebelum ZOEC || Antes de ZOEC
+After ZOEC || Sesudah ZOEC || Después de ZOEC
+Upload the payroll workbook with Update data || Unggah workbook payroll dengan Perbarui data || Sube el libro de nómina con Actualizar datos
+Admits || Admits || Admits
+Budget pace || Laju budget || Ritmo del presupuesto
+Budget || Budget || Presupuesto
+Actual + Forecast || Aktual + Forecast || Real + Pronóstico
+Revenue || Pendapatan || Ingresos
+Admits per man-hour || Admits per jam kerja || Admits por hora-hombre
+Basic pay || Gaji pokok || Sueldo base
+Daily workers (DW) || Pekerja harian (DW) || Trabajadores diarios (DW)
+Contributions (TK, KS, PEN) || Iuran (TK, KS, PEN) || Aportaciones (TK, KS, PEN)
+Accruals (COMP, HOL AL) || Akrual (COMP, HOL AL) || Provisiones (COMP, HOL AL)
+Allowances (MOD Al, MED AL, BIK) || Tunjangan (MOD Al, MED AL, BIK) || Prestaciones (MOD Al, MED AL, BIK)
+Productivity § || Produktivitas § || Productividad §
+Watch the ratio || Awasi rasionya || Vigilar la proporción
+Over budget || Melebihi budget || Sobre el presupuesto
+On track || Sesuai jalur || En camino
+Admits · § MTD || Admits · § MTD || Admits · § MTD
+admits || admits || admits
+vs budget pace || vs laju budget || vs ritmo del presupuesto
+MHDW · § MTD || MHDW · § MTD || MHDW · § MTD
+man-hours || jam kerja || horas-hombre
+vs §, per day || vs §, per hari || vs §, por día
+§ per day || § per hari || § por día
+Productivity · § MTD || Produktivitas · § MTD || Productividad · § MTD
+admits per man-hour || admits per jam kerja || admits por hora-hombre
+vs target || vs target || vs meta
+§ payroll outlook || Proyeksi payroll § || Proyección de nómina de §
+Rp Mio · full month || Rp Mio · sebulan penuh || Rp millones · mes completo
+vs budget || vs budget || vs presupuesto
+§ (actual) || § (aktual) || § (real)
+§ MTD (actual) || § MTD (aktual) || § MTD (real)
+Rest of § (forecast) || Sisa § (forecast) || Resto de § (pronóstico)
+Payroll is § under budget, but it takes a bigger share of revenue || Payroll § di bawah budget, tetapi porsinya terhadap pendapatan lebih besar || La nómina está § por debajo del presupuesto, pero ocupa una mayor parte de los ingresos
+Admits · full year || Admits · setahun penuh || Admits · año completo
+Revenue · full year || Pendapatan · setahun penuh || Ingresos · año completo
+Total payroll · full year || Total payroll · setahun penuh || Nómina total · año completo
+Payroll % of revenue · full year || % payroll dari pendapatan · setahun penuh || % de nómina sobre ingresos · año completo
+Rp Mio || Rp Mio || Rp millones
+of revenue || dari pendapatan || de los ingresos
+Status || Status || Estado
+Admits B || Admits B || Admits P
+Var || Selisih || Var
+Revenue B || Pendapatan B || Ingresos P
+Total payroll B || Total payroll B || Nómina total P
+% of revenue B || % pendapatan B || % de ingresos P
+Diff || Selisih || Dif
+actual || aktual || real
+part actual || sebagian aktual || parcialmente real
+forecast || forecast || pronóstico
+Total || Total || Total
+vs previous week, per day || vs minggu lalu, per hari || vs semana anterior, por día
+Weeks with actual data || Minggu dengan data aktual || Semanas con datos reales
+Actual weeks || Minggu aktual || Semanas reales
+Payroll per admit || Payroll per admit || Nómina por admit
+OPR ÷ admits || OPR ÷ admits || OPR ÷ admits
+Daily-worker cost || Biaya pekerja harian || Costo de trabajadores diarios
+Staff counted for cost || Staf yang dihitung untuk biaya || Personal contado para costos
+Rp Mio, all sites || Rp Mio, semua site || Rp millones, todos los sitios
+Staff (AUG → SEP) || Staf (AGU → SEP) || Personal (AGO → SEP)
+Basic, Rp Mio || Pokok, Rp Mio || Base, Rp millones
+DW, Rp Mio || DW, Rp Mio || DW, Rp millones
+OPR, Rp Mio || OPR, Rp Mio || OPR, Rp millones
+Network avg || Rata-rata jaringan || Prom. de la red
+vs average || vs rata-rata || vs promedio
+Step || Langkah || Paso
+Days in the week || Hari dalam minggu || Días de la semana
+Staff counted || Staf yang dihitung || Personal contado
+Staff hours || Jam staf || Horas del personal
+MHDW hours || Jam MHDW || Horas MHDW
+Total man-hours || Total jam kerja || Total de horas-hombre
+Value in the workbook || Nilai di workbook || Valor en el libro
+Against target || Terhadap target || Contra la meta
+Line || Baris || Línea
+Cell and formula || Sel dan rumus || Celda y fórmula
+Cell and formula in PROD § || Sel dan rumus di PROD § || Celda y fórmula en PROD §
+Step by step || Langkah demi langkah || Paso a paso
+Worked example || Contoh perhitungan || Ejemplo resuelto
+Worth checking with your team || Perlu dicek bersama tim || Conviene revisar con tu equipo
+Things I noticed while tracing the formulas || Hal yang saya temukan saat menelusuri rumus || Cosas que noté al rastrear las fórmulas
+Two headcounts. || Dua jumlah staf. || Dos cifras de personal.
+CL staff are not in productivity. || Staf CL tidak masuk produktivitas. || El personal CL no entra en la productividad.
+One target for every site. || Satu target untuk semua site. || Una meta para todos los sitios.
+Partial weeks. || Minggu parsial. || Semanas parciales.
+Clear saved payroll data || Hapus data payroll tersimpan || Borrar datos de nómina guardados
+MOD Al || MOD Al || MOD Al
+Admits (Actual + Forecast) || Admits (Aktual + Forecast) || Admits (Real + Pronóstico)
+Revenue (Actual + Forecast) || Pendapatan (Aktual + Forecast) || Ingresos (Real + Pronóstico)
+Opr payroll || Opr payroll || Nómina operativa
+Admin payroll || Admin payroll || Nómina administrativa
+% payroll || % payroll || % de nómina
+Forecast weeks || Minggu forecast || Semanas de pronóstico
+Weeks that still hold formulas instead of typed numbers || Minggu yang masih berisi rumus, bukan angka yang diketik || Semanas que aún tienen fórmulas en lugar de números escritos
+Where the number in the site tables comes from || Asal angka di tabel site || De dónde sale el número de las tablas por sitio

@@ -1,0 +1,38 @@
+/* ---------- Admits vs kWh (VIPER module: view styles only) ---------- */
+#s-admits{scroll-margin-top:120px;margin-top:34px}
+.adm .card{box-shadow:none;border:1px solid var(--line)}
+.adm-verdict{margin:0 0 18px;padding:2px 0 2px 14px;border-left:4px solid var(--flat);font-size:20px;line-height:1.35;font-weight:700;max-width:68ch;text-wrap:balance}
+.adm-verdict.up{border-color:var(--up)} .adm-verdict.down{border-color:var(--down)}
+.adm-grid{margin-bottom:20px}
+.adm-chart{height:470px}
+.adm .ctl .seg{flex-wrap:wrap;overflow-x:visible}
+.adm .ctl .seg button{white-space:normal;text-align:left}
+.adm-more{margin-top:12px;display:flex;justify-content:center}
+.adm-cc .crow{grid-template-columns:minmax(0,1fr) auto}
+.adm-cc .crow .tr{grid-column:1/-1;order:3}
+.adm-cc .crow .nm small+small{margin-top:1px}
+.adm-tools{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px 18px;margin-bottom:4px}
+.adm-tools .counts{margin-bottom:0}
+.adm-tools .xsearch{min-width:min(240px,100%)}
+.atbl{min-width:900px}
+.atbl td:first-child{min-width:230px}
+.atbl .sn{align-items:flex-start}
+.atbl .sn .sd{margin-top:6px}
+.atbl .sn span{display:block;min-width:0}
+.atbl .sn b{font-weight:700}
+.atbl .adm-st{display:block;font-size:12px;font-weight:600}
+.atbl .adm-st.up{color:var(--up-ink)} .atbl .adm-st.down{color:var(--down-ink)} .atbl .adm-st.flat{color:var(--muted)}
+.adm-n.up{color:var(--up-ink);font-weight:700} .adm-n.down{color:var(--down-ink);font-weight:700} .adm-n.flat{color:var(--ink)}
+.atbl .flag{margin:2px 0 0}
+.atbl tr.row[aria-expanded="true"] td{background:var(--surface-2)}
+.adm-detail td{padding:0;text-align:left;background:var(--surface-2)}
+.adm-dbox{display:flex;flex-wrap:wrap;align-items:center;gap:10px 28px;padding:14px 18px 16px}
+.adm-dbox dl{display:flex;flex-wrap:wrap;gap:8px 28px;margin:0}
+.adm-dbox dt{font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.adm-dbox dd{margin:0;font-weight:700;font-variant-numeric:tabular-nums}
+.adm-dbox p{margin:0;max-width:68ch;font-size:13.5px;color:var(--muted);flex:1 1 280px}
+.adm-empty{text-align:center;color:var(--muted);padding:24px!important}
+.adm-cov{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px 22px;margin:18px 0 0}
+.adm-cov dt{font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.adm-cov dd{margin:2px 0 0;font-size:14px;font-variant-numeric:tabular-nums}
+@media (max-width:640px){.adm .ctl .f:not(.wide):not(.xsearch){flex:1 1 100%}.adm .ctl .seg:not(:has([data-r=excl])) button{white-space:nowrap}.adm-verdict{font-size:17px}.atbl{min-width:820px}}

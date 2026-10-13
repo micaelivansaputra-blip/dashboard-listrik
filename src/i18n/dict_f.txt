@@ -1,0 +1,79 @@
+# Admits vs kWh module
+Admits vs kWh || Admits vs kWh || Admits vs kWh
+Admits down, kWh up || Admits turun, kWh naik || Admits bajan, kWh sube
+Admits up, kWh up || Admits naik, kWh naik || Admits suben, kWh sube
+Admits up, kWh down || Admits naik, kWh turun || Admits suben, kWh baja
+Both down || Keduanya turun || Ambos bajan
+Both up || Keduanya naik || Ambos suben
+Steady || Stabil || Estable
+Change in admits vs Sep 2025 || Perubahan admits vs Sep 2025 || Cambio en admits vs Sep 2025
+Change in kWh vs Sep 2025 || Perubahan kWh vs Sep 2025 || Cambio en kWh vs Sep 2025
+Sep 2026 vs Sep 2025, invoice kWh || Sep 2026 vs Sep 2025, kWh invoice || Sep 2026 vs Sep 2025, kWh de factura
+Count a change when it is || Hitung perubahan jika sebesar || Contar un cambio cuando sea
+Smallest change that counts || Perubahan terkecil yang dihitung || Cambio mínimo que cuenta
+Any change || Perubahan apa pun || Cualquier cambio
+Above 2% || Di atas 2% || Más de 2%
+Basis || Dasar || Base
+Leave out sites where the CT changed || Kecualikan site yang CT-nya berubah || Excluir sitios cuyo CT cambió
+Electricity (invoice kWh) || Listrik (kWh invoice) || Electricidad (kWh de factura)
+kWh per admit || kWh per admit || kWh por admit
+723,874 vs 785,885 in Sep 2025 || 723,874 vs 785,885 pada Sep 2025 || 723,874 vs 785,885 en Sep 2025
++9.5% from 2.46 in Sep 2025 || +9.5% dari 2.46 pada Sep 2025 || +9.5% desde 2.46 en Sep 2025
++50,078 kWh combined, 9 of 54 sites || +50,078 kWh gabungan, 9 dari 54 site || +50,078 kWh combinados, 9 de 54 sitios
+Every site, admits vs kWh || Setiap site, admits vs kWh || Cada sitio, admits vs kWh
+One mark per site. Hollow marks are pinned to the edge of the chart. || Satu titik per site. Titik kosong ditempel di tepi grafik. || Una marca por sitio. Las marcas huecas se fijan al borde del gráfico.
+Biggest concerns || Perhatian terbesar || Mayores alertas
+Admits down while kWh went up, ranked by kWh added || Admits turun sementara kWh naik, diurutkan menurut kWh yang bertambah || Admits bajan mientras kWh sube, ordenados por kWh añadidos
+Admits −21.5% · kWh +11.4% || Admits −21.5% · kWh +11.4% || Admits −21.5% · kWh +11.4%
+1.42 to 2.01 kWh per admit || 1.42 ke 2.01 kWh per admit || 1.42 a 2.01 kWh por admit
+kWh vs Sep 2025 || kWh vs Sep 2025 || kWh vs Sep 2025
+Admits estimated || Admits diperkirakan || Admits estimados
+Extra meter || Meter tambahan || Medidor adicional
+CT changed || CT berubah || CT cambió
+Filter sites || Filter site || Filtrar sitios
+All · 59 || Semua · 59 || Todos · 59
+Admits down, kWh up · 9 || Admits turun, kWh naik · 9 || Admits bajan, kWh sube · 9
+Both down · 22 || Keduanya turun · 22 || Ambos bajan · 22
+Both up · 16 || Keduanya naik · 16 || Ambos suben · 16
+Admits up, kWh down · 7 || Admits naik, kWh turun · 7 || Admits suben, kWh baja · 7
+Steady · 0 || Stabil · 0 || Estable · 0
+No comparison · 5 || Tanpa pembanding · 5 || Sin comparación · 5
+Tap a column to sort, a status to filter, or a row for its details. || Ketuk kolom untuk mengurutkan, status untuk memfilter, atau baris untuk detailnya. || Toca una columna para ordenar, un estado para filtrar o una fila para ver su detalle.
+Admits Sep 26 || Admits Sep 26 || Admits sep 26
+kWh Sep 26 || kWh Sep 26 || kWh sep 26
+Admits change || Perubahan admits || Cambio en admits
+kWh change || Perubahan kWh || Cambio en kWh
+kWh added || kWh bertambah || kWh añadidos
+Per admit change || Perubahan per admit || Cambio por admit
+Left out: CT changed || Dikecualikan: CT berubah || Excluido: CT cambió
+New site, no Sep 2025 || Site baru, tanpa Sep 2025 || Sitio nuevo, sin sep 2025
+Invoice missing || Invoice belum ada || Falta la factura
+No site matches. || Tidak ada site yang cocok. || Ningún sitio coincide.
+No site has fewer admits and more kWh with the current settings. || Tidak ada site dengan admits lebih rendah dan kWh lebih tinggi pada pengaturan saat ini. || Ningún sitio tiene menos admits y más kWh con la configuración actual.
+Show all 59 sites || Tampilkan semua 59 site || Mostrar los 59 sitios
+Show fewer sites || Tampilkan lebih sedikit site || Mostrar menos sitios
+Open daily chart || Buka grafik harian || Abrir gráfico diario
+Invoice kWh || kWh invoice || kWh de factura
+19,218 to 24,988 || 19,218 ke 24,988 || 19,218 a 24,988
+Compared like-for-like || Dibandingkan apple-to-apple || Comparados en igualdad de condiciones
+54 of 59 sites || 54 dari 59 site || 54 de 59 sitios
+New sites, no Sep 2025 data || Site baru, tanpa data Sep 2025 || Sitios nuevos, sin datos de sep 2025
+No invoice in one of the years || Tidak ada invoice di salah satu tahun || Sin factura en uno de los años
+Left out because the CT changed || Dikecualikan karena CT berubah || Excluidos porque el CT cambió
+Admits only, sites in both years || Hanya admits, site yang ada di kedua tahun || Solo admits, sitios en ambos años
+744,295 vs 810,232 (−8.1%, 56 sites) || 744,295 vs 810,232 (−8.1%, 56 site) || 744,295 vs 810,232 (−8.1%, 56 sitios)
+Admits only, all sites in the file || Hanya admits, semua site di file || Solo admits, todos los sitios del archivo
+778,106 (59 sites) vs 810,232 (56 sites), not like-for-like || 778,106 (59 site) vs 810,232 (56 site), tidak apple-to-apple || 778,106 (59 sitios) vs 810,232 (56 sitios), no comparable
+How to read it: admits are calendar September from the Man Hour Usage sheet, all formats. kWh comes from the electricity invoices (main meters times CT). An invoice period starts around the 23rd to 29th of the month before, so it does not line up exactly with calendar September, but both years follow the same pattern, so the year-on-year comparison holds. || Cara membaca: admits adalah bulan September kalender dari sheet Man Hour Usage, semua format. kWh berasal dari invoice listrik (meter utama dikali CT). Periode invoice dimulai sekitar tanggal 23 sampai 29 bulan sebelumnya, sehingga tidak persis sama dengan September kalender, tetapi kedua tahun mengikuti pola yang sama, jadi perbandingan tahunan tetap berlaku. || Cómo leerlo: los admits son del mes calendario de septiembre de la hoja Man Hour Usage, todos los formatos. Los kWh vienen de las facturas de electricidad (medidores principales por CT). Un periodo de factura empieza entre el 23 y el 29 del mes anterior, por lo que no coincide exactamente con septiembre calendario, pero ambos años siguen el mismo patrón, así que la comparación anual es válida.
+Not enough data to compare. || Data belum cukup untuk dibandingkan. || No hay datos suficientes para comparar.
+Admits || Admits || Admits
+Scatter chart of the change in admits against the change in kWh for each site. The same data is in the table below. || Grafik sebar perubahan admits terhadap perubahan kWh untuk setiap site. Data yang sama ada di tabel di bawah. || Gráfico de dispersión del cambio en admits frente al cambio en kWh de cada sitio. Los mismos datos están en la tabla de abajo.
+Admits 29.1% (10,799 to 7,653) || Admits 29.1% (10,799 ke 7,653) || Admits 29.1% (10,799 a 7,653)
+kWh +19.8% (80,451 to 96,365) || kWh +19.8% (80,451 ke 96,365) || kWh +19.8% (80,451 a 96,365)
+Pinned to the chart edge || Ditempel di tepi grafik || Fijado al borde del gráfico
+The new meter reads kWh directly (CT 200 to 1). The kWh change shown is a real change. || Meter baru membaca kWh langsung (CT 200 ke 1). Perubahan kWh yang tampil adalah perubahan nyata. || El nuevo medidor lee kWh directamente (CT 200 a 1). El cambio de kWh mostrado es real.
+CT changed from 120 to 1 after a meter replacement (Nov 2025). Invoice kWh is not comparable with last year until engineering confirms the billing basis. || CT berubah dari 120 ke 1 setelah penggantian meter (Nov 2025). kWh invoice tidak bisa dibandingkan dengan tahun lalu sampai engineering mengonfirmasi dasar penagihannya. || El CT cambió de 120 a 1 tras reemplazar el medidor (Nov 2025). Los kWh de factura no son comparables con el año pasado hasta que ingeniería confirme la base de facturación.
+A second LWBP meter (CT 50) appears from Jul 2026 and adds about 8,300 kWh a month, which is not in last year's base. || Meter LWBP kedua (CT 50) muncul sejak Jul 2026 dan menambah sekitar 8,300 kWh per bulan, yang tidak ada di basis tahun lalu. || Un segundo medidor LWBP (CT 50) aparece desde jul 2026 y suma unos 8,300 kWh al mes, que no estaban en la base del año pasado.
+Two meters are billed (CT 80 and CT 100). The daily file reads only one of them. || Dua meter ditagih (CT 80 dan CT 100). File harian hanya membaca salah satunya. || Se facturan dos medidores (CT 80 y CT 100). El archivo diario solo lee uno.
+Regular admits are missing in the source sheet (#REF!). Rebuilt from the daily numbers, with the blank day (8 Sep) filled at the average. || Admits Regular hilang di sheet sumber (#REF!). Dihitung ulang dari angka harian, dengan hari kosong (8 Sep) diisi rata-rata. || Los admits Regular faltan en la hoja de origen (#REF!). Reconstruidos con los números diarios, y el día en blanco (8 sep) rellenado con el promedio.
+No September 2025 invoice, so kWh cannot be compared. Admits exist for both years. || Tidak ada invoice September 2025, jadi kWh tidak bisa dibandingkan. Admits ada untuk kedua tahun. || No hay factura de septiembre 2025, así que los kWh no se pueden comparar. Hay admits de ambos años.

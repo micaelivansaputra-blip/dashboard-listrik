@@ -1,0 +1,80 @@
+/* ---------- sites ---------- */
+let STATUS='all', SORTKEY='mom', SORT='desc', EXPAND=false;
+const MKEY={mom:'mom',agu:'vsAgu',yoy:'yoy'}, KMODE={mom:'mom',vsAgu:'agu',yoy:'yoy'};
+function spark(s,c){const m=ma7(s.v),vs=m.filter(x=>x!=null),lo=Math.min(...vs),hi=Math.max(...vs);
+  const pts=m.map((v,i)=>v==null?null:[i/(s.v.length-1)*96,23-(v-lo)/(hi-lo||1)*20]).filter(Boolean);
+  return `<svg viewBox="0 0 96 26" aria-hidden="true"><polyline fill="none" stroke="var(--${c})" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="${pts.map(p=>p.map(n=>n.toFixed(1)).join(',')).join(' ')}"/></svg>`;}
+function setMode(m){MODE=m;document.querySelectorAll('#mode button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.m===m));}
+function renderSites(list){
+  const rows=list.map(s=>({s,a:siteAvg(s)}));
+  const key=MKEY[MODE], q=QUERY.trim().toLowerCase();
+  const all=rows.map(r=>r.a[key]);
+  const nu=all.filter(v=>v>TH).length, nd=all.filter(v=>v<-TH).length, nf=all.length-nu-nd;
+  const name={mom:'September',agu:'August',yoy:'Oct 2025'}[MODE];
+  const seg=(c,l,n)=>`<button type="button" class="seg2 ${c}" data-st="${c}" aria-pressed="${STATUS===c}" style="flex:${Math.max(n,1)} 1 0"><b>${n}</b><span>${l}</span></button>`;
+  document.getElementById('counts').innerHTML=`<div class="dist">${seg('up','Up >5%',nu)}${seg('flat','Stable',nf)}${seg('down','Down >5%',nd)}</div>`+(STATUS!=='all'?'<button type="button" class="chipbtn" data-st="all">Show all</button>':'');
+  let f=rows.filter(r=>(!q||r.s.n.toLowerCase().includes(q))&&(STATUS==='all'||cls(r.a[key])===STATUS));
+  const d=SORT==='desc'?1:-1;
+  f.sort((x,y)=>SORTKEY==='name'?x.s.n.localeCompare(y.s.n)*(SORT==='asc'?1:-1):(y.a[SORTKEY]-x.a[SORTKEY])*d);
+  const lim=12, shown=(EXPAND||q||STATUS!=='all')?f:f.slice(0,lim);
+  document.getElementById('siteSub').textContent=`${f.length} of ${list.length} sites · status vs ${name}`;
+  const mxO=Math.max(...rows.map(r=>r.a.okt));
+  const th=(k,l,cl='')=>`<th class="${cl} ${SORTKEY===k?'sorted':''} ${KMODE[k]===MODE?'actc':''}" aria-sort="${SORTKEY===k?(SORT==='asc'?'ascending':'descending'):'none'}"><button type="button" data-k="${k}">${l}${SORTKEY===k?(SORT==='asc'?' ▲':' ▼'):''}</button></th>`;
+  const pc=(v,k)=>`<span class="cell ${cls(v)} ${key===k?'on':''}">${pct(v)}</span>`;
+  const body=shown.map(({s,a})=>{const c=cls(a[key]);return `<tr class="row" data-n="${s.n}" tabindex="0">
+    <td><div class="sn"><span class="sd ${c}"></span><span><b>${short(s.n)}${s.partial?' *':''}</b><small>${s.r}</small></span></div></td>
+    <td><div class="okt"><span>${fmt(a.okt)}</span><i style="width:${Math.max(4,a.okt/mxO*72)}px"></i></div></td>
+    <td>${pc(a.mom,'mom')}</td><td class="hs">${pc(a.vsAgu,'vsAgu')}</td><td>${pc(a.yoy,'yoy')}</td><td class="sp hs">${spark(s,c==='flat'?'flat':c)}</td></tr>`;}).join('');
+  document.getElementById('tiles').innerHTML=`<table class="ptable"><thead><tr>${th('name','Site')}${th('okt','Oct kWh/day')}${th('mom','vs Sep')}${th('vsAgu','vs Aug','hs')}${th('yoy','vs Oct 2025')}<th class="hs">Trend</th></tr></thead><tbody>${body||'<tr><td colspan="6" class="empty">No matching sites.</td></tr>'}</tbody></table>`;
+  document.getElementById('more').innerHTML=(!q&&STATUS==='all'&&f.length>lim)?`<button type="button" class="chipbtn" data-more aria-pressed="true">${EXPAND?'Show top '+lim:'Show all '+f.length+' sites'}</button>`:'';
+}
+
+function renderConcern(list,P){
+  var __a=[list,P];
+  const natYoy=P.okt.raw/P.py.raw-1;
+  const rows=list.map(s=>{const a=siteAvg(s);const sig=(a.mom>TH)+(a.vsAgu>TH)+(a.yoy>TH);return {s,a,sig,ex:a.okt-a.py*(1+natYoy)};})
+    .sort((x,y)=>y.ex-x.ex).slice(0,8);
+  const mx=Math.max(...rows.map(r=>r.ex),1);
+  document.getElementById('concern').innerHTML=rows.map(r=>`<div class="crow" role="button" tabindex="0" data-n="${r.s.n}"><div class="nm">${short(r.s.n)}${r.s.partial?' *':''}<small>${r.s.r} · ${fmt(r.a.okt)} kWh/day · Oct 2025 ${pct(r.a.yoy,0)} · Sep ${pct(r.a.mom,0)}</small>${typeof fuChip==='function'?'<div class="fuline">'+fuChip(r.s.n)+'</div>':''}</div>
+    <div class="tr"><i class="${r.sig>=2?'hi':''}" style="width:${Math.max(0,r.ex)/mx*100}%"></i></div>
+    <div class="val">${r.ex>=0?'+':'−'}${fmt(Math.abs(r.ex))}<small>kWh/day above national growth</small><span class="flag ${r.sig>=2?'hi':'lo'}">${r.sig>=2?'Red':'Yellow'} · up in ${r.sig} of 3</span></div></div>`).join('');
+  if(typeof LASTC!=='undefined'){LASTC=rows.map(r=>r.s.n);LASTC.args=__a;fuSummary();}
+}
+
+function renderProgram(){
+  const all=DATA.sites, other=all.filter(s=>!s.p);
+  const defs=[['50-MAL BOTANIA 2','WBP + LWBP'],['34-PACIFIC MALL TEGAL','WBP + LWBP'],['69-SENAYAN PARK','WBP + LWBP'],['7-SUN PLAZA','LWBP only, data to 26 Sep'],['51-LIPPO PLAZA SUNSET','WBP + LWBP · readings are noisy'],['39-LIPPO ICON CIBUBUR','LWBP meter only'],['37-MALL PHINISI POINT','',1]];
+  const dn=css('--down'), bl=css('--blue'), oth=natSeries(other);
+  const np=mean(oth.slice(iProg))/mean(oth.slice(0,iProg))-1;
+  const res=defs.map(([n,tag,none])=>{const s=getSite(n);
+    if(!s) return {n,tag,none:1};
+    const pre=mean(s.v.slice(0,iProg)),post=mean(s.v.slice(iProg)),ch=post/pre-1; return {n,tag,v:s.v,pre,post,ch,rel:ch-np};});
+  document.getElementById('prog').innerHTML=res.map(c=>{
+    const nm=short(c.n);
+    if(c.none) return `<div class="card pc none"><svg class="ava" viewBox="0 0 100 120">${bulby(false,true).replace(/^<svg[^>]*>|<\/svg>$/g,'')}</svg><h3>${nm}</h3><div class="tag">No meter data yet</div><div class="big" style="color:var(--muted)">n/a</div><div class="nodata">The daily report has no active meter readings for this site, so it cannot be measured yet. It will appear here once readings are added.</div></div>`;
+    const m=ma7(c.v), vs=m.filter(x=>x!=null), lo=Math.min(...vs), hi=Math.max(...vs), L=c.v.length;
+    const pts=m.map((v,i)=>v==null?null:[i/(N-1)*300, 58-(v-lo)/(hi-lo||1)*50]).filter(Boolean);
+    const px=iProg/(N-1)*300, good=c.rel<0;
+    return `<div class="card pc" role="button" tabindex="0" data-n="${c.n}"><svg class="ava" viewBox="0 0 100 120">${bulby(good).replace(/^<svg[^>]*>|<\/svg>$/g,'')}</svg><h3>${nm}</h3><div class="tag">${c.tag}</div><div class="big ${c.ch<0?'down':'up'}">${pct(c.ch)}</div>
+     <div class="row"><span>Before ${fmt(c.pre)}</span><span>After ${fmt(c.post)}</span></div>
+     <div class="vs ${good?'good':'bad'}">${Math.abs(c.rel*100).toFixed(1)} pts ${good?'better':'worse'} than other sites</div>
+     <svg viewBox="0 0 300 66" preserveAspectRatio="none" role="img" aria-label="7-day trend ${nm}"><line x1="${px}" x2="${px}" y1="0" y2="66" stroke="${dn}" stroke-width="1.6" stroke-dasharray="4 3"/><polyline fill="none" stroke="${bl}" stroke-width="2.6" stroke-linejoin="round" vector-effect="non-scaling-stroke" points="${pts.map(p=>p.join(',')).join(' ')}"/></svg></div>`;}).join('')
+   +(()=>{const ok=res.filter(r=>!r.none).sort((x,y)=>x.rel-y.rel), mx=Math.max(...ok.map(r=>Math.abs(r.rel)),.01), nb=ok.filter(r=>r.rel<0).length;
+     return `<div class="card pc" style="background:var(--surface-2);box-shadow:none"><div class="score-h">${bulby(nb>ok.length/2)}<div><h3 style="padding:0">Scoreboard</h3><div class="tag">${nb} of ${ok.length} sites beat the others</div></div></div>
+      <div class="score">${ok.map(r=>`<div class="r"><span class="n">${short(r.n)}</span><div class="t"><i class="${r.rel<0?'good':'bad'}" style="width:${Math.max(4,Math.abs(r.rel)/mx*100)}%"></i></div><b class="${r.rel<0?'gt':'bt'}">${r.rel<0?'−':'+'}${Math.abs(r.rel*100).toFixed(1)}</b></div>`).join('')}</div>
+      <div class="tag" style="margin-top:10px">Points vs other sites. Negative (green) = fell more than non-program sites.</div></div>`;})();
+  QUIPS.push(`ZOEC check: ${res.filter(r=>!r.none&&r.rel<0).length} of ${res.filter(r=>!r.none).length} program sites fell faster than the rest.`);
+  const nc=res.filter(r=>r.none).length;
+  document.getElementById('progNote').innerHTML=`<b>Before</b> = average kWh/day from 1 to 18 Aug. <b>After</b> = from 19 Aug to the latest data (the same start date is used for every site). Sites without the program changed ${pct(np)} over the same period, so each card compares against that. This is a before/after view and does not prove the program is the cause. Sun Plaza uses LWBP through 26 Sep because later meter readings are unreliable. Lippo Plaza Sunset has many flat, repeated readings and one spike (13 Sep, replaced by the local median), so treat it as indicative. Lippo Icon Cibubur only has an LWBP meter in the report.${nc?' Mall Phinisi Point has no meter data yet.':''}`;
+}
+
+function renderFoot(list){
+  const m=DATA.meta||{}, ex=m.excluded||[];
+  const part=DATA.sites.filter(s=>s.partial).map(s=>short(s.n)).join(', ');
+  const zxn=(DATA.zx||[]).map(z=>short(z.n));
+  document.getElementById('foot').innerHTML=`<div>Coverage: ${DATA.sites.length} of ${m.totalSites||59} sites with reliable daily meter data (+ Sun Plaza${zxn.length?' and '+zxn.join(', '):''}, ZOEC project only). Oct 2026 = ${octLbl}. Oct 2025 comparison = ${pyLbl} 2025 (same weekdays). Data is preliminary.</div>
+   ${part?`<div>* Partial meter coverage (only some meters included): ${part}.</div>`:''}
+   ${m.source?`<div>Source file: ${m.source}${m.generatedAt?' · processed '+new Date(m.generatedAt).toLocaleString(EN,{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):''}${m.lastSeen&&m.lastSeen!==m.last?' · the file has partial rows after '+dm(m.last)+', they are ignored until most sites report':''}.</div>`:''}
+   ${ex.length?`<details class="dq"><summary>Data check: ${ex.length} sites are not included</summary><ul>${ex.map(e=>`<li><b>${short(e.site)}</b>: ${e.reason}</li>`).join('')}</ul></details>`:''}`;
+}
+

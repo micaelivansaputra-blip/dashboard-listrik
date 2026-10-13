@@ -1,0 +1,4 @@
+Axis starts at || Sumbu mulai dari || El eje comienza en
+ZOEC starts (19 Aug) || ZOEC dimulai (19 Aug) || Inicia ZOEC (19 Aug)
+Peak || Puncak || Máximo
+Low || Terendah || Mínimo

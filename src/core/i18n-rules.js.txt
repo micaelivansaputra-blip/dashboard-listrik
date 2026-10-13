@@ -1,0 +1,17 @@
+[/^Remove (.+)$/,{id:'Hapus $1',es:'Quitar $1'}],
+[/^7-day trend (.+)$/,{id:'Tren 7 hari $1',es:'Tendencia de 7 días $1'}],
+[/^(.+?) \((\d+) → (\d+)\)$/,{id:'$1 ($2 → $3)',es:'$1 ($2 → $3)'}],
+[/^(.+) \(([+−]\d+%), ([^)]+)\)(.*)$/,function(m,l){
+  const P={'far below target':{id:'jauh di bawah target',es:'muy por debajo de la meta'},'check meter or CT':{id:'cek meter atau CT',es:'revisa medidor o CT'},'same reading every day':{id:'pembacaan sama setiap hari',es:'misma lectura todos los días'},'one odd day':{id:'satu hari janggal',es:'un día atípico'}};
+  const part=x=>{x=x.trim();let r=/^meter data differs by (\d+%)$/.exec(x);if(r)return l==='id'?'data meter berbeda '+r[1]:'los datos del medidor difieren '+r[1];return P[x]?P[x][l]:x;};
+  const fix=s=>s.replace(/ \(([+−]\d[\d.,]*%), ([^)]*)\)/g,(_,p,rs)=>' ('+I18N.loc(p)+', '+rs.split(', ').map(part).join(', ')+')');
+  return fix(m[0]).replace(/Switch to$/,l==='id'?'Beralih ke':'Cambiar a');
+}],
+[/^Productivity counts HC AUG · FT 1st \((\d+) staff in total\), while payroll cost and forecast MHDW use HC SEP · FT 2nd \((\d+)\)\. (\d+) sites differ: (.+?)\. If the intent is to measure with the current team, productivity should use the same column as cost\.$/,{
+ id:'Produktivitas menghitung HC AUG · FT 1st ($1 staf total), sedangkan biaya payroll dan MHDW forecast memakai HC SEP · FT 2nd ($2). $3 site berbeda: $4. Jika tujuannya mengukur dengan tim saat ini, produktivitas sebaiknya memakai kolom yang sama dengan biaya.',
+ es:'La productividad cuenta HC AUG · FT 1st ($1 personas en total), mientras que el costo de nómina y el MHDW pronosticado usan HC SEP · FT 2nd ($2). $3 sitios difieren: $4. Si la intención es medir con el equipo actual, la productividad debería usar la misma columna que el costo.'}],
+[/^Admits (fell|rose) (\S+) (but|and) electricity (fell|rose) (\S+) across (\d+) like-for-like sites\. Each admit now uses (\S+) kWh, (up|down) (\S+)\.$/,function(m,l){
+  const L=I18N.loc, id={fell:'turun',rose:'naik',but:'tetapi',and:'dan',up:'naik',down:'turun'}, es={fell:['bajaron','bajó'],rose:['subieron','subió'],but:'pero',and:'y',up:'más',down:'menos'};
+  if(l==='id') return `Admits ${id[m[1]]} ${L(m[2])} ${id[m[3]]} listrik ${id[m[4]]} ${L(m[5])} pada ${m[6]} site yang sebanding. Setiap admit kini memakai ${L(m[7])} kWh, ${id[m[8]]} ${L(m[9])}.`;
+  return `Los admits ${es[m[1]][0]} ${L(m[2])} ${es[m[3]]} la electricidad ${es[m[4]][1]} ${L(m[5])} en ${m[6]} sitios comparables. Cada admit ahora usa ${L(m[7])} kWh, ${L(m[9])} ${es[m[8]]}.`;
+}],
