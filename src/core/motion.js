@@ -104,7 +104,7 @@ const Motion = (function () {
     sections.forEach(s => seen.set(s, !s.classList.contains('pg-off')));
     // the page bar gets a hairline once the page scrolls under it
     const bar = document.getElementById('pgbar'), sen = document.getElementById('pgSentinel');
-    if (bar && sen && 'IntersectionObserver' in window) new IntersectionObserver(es => bar.classList.toggle('stuck', !es[0].isIntersecting)).observe(sen);
+    if (bar && sen && 'IntersectionObserver' in window) new IntersectionObserver(es => { bar.classList.toggle('stuck', !es[0].isIntersecting); const hd = document.querySelector('header.bar'); if (hd) hd.classList.toggle('stuck', !es[0].isIntersecting); }).observe(sen);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(scan);
     requestAnimationFrame(() => requestAnimationFrame(() => visibleSections().forEach(play)));
     addEventListener('beforeprint', () => $$('[data-rv]').forEach(e => e.classList.add('in')));
