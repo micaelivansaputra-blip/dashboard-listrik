@@ -6,7 +6,7 @@ const I18N=(function(){
   const MF=['January','February','March','April','May','June','July','August','September','October','November','December'], MS=MF.map(m=>m.slice(0,3));
   const MN={id:{F:['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'],S:['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des']},
             es:{F:['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'],S:['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic']}};
-  const TOK=/\b(January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b|[+−]?\d[\d,]*(?:\.\d+)?%?/g;
+  const TOK=/\b(January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b|[+−]?\d(?:[\d,]*\d)?(?:\.\d+)?%?/g;
   const DN={id:['Sen','Sel','Rab','Kam','Jum','Sab','Min'],es:['lun','mar','mié','jue','vie','sáb','dom']}, DS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
   const TOKD=new RegExp(TOK.source.replace('(January','(Mon|Tue|Wed|Thu|Fri|Sat|Sun|January'),'g');
   const fnum=s=>lang==='id'?s.replace(/,/g,'\u0001').replace(/\./g,',').replace(/\u0001/g,'.'):s;

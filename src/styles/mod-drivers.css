@@ -1,0 +1,51 @@
+/* ---------- Why kWh rose (VIPER module: view styles only) ---------- */
+#s-drivers{scroll-margin-top:120px;margin-top:34px}
+.drv .card{box-shadow:none;border:1px solid var(--line)}
+.drv-lead{margin:0 0 6px;padding:2px 0 2px 14px;border-left:4px solid var(--flat);font-size:20px;line-height:1.35;font-weight:700;max-width:68ch;text-wrap:balance}
+.drv-lead.up{border-color:var(--up)} .drv-lead.down{border-color:var(--down)}
+.drv-sub{margin:0 0 18px 18px;max-width:72ch;color:var(--muted);font-size:14.5px;line-height:1.5}
+.drv-grid{margin-bottom:20px}
+.drv-chart{height:400px}
+.drv-steps{display:grid;gap:8px}
+.drv-step{all:unset;box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;padding:11px 14px;border:1px solid var(--line);border-radius:14px;cursor:pointer;background:var(--surface)}
+.drv-step:hover{background:var(--surface-2)}
+.drv-step:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.drv-step[aria-pressed="true"]{border-color:var(--blue);background:var(--blue-soft)}
+.drv-step .nm{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;min-width:0}
+.drv-step .nm b{font-size:15px}
+.drv-step .val{text-align:right;font-weight:800;font-size:16px;font-variant-numeric:tabular-nums}
+.drv-step .val small{font-size:11px;font-weight:600;color:var(--muted);margin-left:4px}
+.drv-step .tr{grid-column:1/-1;height:6px;border-radius:99px;background:var(--surface-2);overflow:hidden;margin-top:6px}
+.drv-step .tr i{display:block;height:100%;border-radius:99px;background:var(--flat)}
+.drv-step .tr i.up{background:var(--up)} .drv-step .tr i.down{background:var(--down)}
+.drv-step .meta{grid-column:1/-1;color:var(--muted);font-size:12.5px}
+.drv-kind{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:99px;border:1px solid var(--line);color:var(--muted)}
+.drv-kind.amber{background:var(--amber-soft);color:var(--amber-ink);border-color:transparent}
+.drv-kind.ink{background:var(--ink);color:var(--bg);border-color:transparent}
+.drv-detail{margin-bottom:20px}
+.dtbl{min-width:640px}
+.dtbl td:first-child{min-width:240px}
+.dtbl .sn span{display:block;min-width:0}
+.dtbl .adm-st{display:block;font-size:12px;font-weight:500;color:var(--muted);max-width:60ch}
+.dtbl .chipbtn{margin-top:6px}
+.drv-block{margin:6px 0 22px}
+.drv-bh{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:10px 18px;margin-bottom:12px}
+.drv-bh h3{margin:0}
+.drv-bh .sub{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+.drv-p{margin:0 0 10px;max-width:62ch;line-height:1.5;font-size:15px}
+.drv-p.mu{color:var(--muted);font-size:14px}
+.drv-thirds{display:grid;gap:14px;margin-top:6px}
+.drv-third .t{font-weight:700;font-size:14px;margin-bottom:4px}
+.drv-third .t small{margin-left:8px;color:var(--muted);font-weight:500}
+.drv-pair{display:grid;grid-template-columns:58px minmax(0,1fr) 64px;align-items:center;gap:10px;font-size:13px;margin-top:3px}
+.drv-pair span{color:var(--muted)}
+.drv-pair b{text-align:right;font-variant-numeric:tabular-nums}
+.drv-pair .bar{display:block;height:10px;border-radius:99px;background:var(--flat);min-width:2px}
+.drv-pair .bar.blue{background:var(--blue)} .drv-pair .bar.up{background:var(--up)} .drv-pair .bar.down{background:var(--down)}
+.drv-list{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:10px}
+.drv-list li{display:flex;gap:12px;align-items:flex-start}
+.drv-list .chip{flex:none;min-width:92px;text-align:center;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:3px 8px;border-radius:99px;background:var(--amber-soft);color:var(--amber-ink)}
+.drv-list.plain li{display:block}
+.drv-list b{font-size:14.5px}
+.drv-list p{margin:2px 0 0;color:var(--muted);font-size:13.5px;line-height:1.45;max-width:62ch}
+@media (max-width:640px){.drv-lead{font-size:17px}.drv-sub{margin-left:0}.drv-chart{height:300px}.drv-list li{flex-direction:column;gap:4px}.drv-list .chip{text-align:left;min-width:0}.drv-pair{grid-template-columns:50px minmax(0,1fr) 58px}.drv-bh .f{width:100%}.drv .seg{flex-wrap:wrap}}

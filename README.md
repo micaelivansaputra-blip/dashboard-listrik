@@ -36,6 +36,10 @@ A layer may only use layers listed before it.
 Data flows one way: `View event -> Presenter -> Interactor -> Entity`, then `Presenter -> ViewModel -> View.render`.
 Because Entity, Interactor and Presenter are plain JavaScript, `tests/admits.test.js` covers them without a browser.
 
+A second module, `src/modules/drivers/` ("Why kWh Rose"), follows the same five layers. Its Entity classifies each site from
+its meters (new site, CT change, extra meter, incomplete invoice, same meters), so the bridge from Sep 2025 to Sep 2026 adds
+up exactly. Its gateway joins meter-level kWh with the admits data. Tests: `node --test tests/drivers.test.js tests/admits.test.js`.
+
 ### Navigation
 
 `core/pager.js` shows one section at a time: a main bar with a few page groups and a sub bar for the sections in the active group.
@@ -54,3 +58,10 @@ history) disappears from the bar on its own, because the pager reads the `hidden
 
 `src/modules/admits/data.js` holds Sep 2025 and Sep 2026 admits (Man Hour Usage sheet, all formats) and invoice kWh
 (Actual Invoice Electricity, main meters times CT) for 59 sites. Sites without data in a year show `null`, never 0.
+
+## Data notes (Why kWh Rose)
+
+`src/modules/drivers/data.js` is generated, not hand-written: `python3 tools/build_drivers_data.py RAW2.pkl CMP.pkl`
+(meter-level invoice kWh per site for both Septembers, plus the Sep total of the daily file as a cross-check).
+Regenerate it together with the admits data each month. The billing-day assumption (30 or 31 days for the current
+month) is a switch on the page, because the current invoice carries no period dates yet.

@@ -1,0 +1,80 @@
+Why kWh Rose || Mengapa kWh Naik || Por qué subió el kWh
+Sep 2026 vs Sep 2025, split by cause || Sep 2026 vs Sep 2025, dibagi per penyebab || Sep 2026 vs Sep 2025, dividido por causa
+Where the change comes from || Asal perubahan || De dónde viene el cambio
+Each bar starts where the one above it ends. Tap a bar to see its sites. || Setiap batang dimulai di tempat batang di atasnya berakhir. Ketuk batang untuk melihat site-nya. || Cada barra empieza donde termina la de arriba. Toca una barra para ver sus sitios.
+Bridge chart of the change in invoice kWh, split into new sites, CT changes, extra meters, incomplete invoices and same-meter sites. The same numbers are listed beside it. || Grafik jembatan perubahan kWh invoice, dibagi menjadi site baru, perubahan CT, meter tambahan, invoice tidak lengkap, dan site dengan meter sama. Angka yang sama tercantum di sebelahnya. || Gráfico puente del cambio en kWh de factura, dividido en sitios nuevos, cambios de CT, medidores adicionales, facturas incompletas y sitios con los mismos medidores. Las mismas cifras están listadas al lado.
+Causes, ranked by the flow || Penyebab, urut menurut alurnya || Causas, en el orden del flujo
+Only the last one is a real change in usage || Hanya yang terakhir yang merupakan perubahan pemakaian sesungguhnya || Solo la última es un cambio real en el uso
+Causes || Penyebab || Causas
+Sites with the same meters || Site dengan meter yang sama || Sitios con los mismos medidores
+Admits in both years, new meters taken out, a doubtful CT reading left out || Admits ada di kedua tahun, meter baru dikeluarkan, pembacaan CT yang diragukan tidak dihitung || Admits en ambos años, sin los medidores nuevos y sin las lecturas de CT dudosas
+Sep 2026 billing period || Periode tagihan Sep 2026 || Periodo de facturación de Sep 2026
+Assumed days in the Sep 2026 billing period || Asumsi jumlah hari periode tagihan Sep 2026 || Días supuestos del periodo de facturación de Sep 2026
+Admits barely move electricity || Admits hampir tidak menggerakkan listrik || Los admits casi no mueven la electricidad
+Sites with the same meters, split into thirds by the change in admits || Site dengan meter yang sama, dibagi tiga menurut perubahan admits || Sitios con los mismos medidores, divididos en tercios según el cambio en admits
+A few sites carry the rise || Beberapa site menanggung kenaikannya || Pocos sitios cargan con el aumento
+Sites with the same meters, ranked by kWh added || Site dengan meter yang sama, diurutkan menurut kWh tambahan || Sitios con los mismos medidores, ordenados por kWh añadidos
+To verify || Perlu diverifikasi || Por verificar
+Open items that could change these numbers || Hal terbuka yang bisa mengubah angka ini || Pendientes que podrían cambiar estas cifras
+Not measurable from this data || Tidak bisa diukur dari data ini || No medible con estos datos
+Possible causes that need other data || Kemungkinan penyebab yang butuh data lain || Posibles causas que requieren otros datos
+Nothing to verify. || Tidak ada yang perlu diverifikasi. || Nada por verificar.
+How to read it: the causes add up exactly to the net change. New sites, extra meters and CT changes change what is measured, not how much a site uses. Incomplete invoices are a data problem. Only same-meter sites show real usage. The billing period of Sep 2026 is not in the invoice file yet, so its length is an assumption. || Cara membacanya: semua penyebab dijumlahkan persis menjadi perubahan bersih. Site baru, meter tambahan, dan perubahan CT mengubah apa yang terukur, bukan seberapa banyak site memakai listrik. Invoice tidak lengkap adalah masalah data. Hanya site dengan meter sama yang menunjukkan pemakaian sesungguhnya. Periode tagihan Sep 2026 belum ada di file invoice, jadi panjangnya hanya asumsi. || Cómo leerlo: las causas suman exactamente el cambio neto. Los sitios nuevos, los medidores adicionales y los cambios de CT cambian lo que se mide, no cuánto usa un sitio. Las facturas incompletas son un problema de datos. Solo los sitios con los mismos medidores muestran el uso real. El periodo de facturación de Sep 2026 aún no está en el archivo de facturas, así que su duración es un supuesto.
+kWh || kWh || kWh
+New sites || Site baru || Sitios nuevos
+CT changes || Perubahan CT || Cambios de CT
+Extra meters || Meter tambahan || Medidores adicionales
+Incomplete invoices || Invoice tidak lengkap || Facturas incompletas
+Same-meter sites || Site meter sama || Sitios con los mismos medidores
+Net change || Perubahan bersih || Cambio neto
+Structure || Struktur || Estructura
+Data basis || Basis data || Base de datos
+Data issue || Masalah data || Problema de datos
+Real usage || Pemakaian nyata || Uso real
+Change in invoice kWh, Sep 2026 vs Sep 2025 || Perubahan kWh invoice, Sep 2026 vs Sep 2025 || Cambio en kWh de factura, Sep 2026 vs Sep 2025
+No kWh in Sep 2025. They add load, but they are not a change at an existing site. || Tidak ada kWh di Sep 2025. Mereka menambah beban, tetapi bukan perubahan di site yang sudah ada. || Sin kWh en Sep 2025. Suman carga, pero no son un cambio en un sitio existente.
+The same kind of meter now has a different CT, so the two Septembers are read on a different basis. || Jenis meter yang sama kini punya CT berbeda, jadi kedua September dibaca dengan basis yang berbeda. || El mismo tipo de medidor ahora tiene otro CT, así que los dos septiembres se leen con una base distinta.
+A meter was added that last year did not have. Its kWh is not part of last year’s base. || Ada meter yang ditambahkan, yang tahun lalu tidak ada. kWh-nya bukan bagian dari basis tahun lalu. || Se agregó un medidor que el año pasado no existía. Su kWh no forma parte de la base del año pasado.
+A meter billed last year has no kWh this year. The invoice looks incomplete, so the drop is not a saving. || Meter yang ditagih tahun lalu tidak punya kWh tahun ini. Invoice tampak tidak lengkap, jadi penurunan ini bukan penghematan. || Un medidor facturado el año pasado no tiene kWh este año. La factura parece incompleta, así que la baja no es un ahorro.
+The same meters in both years. This is the real change in how sites use electricity. || Meter yang sama di kedua tahun. Ini perubahan sesungguhnya dalam cara site memakai listrik. || Los mismos medidores en ambos años. Este es el cambio real en cómo los sitios usan la electricidad.
+4 sites · 87% of the net change || 4 site · 87% dari perubahan bersih || 4 sitios · 87% del cambio neto
+1 site · 8% of the net change || 1 site · 8% dari perubahan bersih || 1 sitio · 8% del cambio neto
+kWh Sep 25 || kWh Sep 25 || kWh sep 25
+kWh Sep 26 || kWh Sep 26 || kWh sep 26
+kWh change || Perubahan kWh || Cambio de kWh
+Change || Perubahan || Cambio
+New || Baru || Nuevo
+Includes 8,261 kWh from the extra meter. || Termasuk 8,261 kWh dari meter tambahan. || Incluye 8,261 kWh del medidor adicional.
+kWh, same meters || kWh, meter sama || kWh, mismos medidores
+kWh per billing day || kWh per hari tagihan || kWh por día de facturación
+Sep 2025 periods averaged 30.8 days, against 30 days assumed for Sep 2026 || Periode Sep 2025 rata-rata 30.8 hari, dibanding 30 hari yang diasumsikan untuk Sep 2026 || Los periodos de Sep 2025 promediaron 30.8 días, frente a 30 días supuestos para Sep 2026
+30 days || 30 hari || 30 días
+Invoice kWh is +6.9% vs Sep 2025, but 87% of the net rise comes from 4 new sites. || Invoice kWh +6.9% vs Sep 2025, tetapi 87% dari kenaikan bersih berasal dari 4 site baru. || El kWh de factura está +6.9% vs Sep 2025, pero el 87% del aumento neto viene de 4 sitios nuevos.
+Invoice kWh is +6.9% vs Sep 2025 (+133,493 kWh). || kWh invoice +6.9% vs Sep 2025 (+133,493 kWh). || El kWh de factura está +6.9% vs Sep 2025 (+133,493 kWh).
+On 52 sites with the same meters, kWh is +2.8% while admits are −8.1%. Each admit now uses 2.72 kWh (+11.9%). || Pada 52 site dengan meter yang sama, kWh +2.8% sedangkan admits −8.1%. Setiap admit kini memakai 2.72 kWh (+11.9%). || En 52 sitios con los mismos medidores, el kWh está +2.8% mientras que los admits están −8.1%. Cada admit ahora usa 2.72 kWh (+11.9%).
+A 10% change in admits moves kWh by only about 1.1%. Around 89% of the load does not follow admits. || Perubahan admits 10% hanya menggerakkan kWh sekitar 1.1%. Sekitar 89% beban tidak mengikuti admits. || Un cambio de 10% en admits mueve el kWh solo cerca de 1.1%. Alrededor del 89% de la carga no sigue a los admits.
+Third of sites where admits fell most || Sepertiga site dengan penurunan admits terbesar || Tercio de sitios donde más cayeron los admits
+Middle third || Sepertiga tengah || Tercio medio
+Third of sites where admits rose most || Sepertiga site dengan kenaikan admits terbesar || Tercio de sitios donde más subieron los admits
+17 sites || 17 site || 17 sitios
+The typical site did not move: the median change is −0.4%, with 23 sites up and 27 down. || Site yang tipikal tidak banyak bergerak: perubahan mediannya −0.4%, dengan 23 site naik dan 27 turun. || El sitio típico casi no se movió: el cambio mediano es −0.4%, con 23 sitios al alza y 27 a la baja.
+The top 5 sites add 53,608 kWh, 53% of all kWh added by rising sites. || 5 site teratas menambah 53,608 kWh, 53% dari semua kWh yang ditambah site yang naik. || Los 5 sitios principales suman 53,608 kWh, el 53% de todos los kWh añadidos por los sitios que suben.
++19.8% vs Sep 2025 || +19.8% vs Sep 2025 || +19.8% vs sep 2025
+CT change || Perubahan CT || Cambio de CT
+Missing meter || Meter hilang || Medidor faltante
+Invoice gap || Selisih invoice || Brecha de factura
+Admits || Admits || Admits
+The new reading is not comparable with last year’s. Wait for engineering to confirm the billing basis. || Pembacaan baru tidak sebanding dengan tahun lalu. Tunggu engineering mengonfirmasi basis tagihan. || La nueva lectura no es comparable con la del año pasado. Espera a que ingeniería confirme la base de facturación.
+A meter billed last year has no kWh this year, so the drop is not a saving. Check the invoice. || Meter yang ditagih tahun lalu tidak punya kWh tahun ini, jadi penurunannya bukan penghematan. Cek invoice-nya. || Un medidor facturado el año pasado no tiene kWh este año, así que la baja no es un ahorro. Revisa la factura.
+The daily file shows 57,350 kWh against 36,240 on the invoice (+58%). The invoice may be missing a meter. || File harian menunjukkan 57,350 kWh dibanding 36,240 di invoice (+58%). Invoice mungkin kehilangan satu meter. || El archivo diario muestra 57,350 kWh frente a 36,240 en la factura (+58%). Puede que a la factura le falte un medidor.
+Admits exist for Sep 2025 but there is no kWh. If the site opened later, the Sep 2025 admits may be misrecorded. || Admits ada untuk Sep 2025 tetapi tidak ada kWh. Jika site baru buka belakangan, admits Sep 2025 mungkin salah catat. || Hay admits para Sep 2025 pero no hay kWh. Si el sitio abrió después, los admits de Sep 2025 pueden estar mal registrados.
+Admits for this site are estimated, so kWh per admit is approximate. || Admits site ini adalah estimasi, jadi kWh per admit hanya perkiraan. || Los admits de este sitio son estimados, así que el kWh por admit es aproximado.
+The daily file is above the invoice at 4 sites by 59,647 kWh in total (3.1% of last September’s base). || File harian lebih tinggi dari invoice di 4 site sebesar 59,647 kWh secara total (3.1% dari basis September tahun lalu). || El archivo diario está por encima de la factura en 4 sitios por 59,647 kWh en total (3.1% de la base de septiembre del año pasado).
+Weather || Cuaca || Clima
+A hotter September raises air-conditioning load. This needs temperature data. || September yang lebih panas menaikkan beban AC. Ini butuh data suhu. || Un septiembre más caluroso sube la carga del aire acondicionado. Esto requiere datos de temperatura.
+Operating hours and showtimes || Jam operasional dan jadwal tayang || Horario de operación y funciones
+More or longer screenings raise the load. This needs the schedule per site. || Lebih banyak atau lebih lama penayangan menaikkan beban. Ini butuh jadwal per site. || Más funciones o más largas suben la carga. Esto requiere el horario por sitio.
+Equipment changes || Perubahan peralatan || Cambios de equipo
+New or replaced AC, chillers or lighting change the base load. This needs the engineering log. || AC, chiller, atau lampu yang baru atau diganti mengubah beban dasar. Ini butuh catatan engineering. || Aire acondicionado, chillers o iluminación nuevos o reemplazados cambian la carga base. Esto requiere la bitácora de ingeniería.
+Shared mall load || Beban bersama mal || Carga compartida del centro comercial
+Where the mall bills common areas, part of the kWh is not our own use. This needs the allocation rule. || Jika mal menagih area bersama, sebagian kWh bukan pemakaian kita sendiri. Ini butuh aturan alokasinya. || Cuando el centro comercial factura las áreas comunes, parte del kWh no es uso propio. Esto requiere la regla de asignación.

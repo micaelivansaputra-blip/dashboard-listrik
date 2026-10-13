@@ -1,7 +1,7 @@
 import pathlib
 HERE=pathlib.Path(__file__).resolve().parent.parent
 import json,glob,re
-TOKD=re.compile(r'\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun|January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b|[+\u2212]?\d[\d,]*(?:\.\d+)?%?')
+TOKD=re.compile(r'\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun|January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b|[+−]?\d(?:[\d,]*\d)?(?:\.\d+)?%?')
 TOK=re.compile(TOKD.pattern.replace('(Mon|Tue|Wed|Thu|Fri|Sat|Sun|January','(January'))
 def conv(raw,tr):
     rx=TOKD if re.search(r'\d',raw) else TOK
