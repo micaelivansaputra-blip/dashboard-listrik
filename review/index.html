@@ -224,7 +224,7 @@ input[type=search]::placeholder{color:var(--muted)}
   <div class="card" id="costCard"><header><h2>Monthly electricity cost</h2><p>IDR billion, per invoice</p></header><div id="cCost"></div><p class="note" id="rate"></p></div>
 </section>
 
-<section class="card reveal" style="--i:5"><header><h2 id="regT">Variance to budget by region</h2><p>Red is above budget, green is below. With a comparison month, Change reads from the earlier month to the later one, for example July to September.</p></header>
+<section class="card reveal" style="--i:5"><header><h2 id="regT">Variance to budget by region</h2><p>Red is above budget, green is below. With a comparison month, Change reads from the earlier month to the later one, for example July to September. Var is per day.</p></header>
   <div class="scroll"><table id="tReg"></table></div></section>
 
 <section class="grid2b reveal" style="--i:6">
@@ -243,8 +243,8 @@ input[type=search]::placeholder{color:var(--muted)}
 <ul class="notes">
   <li>Actual kWh follows the electricity invoice recap: July 2,120,357 kWh, August 2,300,834 kWh and September 2,130,177 kWh for all 59 cinemas.</li>
   <li>Variance to budget is (actual − budget) ÷ budget. Plus means more electricity than planned (red), minus means less (green). Within 2% counts as on budget.</li>
-  <li>Change between two months is the difference in actual kWh (later month minus earlier month, for example July to September) and its percentage.</li>
-  <li>Paragon Square Mall is counted in the July total, but its first invoice covered a partial period, so its own July variance and its change vs July are shown as n/a.</li>
+  <li>Change kWh is the later month minus the earlier month, for example July to September. Var is the change in average kWh per day, (September kWh ÷ 30) ÷ (July kWh ÷ 31) − 1, so months of different length compare fairly.</li>
+  <li>Paragon Square Mall is counted in the July total, but its first invoice covered a partial period, so its July variance to budget is not meaningful and it is left out of rankings and cinema counts.</li>
   <li>K-Square Batam is still ramping up, so it sits far below budget in all three months.</li>
   <li>Zero Occupancy Energy Control: four sites started on 19 August and three more were added on 9 October.</li>
   
@@ -270,11 +270,12 @@ const cls=v=>v>0.02?'over':v<-0.02?'under':'flat';
 const pill=v=>v==null?'<span style="color:var(--muted)">n/a</span>':'<span class="pill '+cls(v)+'">'+pct(v)+'</span>';
 const idr=n=>{const a=Math.abs(n);return (n<0?'−':'')+'IDR '+(a>=1e9?(a/1e9).toFixed(2)+'B':(a/1e6).toFixed(0)+'M')};
 const sites=D.map(o=>({...o,b:[o.bj,o.ba,o.bs],a:[o.aj,o.aa,o.as_],c:HAS_COST?[o.cj,o.ca,o.cs]:null}));
+const bvt=(s,i)=>s.a[i]/s.b[i]-1;   // raw variance, shown in the table even for Paragon July
 const bv=(s,i)=>(s.id===PAR&&i===0)?null:s.a[i]/s.b[i]-1;                                   // variance to budget; Paragon July not comparable
 const FR=()=>Math.min(S.m,S.c),TO=()=>Math.max(S.m,S.c);   // changes always read from the earlier month to the later one
-const ch=(s,i,j)=>{const f=Math.min(i,j),t=Math.max(i,j);return (s.id===PAR&&f===0)?null:s.a[t]/s.a[f]-1};    // change in kWh between months
+const ch=(s,i,j)=>{const f=Math.min(i,j),t=Math.max(i,j);return (s.a[t]/DAYS[t])/(s.a[f]/DAYS[f])-1};   // Var between months: average kWh per day, as in the working sheet    // change in kWh between months
 function tot(list,i,ex){let b=0,a=0,c=0;list.forEach(s=>{if(HAS_COST)c+=s.c[i];if(ex&&s.id===PAR)return;b+=s.b[i];a+=s.a[i]});return{b,a,c,v:a/b-1}}
-function totCh(list,i,j){const f=Math.min(i,j),t=Math.max(i,j);return tot(list,t,false).a/tot(list,f,false).a-1}
+function totCh(list,i,j){const f=Math.min(i,j),t=Math.max(i,j);return (tot(list,t,false).a/DAYS[t])/(tot(list,f,false).a/DAYS[f])-1}
 function totD(list,i,j){const f=Math.min(i,j),t=Math.max(i,j);return tot(list,t,false).a-tot(list,f,false).a}
 const sgn=n=>(n>0?'+':n<0?'−':'')+fmt(Math.abs(n));
 const S={m:2,c:-1,r:'bud'};
@@ -327,7 +328,7 @@ function hero(){
   P.push([t.v>0?'over':'under',above+' of '+L.length+' cinemas are more than 2% above budget and '+below+' are more than 2% below.']);
   if(sorted[0].v>0.02)P.push(['over','Furthest above budget: '+top3.filter(x=>x.v>0.02).map(x=>x.s.n+' ('+pct(x.v)+')').join(', ')+'.']);
   P.push([regs[0].v>0?'over':'under','Region '+regs[0].r+' is the highest at '+pct(regs[0].v)+'. Region '+regs[5].r+' is the lowest at '+pct(regs[5].v)+'.']);
-  if(cmp){const v=totCh(sites,m,c),d=totD(sites,m,c);P.push(['',MN[TO()]+' is '+fmt(Math.abs(d))+' kWh ('+pct(v)+') '+(d>=0?'higher':'lower')+' than '+MN[FR()]+'.'])}
+  if(cmp){const v=totCh(sites,m,c),d=totD(sites,m,c);P.push(['',MN[TO()]+' is '+fmt(Math.abs(d))+' kWh '+(d>=0?'higher':'lower')+' than '+MN[FR()]+' ('+pct(v)+' per day).'])}
   $('pts').innerHTML=P.map((p,i)=>'<li style="--i:'+i+'"><i class="'+p[0]+'"></i><span>'+p[1]+'</span></li>').join('')}
 const KP=[0,1,2,3].map(i=>{const d=document.createElement('div');d.className='kpi';d.innerHTML='<span class="lab"></span><div class="v"></div><div class="d"></div>';$('kpis').appendChild(d);return{lab:d.children[0],v:d.children[1],d:d.children[2]}});
 function setK(i,label,num,f,sub,cl,key){const k=KP[i];k.lab.textContent=label;tween(k.v,num,f,key);k.v.className='v '+(cl||'');k.d.textContent=sub}
@@ -336,7 +337,7 @@ function kpis(){
   const above=sites.filter(s=>bv(s,m)>0.02).length,below=sites.filter(s=>bv(s,m)<-0.02).length;
   setK(0,MN[m]+' actual',t.a,n=>fmt(n)+' kWh','Budget '+fmt(t.b)+' kWh','','a');
   setK(1,'Gap to budget',t.a-t.b,n=>(n>0?'+':n<0?'−':'')+fmt(Math.abs(n))+' kWh',pct(t.v)+(t.a>t.b?' above':' below')+' budget',t.a>t.b?'pos':'neg','g');
-  if(cmp){const v=totCh(sites,m,c),d=totD(sites,m,c);setK(2,'Change '+MS[FR()]+' to '+MS[TO()],d,n=>sgn(n)+' kWh',pct(v)+' · '+fmt(tot(sites,FR(),false).a)+' to '+fmt(tot(sites,TO(),false).a)+' kWh',d>0?'pos':'neg','c')}
+  if(cmp){const v=totCh(sites,m,c),d=totD(sites,m,c);setK(2,'Change '+MS[FR()]+' to '+MS[TO()],d,n=>sgn(n)+' kWh','Var '+pct(v)+' per day · '+fmt(tot(sites,FR(),false).a)+' to '+fmt(tot(sites,TO(),false).a)+' kWh',d>0?'pos':'neg','c')}
   else setK(2,'Cinemas above budget',above,n=>Math.round(n)+' of 59',below+' below budget (more than 2% under)','','s');
   if(HAS_COST)setK(3,MN[m]+' cost',tAll.c,idr,cmp?pct(tAll.c/tot(sites,c,false).c-1)+' vs '+MN[c]:'Average '+fmt(tAll.c/tAll.a)+' IDR per kWh','','$');
   else if(cmp)setK(3,'Cinemas above budget',above,n=>Math.round(n)+' of 59',below+' below budget (more than 2% under)','','s');
@@ -385,7 +386,7 @@ function regionTable(){
   const m=S.m,c=S.c,cmp=c>=0;
   $('regT').textContent=cmp?'Variance to budget and change '+MN[FR()]+' to '+MN[TO()]+', by region':'Variance to budget by region, '+MN[m];
   const heat=v=>{const k=Math.min(Math.abs(v)/0.3,1)*50;return 'background:color-mix(in srgb,var('+(v>0?'--over-fill':'--under-fill')+') '+k.toFixed(0)+'%,var(--surface))'};
-  let h='<thead><tr><th>Region</th>'+MS.map((x,i)=>'<th class="'+(i===m?'sel':'')+'">'+x+' vs budget</th>').join('')+(cmp?'<th class="sel">Change '+MS[FR()]+' to '+MS[TO()]+' (kWh)</th><th class="sel">Change %</th>':'')+'<th>'+MS[m]+' actual kWh</th><th>'+MS[m]+' budget kWh</th><th>Gap kWh</th>'+(HAS_COST?'<th>'+MS[m]+' cost</th>':'')+'</tr></thead><tbody>';
+  let h='<thead><tr><th>Region</th>'+MS.map((x,i)=>'<th class="'+(i===m?'sel':'')+'">'+x+' vs budget</th>').join('')+(cmp?'<th class="sel">Change '+MS[FR()]+' to '+MS[TO()]+' (kWh)</th><th class="sel">Var</th>':'')+'<th>'+MS[m]+' actual kWh</th><th>'+MS[m]+' budget kWh</th><th>Gap kWh</th>'+(HAS_COST?'<th>'+MS[m]+' cost</th>':'')+'</tr></thead><tbody>';
   REG.concat(['All']).forEach(r=>{const l=r==='All'?sites:sites.filter(s=>s.rg===r),t=[0,1,2].map(i=>tot(l,i,false)),x=tot(l,m,false);
     h+='<tr style="'+(r==='All'?'font-weight:600':'')+'"><td>'+(r==='All'?'All regions':'Region '+r.slice(1))+'</td>'+t.map((z,i)=>'<td class="heat'+(i===m?' sel':'')+'" style="'+heat(z.v)+(i===m?'':';opacity:.78')+'">'+pct(z.v)+'</td>').join('')+(cmp?(function(){const v=totCh(l,m,c),d=totD(l,m,c);return '<td class="sel '+(d>0?'pos':'neg')+'">'+sgn(d)+'</td><td class="heat sel" style="'+heat(v)+'">'+pct(v)+'</td>'})():'')+'<td>'+fmt(x.a)+'</td><td>'+fmt(x.b)+'</td><td class="'+(x.a>x.b?'pos':'neg')+'">'+(x.a>x.b?'+':'−')+fmt(Math.abs(x.a-x.b))+'</td>'+(HAS_COST?'<td>'+idr(tot(l,m,false).c)+'</td>':'')+'</tr>'});
   $('tReg').innerHTML=h+'</tbody>'}
@@ -393,9 +394,9 @@ function rank(id,list){const mx=Math.max(0.0001,...list.map(x=>Math.abs(x.val)))
   el.innerHTML=list.map((x,k)=>{const s=x.s,sg=x.val>0?'over':'under';return '<div class="row" style="--i:'+k+'"><div class="nm"><span class="rank-n">'+(k+1)+'</span>'+s.n+'<small>Region '+s.rg.slice(1)+' · '+x.sub+'</small></div><div class="track"><div class="bar2 '+sg+'" data-w="'+(Math.abs(x.val)/mx*100).toFixed(1)+'" data-tip="'+s.n+': '+fmt(s.a[S.m])+' kWh vs budget '+fmt(s.b[S.m])+'"></div></div><div class="pv '+(x.val>0?'pos':'neg')+'">'+pct(x.val)+'</div></div>'}).join('');
   bindTip(el);requestAnimationFrame(()=>requestAnimationFrame(()=>el.querySelectorAll('.bar2').forEach(b=>b.style.width=b.dataset.w+'%')))}
 function lists(){const m=S.m,c=S.c,byChg=S.r==='chg'&&c>=0;
-  const L=sites.map(s=>({s,val:byChg?ch(s,m,c):bv(s,m)})).filter(x=>x.val!=null);
+  const L=sites.map(s=>({s,val:byChg?ch(s,m,c):bv(s,m)})).filter(x=>x.val!=null&&!(byChg&&x.s.id===PAR));
   L.forEach(x=>{const s=x.s;x.sub=byChg?sgn(s.a[TO()]-s.a[FR()])+' kWh ('+fmt(s.a[FR()])+' to '+fmt(s.a[TO()])+')':(s.a[m]>s.b[m]?'+':'−')+fmt(Math.abs(s.a[m]-s.b[m]))+' kWh vs budget'});
-  if(byChg){$('topT').textContent='Largest increase, '+MS[FR()]+' to '+MS[TO()];$('lowT').textContent='Largest decrease, '+MS[FR()]+' to '+MS[TO()];$('topS').textContent='Top 10 cinemas by change in kWh';$('lowS').textContent='Top 10 cinemas by change in kWh'}
+  if(byChg){$('topT').textContent='Largest increase, '+MS[FR()]+' to '+MS[TO()];$('lowT').textContent='Largest decrease, '+MS[FR()]+' to '+MS[TO()];$('topS').textContent='Top 10 cinemas by Var';$('lowS').textContent='Top 10 cinemas by Var'}
   else{$('topT').textContent='Most above budget in '+MN[m];$('lowT').textContent='Most below budget in '+MN[m];$('topS').textContent='Top 10 cinemas by variance to budget';$('lowS').textContent='Top 10 cinemas by variance to budget'}
   rank('top',[...L].sort((a,b)=>b.val-a.val).slice(0,10));rank('low',[...L].sort((a,b)=>a.val-b.val).slice(0,10))}
 function zoTable(){const m=S.m,c=S.c,cmp=c>=0;
@@ -405,7 +406,7 @@ function zoTable(){const m=S.m,c=S.c,cmp=c>=0;
   $('tZ').innerHTML=h+'</tbody>'}
 let sortKey='v',sortDir=-1;
 function fullTable(){const m=S.m,c=S.c,cmp=c>=0,qv=$('q').value.trim().toLowerCase(),f=cmp?FR():0,t=cmp?TO():0;
-  const cols=cmp?[['n','Cinema'],['rg','Region'],['cb',MS[f]+' budget'],['ca',MS[f]+' actual'],['cv',MS[f]+' var'],['b',MS[t]+' budget'],['a',MS[t]+' actual'],['v',MS[t]+' var'],['dk','Change kWh'],['chg','Change %']]
+  const cols=cmp?[['n','Cinema'],['rg','Region'],['cb',MS[f]+' budget'],['ca',MS[f]+' actual'],['cv',MS[f]+' var'],['b',MS[t]+' budget'],['a',MS[t]+' actual'],['v',MS[t]+' var'],['dk','Change kWh'],['chg','Var']]
    :[['n','Cinema'],['rg','Region'],['v',MS[m]+' vs budget'],['a',MS[m]+' actual kWh'],['b',MS[m]+' budget kWh'],['gap','Gap kWh']];
   const X=cmp?t:m;
   const val=(s,k)=>k==='n'?s.n:k==='rg'?s.rg:k==='v'?(bv(s,X)??-9):k==='a'?s.a[X]:k==='b'?s.b[X]:k==='gap'?s.a[m]-s.b[m]:k==='cb'?s.b[f]:k==='ca'?s.a[f]:k==='cv'?(bv(s,f)??-9):k==='dk'?(ch(s,t,f)==null?-1e9:s.a[t]-s.a[f]):(ch(s,t,f)??-9);
@@ -413,10 +414,10 @@ function fullTable(){const m=S.m,c=S.c,cmp=c>=0,qv=$('q').value.trim().toLowerCa
   const L=sites.filter(s=>!qv||s.n.toLowerCase().includes(qv)).sort((a,b)=>{const x=val(a,sortKey),y=val(b,sortKey);return (x>y?1:x<y?-1:0)*sortDir});
   let h='<thead>'+(cmp?'<tr><th colspan="2"></th><th colspan="3" style="text-align:center">'+MN[f]+'</th><th colspan="3" style="text-align:center">'+MN[t]+'</th><th colspan="2" style="text-align:center">Change '+MS[f]+' to '+MS[t]+'</th></tr>':'')+'<tr>'+cols.map(x=>'<th aria-sort="'+(x[0]===sortKey?(sortDir>0?'ascending':'descending'):'none')+'"><button data-k="'+x[0]+'">'+x[1]+(x[0]===sortKey?(sortDir>0?' ▲':' ▼'):'')+'</button></th>').join('')+'</tr></thead><tbody>';
   L.forEach(s=>{
-    if(cmp){const c2=ch(s,t,f),d=s.a[t]-s.a[f];h+='<tr><td>'+s.n+'</td><td>'+s.rg+'</td><td>'+fmt(s.b[f])+'</td><td>'+fmt(s.a[f])+'</td><td>'+pill(bv(s,f))+'</td><td>'+fmt(s.b[t])+'</td><td>'+fmt(s.a[t])+'</td><td>'+pill(bv(s,t))+'</td><td class="'+(d>0?'pos':'neg')+'">'+(c2==null?'n/a':sgn(d))+'</td><td>'+pill(c2)+'</td></tr>'}
-    else h+='<tr><td>'+s.n+'</td><td>'+s.rg+'</td><td>'+pill(bv(s,m))+'</td><td>'+fmt(s.a[m])+'</td><td>'+fmt(s.b[m])+'</td><td class="'+(s.a[m]>s.b[m]?'pos':'neg')+'">'+sgn(s.a[m]-s.b[m])+'</td></tr>'});
+    if(cmp){const c2=ch(s,t,f),d=s.a[t]-s.a[f];h+='<tr><td>'+s.n+'</td><td>'+s.rg+'</td><td>'+fmt(s.b[f])+'</td><td>'+fmt(s.a[f])+'</td><td>'+pill(bvt(s,f))+'</td><td>'+fmt(s.b[t])+'</td><td>'+fmt(s.a[t])+'</td><td>'+pill(bvt(s,t))+'</td><td class="'+(d>0?'pos':'neg')+'">'+(c2==null?'n/a':sgn(d))+'</td><td>'+pill(c2)+'</td></tr>'}
+    else h+='<tr><td>'+s.n+'</td><td>'+s.rg+'</td><td>'+pill(bvt(s,m))+'</td><td>'+fmt(s.a[m])+'</td><td>'+fmt(s.b[m])+'</td><td class="'+(s.a[m]>s.b[m]?'pos':'neg')+'">'+sgn(s.a[m]-s.b[m])+'</td></tr>'});
   if(cmp&&!qv){[['TOTAL (all 59 cinemas)',false],['TOTAL excl. Paragon',true]].forEach(r=>{const l=r[1]?sites.filter(s=>s.id!==PAR):sites,x=tot(l,f,false),y=tot(l,t,false),d=y.a-x.a;
-    h+='<tr style="font-weight:600"><td>'+r[0]+'</td><td></td><td>'+fmt(x.b)+'</td><td>'+fmt(x.a)+'</td><td>'+pill(x.v)+'</td><td>'+fmt(y.b)+'</td><td>'+fmt(y.a)+'</td><td>'+pill(y.v)+'</td><td class="'+(d>0?'pos':'neg')+'">'+sgn(d)+'</td><td>'+pill(y.a/x.a-1)+'</td></tr>'})}
+    h+='<tr style="font-weight:600"><td>'+r[0]+'</td><td></td><td>'+fmt(x.b)+'</td><td>'+fmt(x.a)+'</td><td>'+pill(x.v)+'</td><td>'+fmt(y.b)+'</td><td>'+fmt(y.a)+'</td><td>'+pill(y.v)+'</td><td class="'+(d>0?'pos':'neg')+'">'+sgn(d)+'</td><td>'+pill((y.a/DAYS[t])/(x.a/DAYS[f])-1)+'</td></tr>'})}
   if(!L.length)h+='<tr><td colspan="'+cols.length+'" style="text-align:center;color:var(--muted)">No cinema matches that search.</td></tr>';
   const e=$('tAll');e.innerHTML=h+'</tbody>';e.querySelectorAll('button').forEach(b=>b.onclick=()=>{const k=b.dataset.k;if(k===sortKey)sortDir*=-1;else{sortKey=k;sortDir=k==='n'||k==='rg'?1:-1}fullTable()})}
 $('q').addEventListener('input',fullTable);
@@ -444,7 +445,7 @@ buildMonth();buildCost();render();
       'Tip: choose a month under Compare with to see what moved between two months.',
       'Tip: tap a bar in the chart to switch month.',
       'Tip: open All 59 cinemas at the bottom to search any site.'];
-    if(S.c>=0){const v=totCh(sites,m,S.c);T.splice(2,0,MN[TO()]+' is '+Math.abs(v*100).toFixed(1)+'% '+(v>=0?'higher':'lower')+' in kWh than '+MN[FR()]+'.')}
+    if(S.c>=0){const v=totCh(sites,m,S.c);T.splice(2,0,MN[TO()]+' is '+Math.abs(v*100).toFixed(1)+'% '+(v>=0?'higher':'lower')+' per day than '+MN[FR()]+'.')}
     return T}
   function say(txt){bub.textContent=txt;bub.classList.add('on');clearTimeout(tm);tm=setTimeout(()=>bub.classList.remove('on'),6500)}
   btn.addEventListener('click',()=>{const T=tips();say(T[k%T.length]);k++;btn.classList.remove('hop');void btn.offsetWidth;if(!RM)btn.classList.add('hop')});
