@@ -1,10 +1,10 @@
 <title>Electricity Budget Review</title>
-<meta name="robots" content="noindex,nofollow">
 <meta name="claude:viewport-fit-sides" content="cover">
+<meta name="robots" content="noindex,nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: one executive column. Summary strip first, then trend, region heat table, follow-up lists, project sites, full table. */
+/* Layout: one executive column. Sticky controls (month, compare, rank) drive every block below. */
 :root{
   --bg:#F3F5F9; --surface:#FFFFFF; --ink:#0E1A2B; --ink2:#46566C; --muted:#76849A; --line:#E1E6EE;
   --accent:#0A66E8; --budget:#B4BECD; --over:#C73A2F; --under:#17856A; --soft:#EEF2F8;
@@ -17,13 +17,21 @@
   --bg:#080B12; --surface:#0F141E; --ink:#E8EDF6; --ink2:#A6B2C5; --muted:#76849A; --line:#212A3A;
   --accent:#4D8DFF; --budget:#4B566B; --over:#FF6F61; --under:#38C79C; --soft:#161D2B; color-scheme:dark}
 *{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:14px;line-height:1.5;
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:14px;line-height:1.5;margin:0;
   padding-block:28px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:10}
 .wrap{max-width:1040px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
 h1{font-size:26px;line-height:1.15;font-weight:600;letter-spacing:-.01em;margin:0;text-wrap:balance}
 h2{font-size:15px;font-weight:600;margin:0;text-wrap:balance}
 .sub{color:var(--ink2);margin:6px 0 0}
 .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.ctrl{position:sticky;top:env(safe-area-inset-top,0px);z-index:11;background:var(--bg);padding:10px 0;display:flex;gap:10px 22px;flex-wrap:wrap;align-items:center;border-bottom:1px solid var(--line)}
+.grp{display:flex;align-items:center;gap:10px}
+.seg{display:inline-flex;background:var(--soft);border-radius:9px;padding:3px;gap:2px}
+.seg button{all:unset;cursor:pointer;padding:5px 14px;border-radius:7px;font-size:13px;color:var(--ink2);font-weight:500}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.seg button:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+select{font:inherit;font-size:13px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 10px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px;min-width:0}
 .card>header{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:14px}
 .card>header p{margin:0;color:var(--muted);font-size:12.5px}
@@ -43,6 +51,8 @@ svg text{font-family:var(--font);fill:var(--ink2);font-size:11.5px}
 svg .num{font-family:var(--mono);fill:var(--ink);font-size:11.5px}
 svg .grid{stroke:var(--line);stroke-width:1}
 svg .bud{fill:var(--budget)} svg .act{fill:var(--accent)}
+svg g.mo{cursor:pointer;transition:opacity .15s} svg g.mo.dim{opacity:.4}
+svg .cmpmark{fill:none;stroke:var(--ink);stroke-width:1.5;stroke-dasharray:4 3}
 .legend{display:flex;gap:16px;font-size:12.5px;color:var(--ink2);margin-bottom:8px;flex-wrap:wrap}
 .legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
 table{border-collapse:collapse;width:100%}
@@ -50,6 +60,7 @@ th,td{padding:9px 10px;text-align:right;border-bottom:1px solid var(--line);font
 th:first-child,td:first-child{text-align:left}
 th{font-weight:500;color:var(--muted);font-size:12px}
 td.heat{font-family:var(--mono);font-size:13px}
+td.sel,th.sel{font-weight:600;color:var(--ink)}
 .scroll{overflow-x:auto}
 .rows{display:flex;flex-direction:column;gap:2px}
 .row{display:grid;grid-template-columns:minmax(120px,1.1fr) 2fr 64px;gap:12px;align-items:center;padding:7px 0;min-width:0}
@@ -69,7 +80,7 @@ th button{all:unset;cursor:pointer;color:inherit;font:inherit}
 th button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 #tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--surface);font-size:12px;padding:6px 9px;border-radius:6px;z-index:20;opacity:0;transition:opacity .12s;max-width:240px}
 @media(max-width:820px){.kpis{grid-template-columns:repeat(2,1fr)}.grid2,.grid2b{grid-template-columns:1fr}.row{grid-template-columns:1fr 64px}.row .track{grid-column:1/-1;order:3}.row .pv{order:2}}
-@media(prefers-reduced-motion:reduce){#tip{transition:none}}
+@media(prefers-reduced-motion:reduce){#tip,svg g.mo{transition:none}}
 </style>
 <div class="wrap">
 <header>
@@ -77,17 +88,23 @@ th button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);ou
   <h1>Electricity Budget Review, July to September 2026</h1>
   <p class="sub" id="sub"></p>
 </header>
+<div class="ctrl" role="group" aria-label="View options">
+  <div class="grp"><span class="eyebrow">Month</span><div class="seg" id="segM"></div></div>
+  <div class="grp"><label class="eyebrow" for="cmp">Compare with</label><select id="cmp"></select></div>
+  <div class="grp" id="rankGrp" hidden><span class="eyebrow">Rank by</span><div class="seg" id="segR"></div></div>
+</div>
 <section class="kpis" id="kpis" aria-label="Key figures"></section>
-<section>
-  <div class="card"><header><h2>Monthly kWh: actual vs budget</h2><p>All 59 cinemas</p></header>
+<section class="grid2" id="chartRow">
+  <div class="card"><header><h2>Monthly kWh: actual vs budget</h2><p id="cmNote">Click a month to select it</p></header>
     <div class="legend"><span><i style="background:var(--budget)"></i>Budget</span><span><i style="background:var(--accent)"></i>Actual</span></div>
     <div id="cMonth"></div></div>
+  <div class="card" id="costCard"><header><h2>Monthly electricity cost</h2><p>IDR billion, per invoice</p></header><div id="cCost"></div><p class="note" id="rate"></p></div>
 </section>
-<section class="card"><header><h2>Variance to budget by region</h2><p>Actual vs budget, kWh. Red is above budget, green is below.</p></header>
+<section class="card"><header><h2 id="regT">Variance to budget by region</h2><p>Red is above, green is below. Changes between months use average kWh per day.</p></header>
   <div class="scroll"><table id="tReg"></table></div></section>
 <section class="grid2b">
-  <div class="card"><header><h2>Highest above budget in September</h2><p>Top 10 sites, variance %</p></header><div class="rows" id="top"></div></div>
-  <div class="card"><header><h2>Best below budget in September</h2><p>Top 10 sites, variance %</p></header><div class="rows" id="low"></div></div>
+  <div class="card"><header><h2 id="topT"></h2><p id="topS"></p></header><div class="rows" id="top"></div></div>
+  <div class="card"><header><h2 id="lowT"></h2><p id="lowS"></p></header><div class="rows" id="low"></div></div>
 </section>
 <section class="card"><header><h2>Zero Occupancy Energy Control sites</h2><p>Program started 19 August. Variance to budget by month.</p></header>
   <div class="scroll"><table id="tZ"></table></div></section>
@@ -97,77 +114,121 @@ th button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);ou
 <section class="card"><header><h2>Data notes</h2></header>
 <ul class="notes">
   <li>Actual kWh comes from the corrected invoice file. September kWh for Kalibata City Square, Q Mall Banjarbaru, Mall of Serang, Palembang Icon, Citimall Sampit and Java Supermal use the corrected invoices.</li>
-  <li>Paragon Square Mall is left out of the July totals because its first invoice covered a partial period.</li>
+  <li>Paragon Square Mall is left out of July totals and of any comparison with July, because its first invoice covered a partial period.</li>
   <li>K-Square Batam is still ramping up, so it sits far below budget in all three months.</li>
+  <li>Month-to-month changes use average kWh per day (July 31 days, August 31 days, September 30 days).</li>
+  
   <li>Invoice periods can start mid-month, so a billed month may differ from the calendar month.</li>
 </ul></section>
 </div>
 <div id="tip" role="tooltip"></div>
 <script>
+const HAS_COST=false;
 const D=[{"id":41,"rg":"R1","n":"Plaza Medan Fair","bj":83422,"aj":76056,"ba":87263,"aa":74227,"bs":66216,"as_":69401},{"id":49,"rg":"R1","n":"Living World Pekanbaru","bj":86032,"aj":76195,"ba":92735,"aa":81649,"bs":63193,"as_":72850},{"id":50,"rg":"R1","n":"Mal Botania 2","bj":44519,"aj":38295,"ba":48377,"aa":38883,"bs":39258,"as_":33135},{"id":54,"rg":"R1","n":"Mal Mandau City","bj":42690,"aj":33203,"ba":46056,"aa":34242,"bs":31673,"as_":35389},{"id":58,"rg":"R1","n":"Binjai Supermall","bj":36631,"aj":34574,"ba":37697,"aa":31538,"bs":31120,"as_":35505},{"id":64,"rg":"R1","n":"Siantar City Square","bj":18994,"aj":16648,"ba":20325,"aa":14808,"bs":14739,"as_":14100},{"id":65,"rg":"R1","n":"Mall Pekanbaru","bj":22238,"aj":18746,"ba":24008,"aa":19169,"bs":16951,"as_":17858},{"id":71,"rg":"R1","n":"K-Square Batam","bj":62731,"aj":33641,"ba":57480,"aa":27841,"bs":62696,"as_":28043},{"id":7,"rg":"R1","n":"Sun Plaza","bj":120693,"aj":104288,"ba":130497,"aa":120520,"bs":98422,"as_":100472},{"id":8,"rg":"R1","n":"Lippo Plaza Medan","bj":28685,"aj":26320,"ba":30815,"aa":30714,"bs":21817,"as_":28567},{"id":11,"rg":"R2","n":"Maxxbox Lippo Village","bj":63248,"aj":64167,"ba":68247,"aa":77967,"bs":48535,"as_":61917},{"id":13,"rg":"R2","n":"Lippo Plaza Jambi","bj":46481,"aj":44100,"ba":49448,"aa":46400,"bs":36325,"as_":41880},{"id":20,"rg":"R2","n":"Mall of Serang","bj":17445,"aj":16320,"ba":18597,"aa":17440,"bs":13618,"as_":16640},{"id":33,"rg":"R2","n":"Lippo Plaza Lubuk Linggau","bj":39588,"aj":32480,"ba":41402,"aa":34528,"bs":30548,"as_":32352},{"id":3,"rg":"R2","n":"Palembang Icon","bj":69916,"aj":63232,"ba":74233,"aa":75620,"bs":54652,"as_":62948},{"id":47,"rg":"R2","n":"Citimall Prabumulih","bj":25649,"aj":24067,"ba":27347,"aa":24413,"bs":20217,"as_":22775},{"id":56,"rg":"R2","n":"Gajah Mada Plaza","bj":34755,"aj":47126,"ba":37031,"aa":50823,"bs":26448,"as_":48472},{"id":61,"rg":"R2","n":"Mangga Dua Square","bj":23823,"aj":28963,"ba":26630,"aa":30393,"bs":21821,"as_":25744},{"id":68,"rg":"R2","n":"Citiplaza Kutabumi","bj":18274,"aj":20429,"ba":19450,"aa":19674,"bs":14274,"as_":19470},{"id":28,"rg":"R3","n":"Citimall Sampit","bj":38800,"aj":32743,"ba":41394,"aa":36195,"bs":29698,"as_":32297},{"id":2,"rg":"R3","n":"Lippo Mall Nusantara","bj":39139,"aj":39625,"ba":41653,"aa":44745,"bs":30816,"as_":39705},{"id":31,"rg":"R3","n":"Living Plaza Balikpapan","bj":65853,"aj":60111,"ba":71035,"aa":65272,"bs":49529,"as_":50548},{"id":32,"rg":"R3","n":"Pluit Village","bj":51936,"aj":49440,"ba":51966,"aa":52480,"bs":38444,"as_":49280},{"id":40,"rg":"R3","n":"Kalibata City Square","bj":23095,"aj":18811,"ba":24639,"aa":22598,"bs":17886,"as_":22273},{"id":42,"rg":"R3","n":"Citimall Ketapang","bj":32454,"aj":22724,"ba":34525,"aa":31240,"bs":24842,"as_":24776},{"id":45,"rg":"R3","n":"Q Mall Banjarbaru","bj":42367,"aj":33290,"ba":43882,"aa":33839,"bs":33427,"as_":34288},{"id":62,"rg":"R3","n":"The Park Pejaten","bj":70228,"aj":59250,"ba":74792,"aa":57409,"bs":53961,"as_":62456},{"id":67,"rg":"R3","n":"Kebayoran Park Mall","bj":21984,"aj":19204,"ba":23380,"aa":20831,"bs":17200,"as_":20506},{"id":69,"rg":"R3","n":"Senayan Park","bj":96282,"aj":105249,"ba":102453,"aa":104128,"bs":74454,"as_":96365},{"id":70,"rg":"R3","n":"Mall The Galeria","bj":40701,"aj":39504,"ba":24597,"aa":39536,"bs":32470,"as_":35536},{"id":14,"rg":"R4","n":"Mall Lippo Cikarang","bj":57923,"aj":50784,"ba":61704,"aa":49056,"bs":44655,"as_":50976},{"id":17,"rg":"R4","n":"Lippo Plaza Ekalokasari","bj":51460,"aj":42144,"ba":54766,"aa":46480,"bs":39333,"as_":42592},{"id":26,"rg":"R4","n":"Istana Plaza","bj":25403,"aj":18749,"ba":27215,"aa":22981,"bs":19125,"as_":22021},{"id":35,"rg":"R4","n":"Lippo Plaza Keboen Raya Bogor","bj":35166,"aj":32411,"ba":37440,"aa":35926,"bs":26949,"as_":35470},{"id":38,"rg":"R4","n":"Depok Town Square","bj":62636,"aj":61794,"ba":66860,"aa":62756,"bs":48569,"as_":57956},{"id":39,"rg":"R4","n":"Lippo Icon Cibubur","bj":49251,"aj":48600,"ba":53898,"aa":52900,"bs":36837,"as_":52900},{"id":44,"rg":"R4","n":"Tamini Square","bj":34193,"aj":28700,"ba":36510,"aa":34600,"bs":26909,"as_":33800},{"id":57,"rg":"R4","n":"Distrik 1 Meikarta","bj":22699,"aj":19103,"ba":24143,"aa":21663,"bs":17486,"as_":19623},{"id":63,"rg":"R4","n":"Blu Plaza Bekasi","bj":22220,"aj":20316,"ba":23668,"aa":22118,"bs":17347,"as_":20208},{"id":66,"rg":"R4","n":"Pondok Kelapa Town Square","bj":31874,"aj":28208,"ba":33380,"aa":27328,"bs":24779,"as_":25856},{"id":10,"rg":"R5","n":"Lippo Plaza Jogja","bj":54304,"aj":24147,"ba":58018,"aa":27407,"bs":41003,"as_":24009},{"id":22,"rg":"R5","n":"Java Supermal","bj":4047,"aj":3328,"ba":4324,"aa":3472,"bs":3122,"as_":3072},{"id":24,"rg":"R5","n":"Lippo Plaza Batu","bj":7645,"aj":5608,"ba":8124,"aa":6323,"bs":5886,"as_":5461},{"id":27,"rg":"R5","n":"Malang Town Square","bj":39584,"aj":37760,"ba":42408,"aa":38920,"bs":30561,"as_":36240},{"id":34,"rg":"R5","n":"Pacific Mall Tegal","bj":49391,"aj":38050,"ba":52727,"aa":40768,"bs":38100,"as_":41153},{"id":43,"rg":"R5","n":"Lippo Plaza Jember","bj":46408,"aj":38880,"ba":49602,"aa":42608,"bs":34897,"as_":38304},{"id":53,"rg":"R5","n":"City of Tomorrow","bj":38867,"aj":28474,"ba":41533,"aa":31490,"bs":30893,"as_":29245},{"id":5,"rg":"R5","n":"Ponorogo City Center","bj":32833,"aj":24064,"ba":34949,"aa":27248,"bs":25074,"as_":26880},{"id":60,"rg":"R5","n":"Lippo Plaza Sidoarjo","bj":27982,"aj":26292,"ba":29418,"aa":27974,"bs":21276,"as_":24279},{"id":16,"rg":"R6","n":"Lippo Plaza Buton","bj":20123,"aj":15701,"ba":21400,"aa":14726,"bs":15420,"as_":15374},{"id":19,"rg":"R6","n":"Lippo Plaza Kupang","bj":27545,"aj":19840,"ba":29475,"aa":23216,"bs":20622,"as_":21104},{"id":21,"rg":"R6","n":"Lippo Plaza Kendari","bj":43256,"aj":6527,"ba":46045,"aa":6836,"bs":33064,"as_":7451},{"id":30,"rg":"R6","n":"Plaza Renon","bj":21414,"aj":16064,"ba":22900,"aa":16752,"bs":16362,"as_":15760},{"id":37,"rg":"R6","n":"Mall Phinisi Point","bj":59543,"aj":55087,"ba":63707,"aa":60541,"bs":46103,"as_":51837},{"id":4,"rg":"R6","n":"Lippo Plaza Manado","bj":73926,"aj":56992,"ba":71629,"aa":62912,"bs":54328,"as_":54528},{"id":51,"rg":"R6","n":"Lippo Plaza Sunset","bj":30626,"aj":24574,"ba":32815,"aa":30557,"bs":24412,"as_":27288},{"id":52,"rg":"R6","n":"Sidewalk Jimbaran","bj":46736,"aj":33690,"ba":49499,"aa":36850,"bs":35577,"as_":31600},{"id":6,"rg":"R6","n":"LM Kuta","bj":40694,"aj":32970,"ba":42427,"aa":38240,"bs":31777,"as_":34789},{"id":72,"rg":"R6","n":"Paragon Square Mall","bj":40118,"aj":2699,"ba":36089,"aa":29064,"bs":34802,"as_":28231}];
 const ZO={7:'Original 4',50:'Original 4',34:'Original 4',69:'Original 4',51:'Added 9 Oct',39:'Added 9 Oct',37:'Added 9 Oct'};
-const M=['Jul','Aug','Sep'];
+const MS=['Jul','Aug','Sep'],MN=['July','August','September'],DAYS=[31,31,30];
 const fmt=n=>Math.round(n).toLocaleString('en-US');
 const pct=(v,d=1)=>(v>0?'+':v<0?'−':'')+Math.abs(v*100).toFixed(d)+'%';
 const cls=v=>v>0.02?'over':v<-0.02?'under':'flat';
-const pill=v=>'<span class="pill '+cls(v)+'">'+pct(v)+'</span>';
-// monthly arrays; Jul excludes Paragon (id 72, partial first invoice)
-const sites=D.map(o=>({...o,b:[o.bj,o.ba,o.bs],a:[o.aj,o.aa,o.as_],v:null}));
-sites.forEach(s=>{s.v=s.a.map((x,i)=>x/s.b[i]-1);s.v[0]=s.id===72?null:s.v[0];});
-function tot(list,i){let b=0,a=0;list.forEach(s=>{if(i===0&&s.id===72)return;b+=s.b[i];a+=s.a[i]});return{b,a,v:a/b-1}}
-const T=[0,1,2].map(i=>tot(sites,i));
-document.getElementById('sub').textContent='59 cinemas, six regions. Figures are monthly kWh per electricity invoice, compared with the FY2026 budget.';
-// KPIs
-const above=sites.filter(s=>s.v[2]>0.02).length,below=sites.filter(s=>s.v[2]<-0.02).length;
-document.getElementById('kpis').innerHTML=[
- ['September actual',fmt(T[2].a)+' kWh','Budget '+fmt(T[2].b)+' kWh'],
- ['September vs budget','<span class="'+(T[2].v>0?'pos':'neg')+'">'+pct(T[2].v)+'</span>',fmt(T[2].a-T[2].b)+' kWh over budget'],
- ['September vs August','<span class="'+(T[2].a<T[1].a?'neg':'pos')+'">'+pct(T[2].a/T[1].a-1)+'</span>',fmt(T[1].a)+' kWh in August'],
- ['Sites above budget',above+' of 59',below+' below budget (more than 2% under)']
-].map(k=>'<div class="kpi"><div class="eyebrow">'+k[0]+'</div><div class="v">'+k[1]+'</div><div class="d">'+k[2]+'</div></div>').join('');
+const pill=v=>v==null?'n/a':'<span class="pill '+cls(v)+'">'+pct(v)+'</span>';
+const idr=n=>{const a=Math.abs(n);return (n<0?'−':'')+'IDR '+(a>=1e9?(a/1e9).toFixed(2)+'B':(a/1e6).toFixed(0)+'M')};
+const $=id=>document.getElementById(id);
+const sites=D.map(o=>({...o,b:[o.bj,o.ba,o.bs],a:[o.aj,o.aa,o.as_],c:HAS_COST?[o.cj,o.ca,o.cs]:null}));
+const PAR=72;
+// variance to budget for a site in month i; Paragon July is not comparable
+const bv=(s,i)=>(s.id===PAR&&i===0)?null:s.a[i]/s.b[i]-1;
+// change per day between months i and j
+const ch=(s,i,j)=>(s.id===PAR&&(i===0||j===0))?null:(s.a[i]/DAYS[i])/(s.a[j]/DAYS[j])-1;
+function tot(list,i,ex){let b=0,a=0,c=0;list.forEach(s=>{if(HAS_COST)c+=s.c[i];if(ex&&s.id===PAR)return;b+=s.b[i];a+=s.a[i]});return{b,a,c,v:a/b-1}}
+function totCh(list,i,j){const ex=i===0||j===0,x=tot(list,i,ex),y=tot(list,j,ex);return (x.a/DAYS[i])/(y.a/DAYS[j])-1}
+const S={m:2,c:-1,r:'bud'};
+$('sub').textContent='59 cinemas, six regions. Figures are monthly kWh'+(HAS_COST?' and cost':'')+' per electricity invoice, compared with the FY2026 budget.';
+// controls
+function drawCtrl(){
+ $('segM').innerHTML=MS.map((m,i)=>'<button data-i="'+i+'" aria-pressed="'+(S.m===i)+'">'+m+'</button>').join('');
+ $('segM').querySelectorAll('button').forEach(b=>b.onclick=()=>setM(+b.dataset.i));
+ $('cmp').innerHTML='<option value="-1">No comparison</option>'+MN.map((n,i)=>i===S.m?'':'<option value="'+i+'"'+(S.c===i?' selected':'')+'>'+n+'</option>').join('');
+ $('rankGrp').hidden=S.c<0;
+ $('segR').innerHTML=[['bud','Budget variance'],['chg','Change vs '+(S.c>=0?MS[S.c]:'')]].map(r=>'<button data-r="'+r[0]+'" aria-pressed="'+(S.r===r[0])+'">'+r[1]+'</button>').join('');
+ $('segR').querySelectorAll('button').forEach(b=>b.onclick=()=>{S.r=b.dataset.r;render()})}
+function setM(i){S.m=i;if(S.c===i)S.c=-1;if(S.c<0)S.r='bud';render()}
+$('cmp').onchange=e=>{S.c=+e.target.value;if(S.c<0)S.r='bud';render()};
 // tooltip
-const tip=document.getElementById('tip');
+const tip=$('tip');
 function bindTip(root){root.querySelectorAll('[data-tip]').forEach(e=>{
  e.addEventListener('mousemove',ev=>{tip.textContent=e.dataset.tip;tip.style.opacity=1;tip.style.left=Math.min(ev.clientX+12,innerWidth-250)+'px';tip.style.top=(ev.clientY+14)+'px'});
  e.addEventListener('mouseleave',()=>tip.style.opacity=0)})}
-// month chart
-(function(){
+function kpis(){const m=S.m,c=S.c,t=tot(sites,m,m===0),cmp=c>=0;
+ const above=sites.filter(s=>bv(s,m)>0.02).length,below=sites.filter(s=>bv(s,m)<-0.02).length;
+ const k=[
+  [MN[m]+' actual',fmt(t.a)+' kWh','Budget '+fmt(t.b)+' kWh'],
+  [MN[m]+' vs budget','<span class="'+(t.v>0?'pos':'neg')+'">'+pct(t.v)+'</span>',fmt(Math.abs(t.a-t.b))+' kWh '+(t.a>t.b?'over':'under')+' budget'],
+  cmp?[MN[m]+' vs '+MN[c],'<span class="'+(totCh(sites,m,c)>0?'pos':'neg')+'">'+pct(totCh(sites,m,c))+'</span>','per day; '+fmt(tot(sites,c,c===0||m===0).a)+' kWh in '+MN[c]]:['Sites above budget',above+' of 59',below+' below budget (more than 2% under)'],
+  HAS_COST?[MN[m]+' cost',idr(t.c),cmp?(pct(t.c/tot(sites,c,false).c-1)+' vs '+MN[c]):'Average '+fmt(t.c/tot(sites,m,false).a)+' IDR per kWh']:[cmp?'Sites above budget':'Sites below budget',cmp?above+' of 59':below+' of 59',cmp?below+' below budget':'More than 2% under budget']
+ ];
+ $('kpis').innerHTML=k.map(x=>'<div class="kpi"><div class="eyebrow">'+x[0]+'</div><div class="v">'+x[1]+'</div><div class="d">'+x[2]+'</div></div>').join('')}
+function monthChart(){
+ const T=[0,1,2].map(i=>tot(sites,i,i===0));
  const W=560,H=280,L=44,B=28,Tp=26,pw=W-L-8,ph=H-B-Tp,max=3e6;
  const y=v=>Tp+ph-v/max*ph;let s='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Monthly actual versus budget kWh">';
  [0,1,2,3].forEach(t=>{s+='<line class="grid" x1="'+L+'" x2="'+(W-8)+'" y1="'+y(t*1e6)+'" y2="'+y(t*1e6)+'"/><text x="'+(L-8)+'" y="'+(y(t*1e6)+4)+'" text-anchor="end">'+t+'M</text>'});
  const gw=pw/3,bw=44;
- T.forEach((t,i)=>{const cx=L+gw*i+gw/2;
-  s+='<rect class="bud" data-tip="'+M[i]+' budget: '+fmt(t.b)+' kWh" x="'+(cx-bw-2)+'" y="'+y(t.b)+'" width="'+bw+'" height="'+(ph-(y(t.b)-Tp))+'" rx="4"/>';
-  s+='<rect class="act" data-tip="'+M[i]+' actual: '+fmt(t.a)+' kWh ('+pct(t.v)+')" x="'+(cx+2)+'" y="'+y(t.a)+'" width="'+bw+'" height="'+(ph-(y(t.a)-Tp))+'" rx="4"/>';
+ T.forEach((t,i)=>{const cx=L+gw*i+gw/2,sel=i===S.m,cm=i===S.c;
+  s+='<g class="mo'+(sel||cm?'':' dim')+'" data-m="'+i+'">';
+  s+='<rect x="'+(cx-gw/2+6)+'" y="'+Tp+'" width="'+(gw-12)+'" height="'+(ph+B-6)+'" fill="transparent"/>';
+  s+='<rect class="bud" data-tip="'+MS[i]+' budget: '+fmt(t.b)+' kWh" x="'+(cx-bw-2)+'" y="'+y(t.b)+'" width="'+bw+'" height="'+(ph-(y(t.b)-Tp))+'" rx="4"/>';
+  s+='<rect class="act" data-tip="'+MS[i]+' actual: '+fmt(t.a)+' kWh ('+pct(t.v)+' vs budget)" x="'+(cx+2)+'" y="'+y(t.a)+'" width="'+bw+'" height="'+(ph-(y(t.a)-Tp))+'" rx="4"/>';
+  if(cm)s+='<rect class="cmpmark" x="'+(cx-bw-6)+'" y="'+(y(Math.max(t.a,t.b))-20)+'" width="'+(2*bw+12)+'" height="'+(ph-(y(Math.max(t.a,t.b))-Tp)+20)+'" rx="6"/>';
   s+='<text class="num" x="'+(cx-bw/2-2)+'" y="'+(y(t.b)-6)+'" text-anchor="middle">'+(t.b/1e6).toFixed(2)+'</text><text class="num" x="'+(cx+bw/2+2)+'" y="'+(y(t.a)-6)+'" text-anchor="middle">'+(t.a/1e6).toFixed(2)+'</text>';
-  s+='<text x="'+cx+'" y="'+(H-8)+'" text-anchor="middle" style="fill:var(--ink)">'+['July','August','September'][i]+' ('+pct(t.v)+')</text>'});
- document.getElementById('cMonth').innerHTML=s+'</svg>';bindTip(document.getElementById('cMonth'))})();
-// region heat table
-(function(){
- const R=['R1','R2','R3','R4','R5','R6'];
- const heat=v=>{const m=Math.min(Math.abs(v)/0.3,1)*55;return 'background:color-mix(in srgb,var('+(v>0?'--over':'--under')+') '+m.toFixed(0)+'%,var(--surface))'};
- let h='<tr><th>Region</th>'+M.map(m=>'<th>'+m+' var</th>').join('')+'<th>Sep actual kWh</th><th>Sep budget kWh</th><th>Sep gap kWh</th></tr>';
- R.concat(['All']).forEach(r=>{const l=r==='All'?sites:sites.filter(s=>s.rg===r),t=[0,1,2].map(i=>tot(l,i));
-  h+='<tr style="'+(r==='All'?'font-weight:600':'')+'"><td>'+(r==='All'?'All regions':r)+'</td>'+t.map(x=>'<td class="heat" style="'+heat(x.v)+'">'+pct(x.v)+'</td>').join('')+'<td>'+fmt(t[2].a)+'</td><td>'+fmt(t[2].b)+'</td><td class="'+(t[2].a>t[2].b?'pos':'neg')+'">'+(t[2].a>t[2].b?'+':'−')+fmt(Math.abs(t[2].a-t[2].b))+'</td></tr>'});
- document.getElementById('tReg').innerHTML=h})();
-// ranked lists
-function rank(id,list,sign){const mx=Math.max(...list.map(s=>Math.abs(s.v[2])));
- document.getElementById(id).innerHTML=list.map(s=>'<div class="row"><div class="nm">'+s.n+'<small>'+s.rg+' · '+(s.as_>s.bs?'+':'−')+fmt(Math.abs(s.as_-s.bs))+' kWh vs budget</small></div><div class="track"><div class="bar '+sign+'" style="width:'+(Math.abs(s.v[2])/mx*100).toFixed(1)+'%" data-tip="'+s.n+': '+fmt(s.as_)+' kWh vs budget '+fmt(s.bs)+'"></div></div><div class="pv '+(sign==='over'?'pos':'neg')+'">'+pct(s.v[2])+'</div></div>').join('');bindTip(document.getElementById(id))}
-rank('top',[...sites].sort((a,b)=>b.v[2]-a.v[2]).slice(0,10),'over');
-rank('low',[...sites].sort((a,b)=>a.v[2]-b.v[2]).slice(0,10),'under');
-// zero occupancy
-(function(){let h='<tr><th>Cinema</th><th>Group</th>'+M.map(m=>'<th>'+m+'</th>').join('')+'<th>Sep actual kWh</th><th>Δ Jul to Sep (kWh/day)</th></tr>';
- sites.filter(s=>ZO[s.id]).sort((a,b)=>((ZO[a.id]==='Original 4'?0:1)-(ZO[b.id]==='Original 4'?0:1))||a.v[2]-b.v[2]).forEach(s=>{
-  const dd=s.id===72||!s.aj?'n/a':pct((s.as_/30)/(s.aj/31)-1);
-  h+='<tr><td>'+s.n+'</td><td>'+ZO[s.id]+'</td>'+s.v.map(v=>'<td>'+(v==null?'n/a':pill(v))+'</td>').join('')+'<td>'+fmt(s.as_)+'</td><td>'+dd+'</td></tr>'});
- document.getElementById('tZ').innerHTML=h})();
-// full table
-(function(){let key='sv',dir=-1;
- const cols=[['n','Cinema'],['rg','Region'],['jv','Jul var'],['av','Aug var'],['sv','Sep var'],['as_','Sep actual'],['bs','Sep budget'],['gap','Gap kWh']];
- const val=(s,k)=>k==='n'?s.n:k==='rg'?s.rg:k==='jv'?(s.v[0]??-9):k==='av'?s.v[1]:k==='sv'?s.v[2]:k==='gap'?s.as_-s.bs:s[k];
- function draw(){const L=[...sites].sort((a,b)=>{const x=val(a,key),y=val(b,key);return (x>y?1:x<y?-1:0)*dir});
-  let h='<tr>'+cols.map(c=>'<th aria-sort="'+(c[0]===key?(dir>0?'ascending':'descending'):'none')+'"><button data-k="'+c[0]+'">'+c[1]+(c[0]===key?(dir>0?' ▲':' ▼'):'')+'</button></th>').join('')+'</tr>';
-  L.forEach(s=>{h+='<tr><td>'+s.n+'</td><td>'+s.rg+'</td><td>'+(s.v[0]==null?'n/a':pill(s.v[0]))+'</td><td>'+pill(s.v[1])+'</td><td>'+pill(s.v[2])+'</td><td>'+fmt(s.as_)+'</td><td>'+fmt(s.bs)+'</td><td class="'+(s.as_>s.bs?'pos':'neg')+'">'+(s.as_>s.bs?'+':'−')+fmt(Math.abs(s.as_-s.bs))+'</td></tr>'});
-  const e=document.getElementById('tAll');e.innerHTML=h;e.querySelectorAll('button').forEach(b=>b.onclick=()=>{const k=b.dataset.k;if(k===key)dir*=-1;else{key=k;dir=k==='n'||k==='rg'?1:-1}draw()})}
- draw()})();
+  s+='<text x="'+cx+'" y="'+(H-8)+'" text-anchor="middle" style="fill:var(--ink);font-weight:'+(sel?600:400)+'">'+MN[i]+' ('+pct(t.v)+')'+(cm?' · compare':'')+'</text></g>'});
+ $('cMonth').innerHTML=s+'</svg>';bindTip($('cMonth'));
+ $('cMonth').querySelectorAll('g.mo').forEach(g=>g.onclick=()=>setM(+g.dataset.m));
+ $('cmNote').textContent='Click a month to select it'+(S.c>=0?'. Dashed outline marks the comparison month.':'')}
+function costChart(){
+ if(!HAS_COST){const cc=$('costCard');if(cc){cc.remove();$('chartRow').className=''}return}
+ const T=[0,1,2].map(i=>tot(sites,i,false));
+ const W=340,H=280,L=36,B=28,Tp=26,ph=H-B-Tp,max=5;
+ const y=v=>Tp+ph-v/max*ph;let s='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Monthly electricity cost in IDR billion">';
+ [0,1,2,3,4,5].forEach(t=>{s+='<line class="grid" x1="'+L+'" x2="'+(W-4)+'" y1="'+y(t)+'" y2="'+y(t)+'"/><text x="'+(L-8)+'" y="'+(y(t)+4)+'" text-anchor="end">'+t+'</text>'});
+ const gw=(W-L-4)/3,bw=52;
+ T.forEach((t,i)=>{const cx=L+gw*i+gw/2,v=t.c/1e9,sel=i===S.m,cm=i===S.c;
+  s+='<g class="mo'+(sel||cm?'':' dim')+'" data-m="'+i+'"><rect class="act" data-tip="'+MS[i]+' cost: IDR '+fmt(t.c)+'" x="'+(cx-bw/2)+'" y="'+y(v)+'" width="'+bw+'" height="'+(ph-(y(v)-Tp))+'" rx="4"/>'+(cm?'<rect class="cmpmark" x="'+(cx-bw/2-4)+'" y="'+(y(v)-20)+'" width="'+(bw+8)+'" height="'+(ph-(y(v)-Tp)+20)+'" rx="6"/>':'')+'<text class="num" x="'+cx+'" y="'+(y(v)-6)+'" text-anchor="middle">'+v.toFixed(2)+'</text><text x="'+cx+'" y="'+(H-8)+'" text-anchor="middle" style="fill:var(--ink);font-weight:'+(sel?600:400)+'">'+MN[i]+'</text></g>'});
+ $('cCost').innerHTML=s+'</svg>';bindTip($('cCost'));
+ $('cCost').querySelectorAll('g.mo').forEach(g=>g.onclick=()=>setM(+g.dataset.m));
+ const over=sites.reduce((x,s)=>x+s.c[S.m]*(1-s.b[S.m]/s.a[S.m])*(S.m===0&&s.id===PAR?0:1),0);
+ $('rate').textContent='Average cost per kWh: IDR '+T.map(t=>fmt(t.c/t.a)).join(' / ')+' (Jul / Aug / Sep). Estimated '+MN[S.m]+' overspend against budget, net of sites below budget: '+idr(over)+'. The budget file holds kWh only, so this is an estimate.'}
+function regionTable(){
+ const m=S.m,c=S.c,cmp=c>=0;
+ $('regT').textContent=cmp?'Variance to budget and change vs '+MN[c]+' by region':'Variance to budget by region, '+MN[m];
+ const heat=v=>{const k=Math.min(Math.abs(v)/0.3,1)*55;return 'background:color-mix(in srgb,var('+(v>0?'--over':'--under')+') '+k.toFixed(0)+'%,var(--surface))'};
+ let h='<tr><th>Region</th>'+MS.map((x,i)=>'<th class="'+(i===m?'sel':'')+'">'+x+' var</th>').join('')+(cmp?'<th class="sel">'+MS[m]+' vs '+MS[c]+'</th>':'')+'<th>'+MS[m]+' actual kWh</th><th>'+MS[m]+' budget kWh</th><th>Gap kWh</th>'+(HAS_COST?'<th>'+MS[m]+' cost</th>':'')+'</tr>';
+ ['R1','R2','R3','R4','R5','R6','All'].forEach(r=>{const l=r==='All'?sites:sites.filter(s=>s.rg===r),t=[0,1,2].map(i=>tot(l,i,i===0)),x=tot(l,m,m===0);
+  h+='<tr style="'+(r==='All'?'font-weight:600':'')+'"><td>'+(r==='All'?'All regions':r)+'</td>'+t.map((z,i)=>'<td class="heat'+(i===m?' sel':'')+'" style="'+heat(z.v)+(i===m?';font-weight:600':';opacity:.8')+'">'+pct(z.v)+'</td>').join('')+(cmp?(function(){const v=totCh(l,m,c);return '<td class="heat sel" style="'+heat(v)+'">'+pct(v)+'</td>'})():'')+'<td>'+fmt(x.a)+'</td><td>'+fmt(x.b)+'</td><td class="'+(x.a>x.b?'pos':'neg')+'">'+(x.a>x.b?'+':'−')+fmt(Math.abs(x.a-x.b))+'</td>'+(HAS_COST?'<td>'+idr(tot(l,m,false).c)+'</td>':'')+'</tr>'});
+ $('tReg').innerHTML=h}
+function rank(id,list,sign,metric){const mx=Math.max(0.0001,...list.map(x=>Math.abs(x.val)));
+ $(id).innerHTML=list.map(x=>{const s=x.s;return '<div class="row"><div class="nm">'+s.n+'<small>'+s.rg+' · '+x.sub+'</small></div><div class="track"><div class="bar '+sign+'" style="width:'+(Math.abs(x.val)/mx*100).toFixed(1)+'%" data-tip="'+s.n+': '+fmt(s.a[S.m])+' kWh vs budget '+fmt(s.b[S.m])+'"></div></div><div class="pv '+(x.val>0?'pos':'neg')+'">'+pct(x.val)+'</div></div>'}).join('');bindTip($(id))}
+function lists(){const m=S.m,c=S.c,byChg=S.r==='chg'&&c>=0;
+ const val=s=>byChg?ch(s,m,c):bv(s,m);
+ const L=sites.map(s=>({s,val:val(s)})).filter(x=>x.val!=null);
+ L.forEach(x=>{const s=x.s;x.sub=byChg?(fmt(s.a[m])+' kWh vs '+fmt(s.a[c])+' in '+MS[c]):((s.a[m]>s.b[m]?'+':'−')+fmt(Math.abs(s.a[m]-s.b[m]))+' kWh vs budget')});
+ const desc=[...L].sort((a,b)=>b.val-a.val).slice(0,10),asc=[...L].sort((a,b)=>a.val-b.val).slice(0,10);
+ if(byChg){$('topT').textContent='Largest increase vs '+MN[c]+', '+MN[m];$('lowT').textContent='Largest decrease vs '+MN[c]+', '+MN[m];$('topS').textContent='Top 10 sites, change per day';$('lowS').textContent='Top 10 sites, change per day'}
+ else{$('topT').textContent='Highest above budget in '+MN[m];$('lowT').textContent='Best below budget in '+MN[m];$('topS').textContent='Top 10 sites, variance %';$('lowS').textContent='Top 10 sites, variance %'}
+ rank('top',desc,'over');rank('low',asc,'under')}
+function zoTable(){const m=S.m,c=S.c,cmp=c>=0;
+ let h='<tr><th>Cinema</th><th>Group</th>'+MS.map((x,i)=>'<th class="'+(i===m?'sel':'')+'">'+x+'</th>').join('')+'<th>'+MS[m]+' actual kWh</th>'+(cmp?'<th>'+MS[m]+' vs '+MS[c]+'</th>':'')+'</tr>';
+ sites.filter(s=>ZO[s.id]).sort((a,b)=>((ZO[a.id]==='Original 4'?0:1)-(ZO[b.id]==='Original 4'?0:1))||(bv(a,m)??9)-(bv(b,m)??9)).forEach(s=>{
+  h+='<tr><td>'+s.n+'</td><td>'+ZO[s.id]+'</td>'+[0,1,2].map(i=>'<td class="'+(i===m?'sel':'')+'">'+pill(bv(s,i))+'</td>').join('')+'<td>'+fmt(s.a[m])+'</td>'+(cmp?'<td>'+pill(ch(s,m,c))+'</td>':'')+'</tr>'});
+ $('tZ').innerHTML=h}
+let sortKey='v',sortDir=-1;
+function fullTable(){const m=S.m,c=S.c,cmp=c>=0;
+ const cols=[['n','Cinema'],['rg','Region'],['v',MS[m]+' var'],['a',MS[m]+' actual'],['b',MS[m]+' budget'],['gap','Gap kWh']].concat(cmp?[['ca',MS[c]+' actual'],['chg',MS[m]+' vs '+MS[c]]]:[]);
+ const val=(s,k)=>k==='n'?s.n:k==='rg'?s.rg:k==='v'?(bv(s,m)??-9):k==='a'?s.a[m]:k==='b'?s.b[m]:k==='gap'?s.a[m]-s.b[m]:k==='ca'?s.a[c]:(ch(s,m,c)??-9);
+ if(!cols.some(x=>x[0]===sortKey))sortKey='v';
+ const L=[...sites].sort((a,b)=>{const x=val(a,sortKey),y=val(b,sortKey);return (x>y?1:x<y?-1:0)*sortDir});
+ let h='<tr>'+cols.map(x=>'<th aria-sort="'+(x[0]===sortKey?(sortDir>0?'ascending':'descending'):'none')+'"><button data-k="'+x[0]+'">'+x[1]+(x[0]===sortKey?(sortDir>0?' ▲':' ▼'):'')+'</button></th>').join('')+'</tr>';
+ L.forEach(s=>{h+='<tr><td>'+s.n+'</td><td>'+s.rg+'</td><td>'+pill(bv(s,m))+'</td><td>'+fmt(s.a[m])+'</td><td>'+fmt(s.b[m])+'</td><td class="'+(s.a[m]>s.b[m]?'pos':'neg')+'">'+(s.a[m]>s.b[m]?'+':'−')+fmt(Math.abs(s.a[m]-s.b[m]))+'</td>'+(cmp?'<td>'+fmt(s.a[c])+'</td><td>'+pill(ch(s,m,c))+'</td>':'')+'</tr>'});
+ const e=$('tAll');e.innerHTML=h;e.querySelectorAll('button').forEach(b=>b.onclick=()=>{const k=b.dataset.k;if(k===sortKey)sortDir*=-1;else{sortKey=k;sortDir=k==='n'||k==='rg'?1:-1}fullTable()})}
+function render(){drawCtrl();kpis();monthChart();costChart();regionTable();lists();zoTable();fullTable()}
+render();
 </script>
