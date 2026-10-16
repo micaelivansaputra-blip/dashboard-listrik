@@ -210,19 +210,14 @@ input[type=search]::placeholder{color:var(--muted)}
   <div class="tools"><input id="q" type="search" placeholder="Search a cinema" aria-label="Search a cinema"><span class="note" style="margin:0">Click a column heading to sort.</span></div>
   <div class="scroll"><table id="tAll"></table></div></details></section>
 
-<section class="card reveal" style="--i:9"><header><h2>How to read this page</h2></header>
-  <div class="defs">
-    <div><b>Variance to budget</b>(Actual kWh − Budget kWh) ÷ Budget kWh. Plus means more electricity than planned, shown in red. Minus means less, shown in green. Within 2% counts as on budget.</div>
-    <div><b>Change vs another month</b>Compares average kWh per day, so a 31-day month and a 30-day month are fair to each other.</div>
-    <div><b>Zero Occupancy sites</b>Seven cinemas in the energy control program. Four started on 19 August; three more were added on 9 October.</div>
-  </div></section>
-
-<section class="card reveal" style="--i:10"><header><h2>Data notes</h2></header>
+<section class="card reveal" style="--i:9"><header><h2>Data notes</h2></header>
 <ul class="notes">
-  <li>Actual kWh comes from the corrected invoice file. September kWh for Kalibata City Square, Q Mall Banjarbaru, Mall of Serang, Palembang Icon, Citimall Sampit and Java Supermal use the corrected invoices.</li>
-  <li>Paragon Square Mall is left out of July totals and of any comparison with July, because its first invoice covered a partial period.</li>
+  <li>Actual kWh comes from the latest corrected invoice file: July 2,120,357 kWh, August 2,300,834 kWh, September 2,113,555 kWh. September uses the corrected invoices for Kalibata City Square and Q Mall Banjarbaru; earlier drafts that showed 2,130,177 kWh still carried their old values.</li>
+  <li>Variance to budget is (actual − budget) ÷ budget. Plus means more electricity than planned (red), minus means less (green). Within 2% counts as on budget.</li>
+  <li>Changes between months compare average kWh per day (July 31 days, August 31 days, September 30 days), so months of different length are comparable.</li>
+  <li>Paragon Square Mall is counted in the July total, but its first invoice covered a partial period, so its own July variance and any per-day comparison with July are shown as n/a.</li>
   <li>K-Square Batam is still ramping up, so it sits far below budget in all three months.</li>
-  <li>Month-to-month changes use average kWh per day (July 31 days, August 31 days, September 30 days).</li>
+  <li>Zero Occupancy Energy Control: four sites started on 19 August and three more were added on 9 October.</li>
   
   <li>Invoice periods can start mid-month, so a billed month may differ from the calendar month.</li>
 </ul></section>
@@ -284,11 +279,11 @@ function bindTip(root){root.querySelectorAll('[data-tip]').forEach(e=>{
 /* verdict card and figures */
 const REG=['R1','R2','R3','R4','R5','R6'];
 function hero(){
-  const m=S.m,c=S.c,cmp=c>=0,t=tot(sites,m,m===0);
+  const m=S.m,c=S.c,cmp=c>=0,t=tot(sites,m,false);
   const L=sites.map(s=>({s,v:bv(s,m)})).filter(x=>x.v!=null);
   const above=L.filter(x=>x.v>.02).length,below=L.filter(x=>x.v<-.02).length;
   const sorted=[...L].sort((a,b)=>b.v-a.v),top3=sorted.slice(0,3);
-  const regs=REG.map(r=>({r,v:tot(sites.filter(s=>s.rg===r),m,m===0).v})).sort((a,b)=>b.v-a.v);
+  const regs=REG.map(r=>({r,v:tot(sites.filter(s=>s.rg===r),m,false).v})).sort((a,b)=>b.v-a.v);
   $('heroEy').textContent=MN[m]+' 2026 against budget';
   const big=$('heroBig');tween(big,t.v,v=>pct(v),'h');big.className='big '+(t.v>0.02?'pos':t.v<-0.02?'neg':'');
   $('heroTxt').textContent=fmt(t.a)+' kWh used against a budget of '+fmt(t.b)+' kWh, '+fmt(Math.abs(t.a-t.b))+' kWh '+(t.a>t.b?'over':'under')+'.';
@@ -301,7 +296,7 @@ function hero(){
 const KP=[0,1,2,3].map(i=>{const d=document.createElement('div');d.className='kpi';d.innerHTML='<span class="lab"></span><div class="v"></div><div class="d"></div>';$('kpis').appendChild(d);return{lab:d.children[0],v:d.children[1],d:d.children[2]}});
 function setK(i,label,num,f,sub,cl,key){const k=KP[i];k.lab.textContent=label;tween(k.v,num,f,key);k.v.className='v '+(cl||'');k.d.textContent=sub}
 function kpis(){
-  const m=S.m,c=S.c,cmp=c>=0,t=tot(sites,m,m===0),tAll=tot(sites,m,false);
+  const m=S.m,c=S.c,cmp=c>=0,t=tot(sites,m,false),tAll=tot(sites,m,false);
   const above=sites.filter(s=>bv(s,m)>0.02).length,below=sites.filter(s=>bv(s,m)<-0.02).length;
   setK(0,MN[m]+' actual',t.a,n=>fmt(n)+' kWh','Budget '+fmt(t.b)+' kWh','','a');
   setK(1,'Gap to budget',t.a-t.b,n=>(n>0?'+':n<0?'−':'')+fmt(Math.abs(n))+' kWh',pct(t.v)+(t.a>t.b?' above':' below')+' budget',t.a>t.b?'pos':'neg','g');
@@ -313,7 +308,7 @@ function kpis(){
 
 /* charts are drawn once; selection only changes classes, so everything transitions */
 function buildMonth(){
-  const T=[0,1,2].map(i=>tot(sites,i,i===0));
+  const T=[0,1,2].map(i=>tot(sites,i,false));
   const W=560,H=300,L=44,B=44,Tp=26,pw=W-L-8,ph=H-B-Tp,max=3e6;
   const y=v=>Tp+ph-v/max*ph;let s='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Monthly actual versus budget kWh">';
   [0,1,2,3].forEach(t=>{s+='<line class="grid" x1="'+L+'" x2="'+(W-8)+'" y1="'+y(t*1e6)+'" y2="'+y(t*1e6)+'"/><text x="'+(L-8)+'" y="'+(y(t*1e6)+4)+'" text-anchor="end">'+t+'M</text>'});
@@ -355,7 +350,7 @@ function regionTable(){
   $('regT').textContent=cmp?'Variance to budget and change vs '+MN[c]+', by region':'Variance to budget by region, '+MN[m];
   const heat=v=>{const k=Math.min(Math.abs(v)/0.3,1)*50;return 'background:color-mix(in srgb,var('+(v>0?'--over-fill':'--under-fill')+') '+k.toFixed(0)+'%,var(--surface))'};
   let h='<thead><tr><th>Region</th>'+MS.map((x,i)=>'<th class="'+(i===m?'sel':'')+'">'+x+' vs budget</th>').join('')+(cmp?'<th class="sel">'+MS[m]+' vs '+MS[c]+' per day</th>':'')+'<th>'+MS[m]+' actual kWh</th><th>'+MS[m]+' budget kWh</th><th>Gap kWh</th>'+(HAS_COST?'<th>'+MS[m]+' cost</th>':'')+'</tr></thead><tbody>';
-  REG.concat(['All']).forEach(r=>{const l=r==='All'?sites:sites.filter(s=>s.rg===r),t=[0,1,2].map(i=>tot(l,i,i===0)),x=tot(l,m,m===0);
+  REG.concat(['All']).forEach(r=>{const l=r==='All'?sites:sites.filter(s=>s.rg===r),t=[0,1,2].map(i=>tot(l,i,false)),x=tot(l,m,false);
     h+='<tr style="'+(r==='All'?'font-weight:600':'')+'"><td>'+(r==='All'?'All regions':'Region '+r.slice(1))+'</td>'+t.map((z,i)=>'<td class="heat'+(i===m?' sel':'')+'" style="'+heat(z.v)+(i===m?'':';opacity:.78')+'">'+pct(z.v)+'</td>').join('')+(cmp?(function(){const v=totCh(l,m,c);return '<td class="heat sel" style="'+heat(v)+'">'+pct(v)+'</td>'})():'')+'<td>'+fmt(x.a)+'</td><td>'+fmt(x.b)+'</td><td class="'+(x.a>x.b?'pos':'neg')+'">'+(x.a>x.b?'+':'−')+fmt(Math.abs(x.a-x.b))+'</td>'+(HAS_COST?'<td>'+idr(tot(l,m,false).c)+'</td>':'')+'</tr>'});
   $('tReg').innerHTML=h+'</tbody>'}
 function rank(id,list){const mx=Math.max(0.0001,...list.map(x=>Math.abs(x.val))),el=$(id);
