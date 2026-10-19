@@ -57,7 +57,7 @@ function budgetFor(s){
 const CT={hi:.10,lo:.05};   // Red: more than 10% above budget. Yellow: 5 to 10% above
 function renderConcern(list,P){
   var __a=[list,P];
-  const all=list.map(s=>{const a=siteAvg(s),b=budgetFor(s); if(!b||!Number.isFinite(a.okt)) return null; const p=a.okt/b.perDay-1; const l7=s.v.slice(-7).filter(x=>x!=null&&Number.isFinite(x)); const p7=l7.length?(l7.reduce((q,x)=>q+x,0)/l7.length)/b.perDay-1:p; const dt=p7-p; return {s,a,b,act:a.okt,bud:b.perDay,ex:a.okt-b.perDay,p,p7,tr:dt>.03?'up':dt<-.03?'down':'flat',lv:p>CT.hi?'hi':p>CT.lo?'lo':'ok'};}).filter(Boolean);
+  const all=list.map(s=>{const a=siteAvg(s),b=budgetFor(s); if(!b||!Number.isFinite(a.okt)) return null; const p=a.okt/b.perDay-1; const l7=s.v.slice(-7).filter(x=>x!=null&&Number.isFinite(x)); const p7=l7.length?(l7.reduce((q,x)=>q+x,0)/l7.length)/b.perDay-1:p; const dt=p7-p; const lv1=s.v[s.v.length-1], pl=Number.isFinite(lv1)?lv1/b.perDay-1:null; return {s,a,last:lv1,pl,spike:pl!=null&&pl-p>.20,b,act:a.okt,bud:b.perDay,ex:a.okt-b.perDay,p,p7,tr:dt>.03?'up':dt<-.03?'down':'flat',lv:p>CT.hi?'hi':p>CT.lo?'lo':'ok'};}).filter(Boolean);
   const over=all.filter(r=>r.lv!=='ok').sort((x,y)=>y.ex-x.ex), rows=over.slice(0,8);
   const ta=all.reduce((t,r)=>t+r.act,0), tb=all.reduce((t,r)=>t+r.bud,0);
   CROWS=rows; CMETA={n:all.length,nOver:over.length,nRed:over.filter(r=>r.lv==='hi').length,ta,tb,tp:tb?ta/tb-1:0,mon:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][all[0]?all[0].b.mi:0]};

@@ -77,6 +77,7 @@ function cxCaption(){
   rows.forEach((r,i)=>{
     const pc=Math.abs(r.p*100).toFixed(0);
     L.push(`${i+1}. ${short(r.s.n)} (${r.s.r}): +${nf(r.ex)} kWh/${id?'hari':'day'} (+${pc}%)${r.tr==='up'?' ↑':r.tr==='down'?' ↓':''}`);
+    if(r.spike){L.push('    '+(id?`${dt.replace(/ \d{4}$/,'')}: ${nf(r.last)} kWh (${pf(r.pl)} dari budget), lonjakan`:`${dt.replace(/ \d{4}$/,'')}: ${nf(r.last)} kWh (${pf(r.pl)} vs budget), spike`));}
     const f=CX.capNotes&&FU[fuId(r.s.n)]; if(f&&(f.reason||f.tag)){const tg=f.tag?((id?TGI[f.tag]:FUTAG[f.tag])||''):''; L.push('    '+(id?'Alasan: ':'Reason: ')+[tg,f.reason].filter(Boolean).join(' – ')+(f.cm?' ('+f.cm+')':''));}
   });
   if(rows.some(r=>r.tr!=='flat')){L.push(''); L.push(id?'↑ masih naik, ↓ mulai turun (7 hari terakhir)':'↑ still rising, ↓ easing (last 7 days)');}
