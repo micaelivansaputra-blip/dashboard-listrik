@@ -72,14 +72,17 @@ function cxCaption(){
   const dt=mm?(+mm[3])+' '+MO[+mm[2]-1]+' '+mm[1]:'';
   const TGI={extra:'Tambahan jam tayang / acara',ac:'Jadwal atau setelan AC',reno:'Renovasi / pekerjaan tenant',meter:'Masalah meter atau data',weather:'Cuaca',other:'Lainnya'};
   const L=[];
-  L.push(id?'Dear Kakak-kakak RM,':'Dear RMs,'); L.push('');
-  L.push(id?`Berikut site dengan pemakaian listrik di atas budget (data s/d ${dt}):`:`Here are the sites using more electricity than budget (data through ${dt}):`); L.push('');
+  const h=new Date().getHours(), sal=id?'Selamat '+(h<11?'pagi':h<15?'siang':h<18?'sore':'malam'):'Good '+(h<12?'morning':h<18?'afternoon':'evening');
+  L.push(id?sal+', Kakak-kakak RM.':sal+', everyone.'); L.push('');
+  L.push(id?`Berikut kami sampaikan site dengan pemakaian listrik di atas budget per ${dt}:`:`Please find below the sites with electricity usage above budget as of ${dt}:`); L.push('');
   rows.forEach((r,i)=>{
-    L.push(`${i+1}. ${short(r.s.n)} (${r.s.r}): +${nf(r.ex)} kWh/${id?'hari':'day'} (${pf(r.p)})`);
+    const pc=Math.abs(r.p*100).toFixed(0);
+    L.push(id?`${i+1}. ${short(r.s.n)} (${r.s.r}): +${nf(r.ex)} kWh/hari, naik ${pc}% dari budget`:`${i+1}. ${short(r.s.n)} (${r.s.r}): +${nf(r.ex)} kWh/day, ${pc}% above budget`);
     const f=CX.capNotes&&FU[fuId(r.s.n)]; if(f&&(f.reason||f.tag)){const tg=f.tag?((id?TGI[f.tag]:FUTAG[f.tag])||''):''; L.push('    '+(id?'Alasan: ':'Reason: ')+[tg,f.reason].filter(Boolean).join(' – ')+(f.cm?' ('+f.cm+')':''));}
   });
   L.push('');
-  L.push(id?'Mohon bantuannya untuk follow up ke CM masing-masing dan info alasan kenaikannya ya. Terima kasih.':'Please follow up with the CMs of these sites and share the reason for the increase. Thank you.');
+  L.push(id?'Mohon kesediaan Kakak-kakak untuk menindaklanjuti bersama CM masing-masing dan menginformasikan penyebab kenaikannya kepada kami.':'We would appreciate it if you could follow up with the respective CMs and share the reason for the increase with us.');
+  L.push(''); L.push(id?'Atas perhatian dan kerja samanya, kami ucapkan terima kasih.':'Thank you for your attention and support.');
   return L.join('\n');
 }
 function cxCapRender(force){const t=document.getElementById('cxCap'); if(!t) return; if(CX.edited&&!force) return; CX.edited=false; t.value=cxCaption();}
