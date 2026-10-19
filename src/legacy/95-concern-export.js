@@ -1,7 +1,7 @@
 /* ---------- Site Concern: email-ready image (PNG) ----------
    Drawn on a canvas so the picture is crisp and always light, whatever theme the page is in.
    Download saves a PNG; Copy puts the image on the clipboard, ready to paste into an email body. */
-const CX={rows:5,notes:false,capNotes:true,lang:'id',edited:false};
+const CX={rows:5,notes:false,capNotes:true,capTrend:false,lang:'id',edited:false};
 const cxFont='Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif';
 function cxDate(){const l=(DATA.meta&&DATA.meta.last)||''; const m=/^(\d{4})-(\d\d)-(\d\d)$/.exec(l); if(!m) return ''; return (+m[3])+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+m[2]-1]+' '+m[1];}
 function cxWrap(ctx,text,maxW){const out=[];let line='';String(text).split(/\s+/).forEach(w=>{const t=line?line+' '+w:w; if(ctx.measureText(t).width>maxW&&line){out.push(line);line=w;}else line=t;}); if(line) out.push(line); return out;}
@@ -72,17 +72,18 @@ function cxCaption(){
   const dt=mm?(+mm[3])+' '+MO[+mm[2]-1]+' '+mm[1]:'';
   const TGI={extra:'Tambahan jam tayang / acara',ac:'Jadwal atau setelan AC',reno:'Renovasi / pekerjaan tenant',meter:'Masalah meter atau data',weather:'Cuaca',other:'Lainnya'};
   const L=[];
-  L.push(id?'Hai kakak-kakak RM 👋':'Hi RMs 👋'); L.push('');
-  L.push(id?`Ini update site yang listriknya lagi di atas budget (per ${dt}):`:`Quick update on the sites running above their electricity budget (as of ${dt}):`); L.push('');
+  const h=new Date().getHours(), sal=id?(h<11?'Pagi':h<15?'Siang':h<18?'Sore':'Malam'):(h<12?'Good morning':h<18?'Good afternoon':'Good evening');
+  L.push(id?sal+' kakak-kakak RM,':sal+', everyone,'); L.push('');
+  L.push(id?`Berikut untuk site yang penggunaan listriknya di atas budget (per ${dt}):`:`Here are the sites with electricity usage above budget (as of ${dt}):`); L.push('');
   rows.forEach((r,i)=>{
     const pc=Math.abs(r.p*100).toFixed(0);
-    L.push(`${i+1}. ${short(r.s.n)} (${r.s.r}): +${nf(r.ex)} kWh/${id?'hari':'day'} (+${pc}%)${r.tr==='up'?' ↑':r.tr==='down'?' ↓':''}`);
-    if(r.spike){L.push('    '+(id?`${dt.replace(/ \d{4}$/,'')}: ${nf(r.last)} kWh (${pf(r.pl)} dari budget), lonjakan`:`${dt.replace(/ \d{4}$/,'')}: ${nf(r.last)} kWh (${pf(r.pl)} vs budget), spike`));}
+    L.push(`${i+1}. ${short(r.s.n)} (${r.s.r}): +${nf(r.ex)} kWh/${id?'hari':'day'} (+${pc}%)${CX.capTrend?(r.tr==='up'?' ↑':r.tr==='down'?' ↓':''):''}`);
+    if(CX.capTrend&&r.spike){L.push('    '+(id?`${dt.replace(/ \d{4}$/,'')}: ${nf(r.last)} kWh (${pf(r.pl)} dari budget), lonjakan`:`${dt.replace(/ \d{4}$/,'')}: ${nf(r.last)} kWh (${pf(r.pl)} vs budget), spike`));}
     const f=CX.capNotes&&FU[fuId(r.s.n)]; if(f&&(f.reason||f.tag)){const tg=f.tag?((id?TGI[f.tag]:FUTAG[f.tag])||''):''; L.push('    '+(id?'Alasan: ':'Reason: ')+[tg,f.reason].filter(Boolean).join(' – ')+(f.cm?' ('+f.cm+')':''));}
   });
-  if(rows.some(r=>r.tr!=='flat')){L.push(''); L.push(id?'↑ masih naik, ↓ mulai turun (7 hari terakhir)':'↑ still rising, ↓ easing (last 7 days)');}
+  if(CX.capTrend&&rows.some(r=>r.tr!=='flat')){L.push(''); L.push(id?'↑ masih naik, ↓ mulai turun (7 hari terakhir)':'↑ still rising, ↓ easing (last 7 days)');}
   L.push('');
-  L.push(id?'Mohon bantuannya untuk follow up ke CM masing-masing ya kakak-kakak, thanks banget! 🙏':'Could you help follow up with each CM, please? Thanks a lot! 🙏');
+  L.push(id?'Mohon bantuannya untuk follow up-nya ya kak, terima kasih.':'Please help follow up, thank you.');
   return L.join('\n');
 }
 function cxCapRender(force){const t=document.getElementById('cxCap'); if(!t) return; if(CX.edited&&!force) return; CX.edited=false; t.value=cxCaption();}
@@ -120,5 +121,6 @@ document.addEventListener('click',e=>{
   else if(k==='cr') cxCapRender(true);
   else if(k==='lid'||k==='len'){CX.lang=k==='lid'?'id':'en'; seg('[data-cx=lid],[data-cx=len]',b); cxCapRender(true);}
   else if(k==='cn'){CX.capNotes=!CX.capNotes; b.setAttribute('aria-pressed',String(CX.capNotes)); cxCapRender(true);}
+  else if(k==='ct'){CX.capTrend=!CX.capTrend; b.setAttribute('aria-pressed',String(CX.capTrend)); cxCapRender(true);}
 });
 document.addEventListener('input',e=>{if(e.target&&e.target.id==='cxCap') CX.edited=true;});
