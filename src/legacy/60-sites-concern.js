@@ -1,5 +1,5 @@
 /* ---------- sites ---------- */
-let STATUS='all', SORTKEY='p', SORT='desc', EXPAND=false;
+let STATUS='all', SORTKEY='p', SORT='desc', EXPAND=false, NOTEF=false;
 const PS={A:null,B:null,type:'all'};
 const MKEY={mom:'mom',agu:'vsAgu',yoy:'yoy'}, KMODE={};
 function spark(s,c){const m=ma7(s.v),vs=m.filter(x=>x!=null),lo=Math.min(...vs),hi=Math.max(...vs);
@@ -25,11 +25,11 @@ function renderSites(list){
   const rows=all.filter(r=>r.ok), miss=all.length-rows.length;
   const nu=rows.filter(r=>r.p>TH).length, nd=rows.filter(r=>r.p<-TH).length, nf=rows.length-nu-nd;
   const seg=(c,l,n)=>`<button type="button" class="seg2 ${c}" data-st="${c}" aria-pressed="${STATUS===c}" style="flex:${Math.max(n,1)} 1 0"><b>${n}</b><span>${l}</span></button>`;
-  document.getElementById('counts').innerHTML=`<div class="dist">${seg('up','Up >5%',nu)}${seg('flat','Stable',nf)}${seg('down','Down >5%',nd)}</div>`+(STATUS!=='all'?'<button type="button" class="chipbtn" data-st="all">Show all</button>':'');
-  let f=rows.filter(r=>(!q||r.s.n.toLowerCase().includes(q))&&(STATUS==='all'||cls(r.p)===STATUS));
+  document.getElementById('counts').innerHTML=`<div class="dist">${seg('up','Up >5%',nu)}${seg('flat','Stable',nf)}${seg('down','Down >5%',nd)}</div>`+(STATUS!=='all'?'<button type="button" class="chipbtn" data-st="all">Show all</button>':'')+`<div class="noterow"><button type="button" class="chipbtn" id="noteFilt" aria-pressed="${NOTEF}">Sites with notes · ${typeof fuCount==='function'?fuCount():0}</button><button type="button" class="chipbtn" id="noteCopy">Copy all notes</button><span class="fumsg" id="noteMsg" role="status"></span></div>`;
+  let f=rows.filter(r=>(!q||r.s.n.toLowerCase().includes(q))&&(STATUS==='all'||cls(r.p)===STATUS)&&(!NOTEF||fuHas(r.s.n)));
   const d=SORT==='desc'?1:-1;
   f.sort((x,y)=>SORTKEY==='name'?x.s.n.localeCompare(y.s.n)*(SORT==='asc'?1:-1):(y[SORTKEY]-x[SORTKEY])*d);
-  const lim=12, shown=(EXPAND||q||STATUS!=='all')?f:f.slice(0,lim);
+  const lim=12, shown=(EXPAND||q||STATUS!=='all'||NOTEF)?f:f.slice(0,lim);
   const tn=PS.type==='all'?'':(PS.type==='wd'?' (weekdays)':' (weekends)');
   document.getElementById('siteSub').textContent=`${f.length} sites · ${lblOf(PS.A)} vs ${lblOf(PS.B)}${tn}`;
   const ks=monthKeys(), part=[PS.A,PS.B].map(k=>ks.find(m=>m.k===k)).filter(m=>m&&m.part).map(m=>m.label);
@@ -38,13 +38,13 @@ function renderSites(list){
   const th=(k,l,cl='')=>`<th class="${cl} ${SORTKEY===k?'sorted':''} ${k==='p'?'actc':''}" aria-sort="${SORTKEY===k?(SORT==='asc'?'ascending':'descending'):'none'}"><button type="button" data-k="${k}">${l}${SORTKEY===k?(SORT==='asc'?' ▲':' ▼'):''}</button></th>`;
   const sgn=v=>(v>=0?'+':'−')+fmt(Math.abs(v));
   const body=shown.map(({s,a,b,d:dd,p})=>{const c=cls(p);return `<tr class="row" data-n="${s.n}" tabindex="0">
-    <td><div class="sn"><span class="sd ${c}"></span><span><b>${short(s.n)}${s.partial?' *':''}</b><small>${s.r}</small></span></div></td>
+    <td><div class="sn"><span class="sd ${c}"></span><span><b>${short(s.n)}${s.partial?' *':''}${fuHas(s.n)?'<i class="nd" title="Has a note"></i>':''}</b><small>${s.r}</small></span></div></td>
     <td><div class="okt"><span>${fmt(a)}</span><i style="width:${Math.max(4,a/mx*72)}px"></i></div></td>
     <td class="hs"><div class="okt"><span>${fmt(b)}</span><i style="width:${Math.max(4,b/mx*72)}px;opacity:.55"></i></div></td>
     <td class="hs"><span class="cell ${c}">${sgn(dd)}</span></td>
-    <td><span class="cell ${c} on">${pct(p)}</span></td><td class="sp hs">${spark(s,c==='flat'?'flat':c)}</td></tr>`;}).join('');
-  box.innerHTML=`<table class="ptable"><thead><tr>${th('name','Site')}${th('a',LA+' kWh/day')}${th('b',LB+' kWh/day','hs')}${th('d','Change kWh/day','hs')}${th('p','Change %')}<th class="hs">Trend</th></tr></thead><tbody>${body||'<tr><td colspan="6" class="empty">No matching sites.</td></tr>'}</tbody></table>`;
-  document.getElementById('more').innerHTML=(!q&&STATUS==='all'&&f.length>lim)?`<button type="button" class="chipbtn" data-more aria-pressed="true">${EXPAND?'Show top '+lim:'Show all '+f.length+' sites'}</button>`:'';
+    <td><span class="cell ${c} on">${pct(p)}</span></td><td class="sp hs">${spark(s,c==='flat'?'flat':c)}</td><td class="nt">${fuChip(s.n)}</td></tr>`;}).join('');
+  box.innerHTML=`<table class="ptable"><thead><tr>${th('name','Site')}${th('a',LA+' kWh/day')}${th('b',LB+' kWh/day','hs')}${th('d','Change kWh/day','hs')}${th('p','Change %')}<th class="hs">Trend</th><th class="nt">Notes</th></tr></thead><tbody>${body||'<tr><td colspan="7" class="empty">No matching sites.</td></tr>'}</tbody></table>`;
+  document.getElementById('more').innerHTML=(!q&&STATUS==='all'&&!NOTEF&&f.length>lim)?`<button type="button" class="chipbtn" data-more aria-pressed="true">${EXPAND?'Show top '+lim:'Show all '+f.length+' sites'}</button>`:'';
 }
 
 function renderConcern(list,P){

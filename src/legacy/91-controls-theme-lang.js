@@ -21,6 +21,10 @@ document.getElementById('mascot').addEventListener('click',say);
 document.getElementById('tiles').addEventListener('click',e=>{const b=e.target.closest('th button');if(!b)return;e.stopPropagation();const k=b.dataset.k;
   if(SORTKEY===k)SORT=SORT==='desc'?'asc':'desc';else{SORTKEY=k;SORT=k==='name'?'asc':'desc';}
   renderSites(selected());});
+document.getElementById('counts').addEventListener('click',e=>{
+  if(e.target.closest('#noteFilt')){NOTEF=!NOTEF;renderSites(selected());return;}
+  if(e.target.closest('#noteCopy')){fuCopyAll().then(n=>{const m=document.getElementById('noteMsg');if(m){m.textContent=n?n+' notes copied. Paste into Excel.':'No notes yet.';m.className='fumsg ok';}}).catch(()=>{const m=document.getElementById('noteMsg');if(m){m.textContent='Copy was blocked by the browser.';m.className='fumsg err';}});}
+});
 document.getElementById('more').addEventListener('click',e=>{if(e.target.closest('[data-more]')){EXPAND=!EXPAND;renderSites(selected());}});
 document.getElementById('dailyTog').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;SHOW[b.dataset.k]=!SHOW[b.dataset.k];b.setAttribute('aria-pressed',SHOW[b.dataset.k]);renderCharts(periods(selected()));});
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>render());

@@ -29,6 +29,13 @@ const Chrome = (function () {
     const g = greet() + ' \u{1F44B}'; if (gEl.textContent !== g) gEl.textContent = g;
     const a = ($('asof') && $('asof').textContent || '').trim(); if (aEl.textContent !== a) aEl.textContent = a;
     head.hidden = !t || !!($('pgNav') && $('pgNav').hidden);
+    // the section heading repeats the page title: keep only its small caption
+    document.querySelectorAll('section > .sec-head:first-child').forEach(sh => {
+      const h2 = sh.querySelector('h2'); if (!h2) return;
+      let tn = h2.querySelector('.dupt');
+      if (!tn) { const n0 = Array.from(h2.childNodes).find(n => n.nodeType === 3 && n.textContent.trim()); if (!n0) return; tn = document.createElement('span'); tn.className = 'dupt'; n0.replaceWith(tn); tn.appendChild(n0); }
+      sh.classList.toggle('dup', !!t && tn.textContent.trim() === t);
+    });
     if (typeof Buddy !== 'undefined' && Buddy.update) Buddy.update();
   }
   function start() {

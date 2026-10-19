@@ -289,3 +289,20 @@ body::before{background:radial-gradient(60vmax 46vmax at 4% -4%,var(--glow1),tra
 @media (prefers-reduced-motion:no-preference){.bd-body{animation:bob 4.2s ease-in-out infinite}@keyframes bob{50%{translate:0 -5px}}}
 @media (max-width:640px){.buddy{bottom:calc(86px + env(safe-area-inset-bottom,0px));right:10px}.bd-char{width:64px;height:76px}.bd-badge{width:24px;height:24px}}
 @media print{.buddy,#curGlow,#curRing{display:none!important}}
+
+/* ============================================================================
+   Notes per site + clearer pages
+   ========================================================================== */
+.ptable th.nt,.ptable td.nt{text-align:left;min-width:190px;max-width:280px;white-space:normal}
+.ptable td.nt .fu.none{background:none;box-shadow:inset 0 0 0 1px var(--hair);color:var(--muted);font-weight:600}
+.ptable tr.row:hover td.nt .fu.none{color:var(--ink);box-shadow:inset 0 0 0 1px var(--blue)}
+.fu.tag{background:var(--blue-soft,color-mix(in srgb,var(--blue) 14%,transparent));color:var(--blue)}
+.nd{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--amber);margin-left:7px;vertical-align:middle}
+.noterow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;width:100%;margin-top:10px}
+.fubtn.ghost{background:none;color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
+.fumore{margin:2px 0 6px;font-size:13px}.fumore summary{cursor:pointer;font-weight:600;color:var(--muted)}
+.fubox .note{margin:0 0 4px}
+.sec-head.dup h2 .dupt{display:none}
+.sec-head.dup h2{margin:0}
+.sec-head.dup small{margin-left:0;font-size:14px}
+@media (max-width:640px){.ptable th.nt,.ptable td.nt{display:none}}
