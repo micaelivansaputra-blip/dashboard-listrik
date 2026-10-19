@@ -66,28 +66,20 @@ function cxDraw(cv,rows,opt){
 /* ---------- caption to send together with the image ---------- */
 function cxCaption(){
   const rows=CROWS.slice(0,CX.rows), m=CMETA, id=CX.lang==='id'; if(!m||!m.n) return '';
-  const nf=v=>Math.round(v).toLocaleString(id?'id-ID':'en-US'), pf=v=>(v>=0?'+':'−')+Math.abs(v*100).toFixed(1).replace('.',id?',':'.')+'%';
+  const nf=v=>Math.round(v).toLocaleString(id?'id-ID':'en-US'), pf=v=>(v>=0?'+':'−')+Math.abs(v*100).toFixed(0)+'%';
   const l=(DATA.meta&&DATA.meta.last)||'', mm=/^(\d{4})-(\d\d)-(\d\d)$/.exec(l);
   const MO=id?['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des']:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const dt=mm?(+mm[3])+' '+MO[+mm[2]-1]+' '+mm[1]:'';
-  const h=new Date().getHours(), sal=id?(h<11?'pagi':h<15?'siang':h<18?'sore':'malam'):(h<12?'morning':h<18?'afternoon':'evening');
-  const up=m.ta>=m.tb, diff=nf(Math.abs(m.ta-m.tb));
+  const TGI={extra:'Tambahan jam tayang / acara',ac:'Jadwal atau setelan AC',reno:'Renovasi / pekerjaan tenant',meter:'Masalah meter atau data',weather:'Cuaca',other:'Lainnya'};
   const L=[];
-  L.push(id?'Selamat '+sal+' Kak,':'Good '+sal+',');
+  L.push(id?'Dear Kakak-kakak RM,':'Dear RMs,'); L.push('');
+  L.push(id?`Berikut site dengan pemakaian listrik di atas budget (data s/d ${dt}):`:`Here are the sites using more electricity than budget (data through ${dt}):`); L.push('');
+  rows.forEach((r,i)=>{
+    L.push(`${i+1}. ${short(r.s.n)} (${r.s.r}): +${nf(r.ex)} kWh/${id?'hari':'day'} (${pf(r.p)})`);
+    const f=CX.capNotes&&FU[fuId(r.s.n)]; if(f&&(f.reason||f.tag)){const tg=f.tag?((id?TGI[f.tag]:FUTAG[f.tag])||''):''; L.push('    '+(id?'Alasan: ':'Reason: ')+[tg,f.reason].filter(Boolean).join(' – ')+(f.cm?' ('+f.cm+')':''));}
+  });
   L.push('');
-  L.push(id?`Berikut update Site Concern listrik sampai ${dt} (${m.n} site).`:`Here is the electricity Site Concern update through ${dt} (${m.n} sites).`);
-  L.push('');
-  L.push(id?`Rata-rata pemakaian ${nf(m.ta)} kWh/hari, ${pf(Math.abs(m.tp)).replace(/^[+−]/,'')} ${up?'di atas':'di bawah'} budget (${nf(m.tb)} kWh/hari), selisih ${diff} kWh/hari.`
-           :`Average usage is ${nf(m.ta)} kWh/day, ${pf(Math.abs(m.tp)).replace(/^[+−]/,'')} ${up?'above':'below'} budget (${nf(m.tb)} kWh/day), a gap of ${diff} kWh/day.`);
-  L.push(id?`${m.nOver} dari ${m.n} site lebih dari 5% di atas budget, ${m.nRed} di antaranya merah (lebih dari 10%).`:`${m.nOver} of ${m.n} sites are more than 5% above budget, ${m.nRed} of them red (more than 10%).`);
-  if(rows.length){
-    L.push(''); L.push(id?`${rows.length} site dengan kenaikan terbesar dari budget:`:`Top ${rows.length} sites above budget:`);
-    rows.forEach((r,i)=>{
-      L.push(`${i+1}. ${short(r.s.n)}: +${nf(r.ex)} kWh/${id?'hari':'day'} (${pf(r.p)})`);
-      const f=CX.capNotes&&FU[fuId(r.s.n)]; if(f&&(f.reason||f.tag)){const TGI={extra:'Tambahan jam tayang / acara',ac:'Jadwal atau setelan AC',reno:'Renovasi / pekerjaan tenant',meter:'Masalah meter atau data',weather:'Cuaca',other:'Lainnya'}; const tg=f.tag?((id?TGI[f.tag]:FUTAG[f.tag])||''):''; L.push('   '+(id?'Alasan: ':'Reason: ')+[tg,f.reason].filter(Boolean).join(' – ')+(f.cm?' ('+f.cm+')':''));}
-    });
-  }
-  L.push(''); L.push(id?'Detail ada di gambar terlampir. Terima kasih, Kak.':'Details are in the attached image. Thank you.');
+  L.push(id?'Mohon bantuannya untuk follow up ke CM masing-masing dan info alasan kenaikannya ya. Terima kasih.':'Please follow up with the CMs of these sites and share the reason for the increase. Thank you.');
   return L.join('\n');
 }
 function cxCapRender(force){const t=document.getElementById('cxCap'); if(!t) return; if(CX.edited&&!force) return; CX.edited=false; t.value=cxCaption();}
