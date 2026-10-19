@@ -29,7 +29,7 @@ def build():
     html = rd('index.template.html')
     html = html.replace('/*STYLES*/', '<style>\n' + css + '\n</style>')
     html = html.replace('/*I18NCORE*/', i18n).replace('/*ENGINE*/', rd('core/engine.js')).replace('/*PAYENGINE*/', rd('legacy/payroll-engine.js'))
-    html = html.replace('/*APP*/', app).replace('/*DATA*/', rd('data/electricity.json'))
+    html = html.replace('/*APP*/', app).replace('/*DATA*/', rd('data/electricity.json')).replace('/*BUDGET*/', rd('data/budget.json'))
     return html
 
 if __name__ == '__main__':

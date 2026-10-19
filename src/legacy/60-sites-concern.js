@@ -48,18 +48,25 @@ function renderSites(list){
 }
 
 let CROWS=[], CMETA={};
+/* FY2026 budget for the month of the latest data, as kWh per day */
+function budgetFor(s){
+  const m=/^\d+/.exec(s.n), b=m&&BUDGET[+m[0]]; if(!b) return null;
+  const d=days[iOkt], mi=+d.slice(5,7)-1, dim=new Date(+d.slice(0,4),mi+1,0).getDate(), v=b.m[mi];
+  return v?{perDay:v/dim,month:v,mi,dim}:null;
+}
+const CT={hi:.10,lo:.05};   // Red: more than 10% above budget. Yellow: 5 to 10% above
 function renderConcern(list,P){
   var __a=[list,P];
-  const natYoy=P.okt.raw/P.py.raw-1;
-  const rows=list.map(s=>{const a=siteAvg(s);const sig=(a.mom>TH)+(a.vsAgu>TH)+(a.yoy>TH);return {s,a,sig,ex:a.okt-a.py*(1+natYoy)};})
-    .sort((x,y)=>y.ex-x.ex).slice(0,8);
-  CROWS=rows; CMETA={natYoy,dSep:P.okt.raw/P.sep.raw-1,dAgu:P.okt.raw/P.agu.raw-1,yoy:natYoy,n:list.length};
+  const all=list.map(s=>{const a=siteAvg(s),b=budgetFor(s); if(!b||!Number.isFinite(a.okt)) return null; const p=a.okt/b.perDay-1; return {s,a,b,act:a.okt,bud:b.perDay,ex:a.okt-b.perDay,p,lv:p>CT.hi?'hi':p>CT.lo?'lo':'ok'};}).filter(Boolean);
+  const over=all.filter(r=>r.lv!=='ok').sort((x,y)=>y.ex-x.ex), rows=over.slice(0,8);
+  const ta=all.reduce((t,r)=>t+r.act,0), tb=all.reduce((t,r)=>t+r.bud,0);
+  CROWS=rows; CMETA={n:all.length,nOver:over.length,nRed:over.filter(r=>r.lv==='hi').length,ta,tb,tp:tb?ta/tb-1:0,mon:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][all[0]?all[0].b.mi:0]};
   const mx=Math.max(...rows.map(r=>r.ex),1);
-  const cp=(l,v)=>`<span class="cp ${cls(v)}">${l} ${pct(v,0)}</span>`;
-  document.getElementById('concern').innerHTML=rows.map((r,i)=>`<div class="crow" role="button" tabindex="0" data-n="${r.s.n}"><div class="nm"><span class="rk">${i+1}</span><div class="nb"><b>${short(r.s.n)}${r.s.partial?' *':''}</b><small>${r.s.r} · ${fmt(r.a.okt)} kWh/day in October</small>
-    <div class="cmp">${cp('vs Oct 2025',r.a.yoy)}${cp('vs Sep',r.a.mom)}${cp('vs Aug',r.a.vsAgu)}</div>${typeof fuChip==='function'?'<div class="fuline">'+fuChip(r.s.n)+'</div>':''}</div></div>
-    <div class="tr"><i class="${r.sig>=2?'hi':''}" style="width:${Math.max(0,r.ex)/mx*100}%"></i></div>
-    <div class="val">${r.ex>=0?'+':'−'}${fmt(Math.abs(r.ex))}<small>kWh/day above national growth</small><span class="flag ${r.sig>=2?'hi':'lo'}">${r.sig>=2?'Red':'Yellow'} · up in ${r.sig} of 3</span></div></div>`).join('');
+  document.getElementById('concern').innerHTML=rows.length?rows.map((r,i)=>`<div class="crow" role="button" tabindex="0" data-n="${r.s.n}"><div class="nm"><span class="rk">${i+1}</span><div class="nb"><b>${short(r.s.n)}${r.s.partial?' *':''}</b><small>${r.s.r}</small>
+    <div class="cmp"><span class="cp">Budget ${fmt(r.bud)}/day</span><span class="cp ${r.lv==='hi'?'up':'warn'}">Actual ${fmt(r.act)}/day</span></div>${typeof fuChip==='function'?'<div class="fuline">'+fuChip(r.s.n)+'</div>':''}</div></div>
+    <div class="tr"><i class="${r.lv==='hi'?'hi':''}" style="width:${Math.max(0,r.ex)/mx*100}%"></i></div>
+    <div class="val">+${fmt(r.ex)}<small>kWh/day above budget</small><span class="flag ${r.lv}">${r.lv==='hi'?'Red':'Yellow'} · ${pct(r.p,0)} vs budget</span></div></div>`).join(''):'<div class="empty">No site is more than 5% above its budget.</div>';
+  const sm=document.getElementById('cSum'); if(sm) sm.innerHTML=`<div class="cs"><small>Budget</small><b>${fmt(CMETA.tb)}</b><span>kWh/day, ${CMETA.n} sites</span></div><div class="cs"><small>Actual</small><b>${fmt(CMETA.ta)}</b><span>kWh/day so far</span></div><div class="cs ${cls(CMETA.tp)}"><small>vs budget</small><b>${pct(CMETA.tp)}</b><span>${CMETA.ta>=CMETA.tb?'+':'−'}${fmt(Math.abs(CMETA.ta-CMETA.tb))} kWh/day</span></div><div class="cs"><small>Over budget</small><b>${CMETA.nOver}</b><span>of ${CMETA.n} sites, ${CMETA.nRed} red</span></div>`;
   if(typeof LASTC!=='undefined'){LASTC=rows.map(r=>r.s.n);LASTC.args=__a;fuSummary();}
   if(typeof cxRender==='function') cxRender();
 }

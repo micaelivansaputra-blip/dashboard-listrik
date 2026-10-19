@@ -7,51 +7,60 @@ function cxDate(){const l=(DATA.meta&&DATA.meta.last)||''; const m=/^(\d{4})-(\d
 function cxWrap(ctx,text,maxW){const out=[];let line='';String(text).split(/\s+/).forEach(w=>{const t=line?line+' '+w:w; if(ctx.measureText(t).width>maxW&&line){out.push(line);line=w;}else line=t;}); if(line) out.push(line); return out;}
 function cxRR(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
 function cxDraw(cv,rows,opt){
-  const S=2, W=880, P=40, C={ink:'#1D1D1F',mut:'#6E6E73',hair:'#E6E6EB',bg:'#FFFFFF',soft:'#F5F5F7',up:'#D70015',upS:'#FFEFED',dn:'#1B7F37',am:'#B26A00',amS:'#FFF3DD',red:'#FF3B30',amb:'#FF9F0A',blue:'#0071E3',blueS:'#E8F2FD'};
-  const tmp=document.createElement('canvas').getContext('2d'); tmp.font='400 13px '+cxFont;
-  // measure note heights first so the canvas is tall enough
-  const lay=rows.map(r=>{const f=FU[fuId(r.s.n)]; const has=opt.notes&&f&&(f.reason||f.tag); let lines=[]; if(has&&f.reason) lines=cxWrap(tmp,f.reason,W-P*2-32-(f.tag?0:0)).slice(0,3); return {r,f:has?f:null,lines,h:62+(has?(f.tag?24:0)+lines.length*19+(lines.length?4:0):0)};});
-  const head=170, colH=34, foot=96, H=head+colH+lay.reduce((t,l)=>t+l.h,0)+foot;
-  cv.width=W*S; cv.height=H*S; const ctx=cv.getContext('2d'); ctx.scale(S,S);
-  ctx.fillStyle=C.bg; ctx.fillRect(0,0,W,H); ctx.textBaseline='alphabetic';
-  const T=(s,x,y,font,color,al)=>{ctx.font=font;ctx.fillStyle=color;ctx.textAlign=al||'left';ctx.fillText(s,x,y);};
-  // header
-  ctx.fillStyle=C.amb; cxRR(ctx,P,38,28,4,2); ctx.fill();
-  T('ELECTRICITY · SITE CONCERN',P,66,'700 12px '+cxFont,C.mut);
-  T('Sites using more electricity than expected',P,102,'800 28px '+cxFont,C.ink);
-  const m=CMETA, sg=v=>(v>=0?'+':'−')+Math.abs(v*100).toFixed(1)+'%';
-  T('Data through '+cxDate()+' · '+m.n+' sites',P,128,'500 14px '+cxFont,C.mut);
-  // summary chips
-  let cx0=P; const chip=(l,v)=>{const t=l+' '+sg(v); ctx.font='700 12.5px '+cxFont; const w=ctx.measureText(t).width+22; ctx.fillStyle=v>TH?C.upS:v<-TH?'#E8F8ED':C.soft; cxRR(ctx,cx0,140,w,24,12); ctx.fill(); T(t,cx0+11,156.5,'700 12.5px '+cxFont,v>TH?C.up:v<-TH?C.dn:C.mut); cx0+=w+8;};
-  chip('October vs Sep',m.dSep); chip('vs Aug',m.dAgu); chip('vs Oct 2025',m.yoy);
-  // column header
-  let y=head; ctx.fillStyle=C.soft; cxRR(ctx,P-12,y,W-P*2+24,colH-6,10); ctx.fill();
-  const ch='700 11px '+cxFont; T('SITE',P+32,y+19,ch,C.mut); T('OCT kWh/DAY',410,y+19,ch,C.mut,'right'); T('VS OCT 2025',500,y+19,ch,C.mut,'right'); T('VS SEP',575,y+19,ch,C.mut,'right'); T('EXCESS kWh/DAY',W-P,y+19,ch,C.mut,'right');
-  y+=colH;
-  const mx=Math.max(...rows.map(r=>r.ex),1);
+  const S=2, W=880, X=32, CW=W-X*2;
+  const C={ink:'#1D1D1F',mut:'#6E6E73',soft:'#F5F5F7',track:'#E3E3E8',base:'#AFC0D8',red:'#FF3B30',amb:'#FF9F0A',up:'#D70015',upS:'#FFEFED',am:'#B26A00',amS:'#FFF3DD',blue:'#0071E3',blueS:'#E8F2FD',dn:'#1B7F37'};
+  const tmp=document.createElement('canvas').getContext('2d'); tmp.font='400 13.5px '+cxFont;
+  const lay=rows.map(r=>{const f=FU[fuId(r.s.n)]; const has=opt.notes&&f&&(f.reason||f.tag); const lines=has&&f.reason?cxWrap(tmp,f.reason,CW-54-24-8).slice(0,3):[]; const nh=has?(f.tag?28:0)+lines.length*19+8:0; return {r,f:has?f:null,lines,h:100+nh};});
+  const m=CMETA, heroH=200, listTop=heroH+X+64, foot=110;
+  const H=listTop+(lay.length?lay.reduce((t,l)=>t+l.h+12,0):70)+foot;
+  cv.width=W*S; cv.height=H*S; const ctx=cv.getContext('2d'); ctx.scale(S,S); ctx.textBaseline='alphabetic';
+  ctx.fillStyle='#FFFFFF'; ctx.fillRect(0,0,W,H);
+  const T=(t,x,y,font,color,al)=>{ctx.font=font;ctx.fillStyle=color;ctx.textAlign=al||'left';ctx.fillText(t,x,y);};
+  const sg=v=>(v>=0?'+':'−')+Math.abs(v*100).toFixed(1)+'%';
+  // hero
+  const g=ctx.createLinearGradient(X,X,X+CW,X+heroH); g.addColorStop(0,'#0A84FF'); g.addColorStop(1,'#5E5CE6');
+  ctx.fillStyle=g; cxRR(ctx,X,X,CW,heroH,26); ctx.fill();
+  T('SITE CONCERN · ELECTRICITY',X+28,X+40,'700 12px '+cxFont,'rgba(255,255,255,.78)');
+  T('Sites above their kWh budget',X+28,X+76,'800 28px '+cxFont,'#FFFFFF');
+  T('Daily usage vs FY2026 budget · data through '+cxDate()+' · '+m.n+' sites',X+28,X+100,'500 13.5px '+cxFont,'rgba(255,255,255,.85)');
+  const tw=(CW-56-24)/3, ty=X+122, th=58, tile=(i,lab,val,sub,hl)=>{const x=X+28+i*(tw+12); ctx.fillStyle=hl?'#FFFFFF':'rgba(255,255,255,.18)'; cxRR(ctx,x,ty,tw,th,16); ctx.fill(); T(lab,x+16,ty+20,'700 11px '+cxFont,hl?C.mut:'rgba(255,255,255,.8)'); T(val,x+16,ty+43,'800 21px '+cxFont,hl?(m.tp>CT.lo?C.up:m.tp<-CT.lo?C.dn:C.ink):'#FFFFFF'); if(sub) T(sub,x+tw-14,ty+43,'600 12px '+cxFont,hl?C.mut:'rgba(255,255,255,.85)','right');};
+  tile(0,'BUDGET kWh/DAY',fmt(m.tb),'');
+  tile(1,'ACTUAL kWh/DAY',fmt(m.ta),'');
+  tile(2,'VS BUDGET',sg(m.tp),(m.ta>=m.tb?'+':'−')+fmt(Math.abs(m.ta-m.tb))+'/day',true);
+  // list heading
+  let y=X+heroH+24;
+  T('Top '+rows.length+' sites over budget',X,y+22,'800 18px '+cxFont,C.ink);
+  T(m.nOver+' of '+m.n+' sites are more than 5% over · ranked by kWh/day above budget',X+CW,y+22,'500 12.5px '+cxFont,C.mut,'right');
+  y=listTop;
+  if(!lay.length) T('No site is more than 5% above its budget.',X,y+30,'500 15px '+cxFont,C.mut);
+  const mx=Math.max(...rows.map(r=>Math.max(r.act,r.bud)),1), bx=X+54, bw=440;
   lay.forEach((L,i)=>{
-    const r=L.r, hi=r.sig>=2, col=hi?C.red:C.amb, top=y;
-    if(i>0){ctx.fillStyle=C.hair;ctx.fillRect(P,y,W-P*2,1);}
-    // rank
-    ctx.fillStyle=hi?C.upS:C.amS; ctx.beginPath(); ctx.arc(P+11,y+31,11,0,7); ctx.fill(); T(String(i+1),P+11,y+35.5,'800 12px '+cxFont,hi?C.up:C.am,'center');
-    T(short(r.s.n)+(r.s.partial?' *':''),P+32,y+29,'700 16px '+cxFont,C.ink); T(r.s.r+(hi?' · Red':' · Yellow')+' · up in '+r.sig+' of 3',P+32,y+47,'500 12px '+cxFont,hi?C.up:C.am);
-    T(fmt(r.a.okt),410,y+34,'600 15px '+cxFont,C.ink,'right');
-    const pc=(v,x)=>T(sg(v),x,y+34,'700 14px '+cxFont,v>TH?C.up:v<-TH?C.dn:C.mut,'right'); pc(r.a.yoy,500); pc(r.a.mom,575);
-    // excess bar + value
-    const bx=600, bw=120; ctx.fillStyle=C.soft; cxRR(ctx,bx,y+25,bw,10,5); ctx.fill(); ctx.fillStyle=col; cxRR(ctx,bx,y+25,Math.max(8,bw*Math.max(0,r.ex)/mx),10,5); ctx.fill();
-    T((r.ex>=0?'+':'−')+fmt(Math.abs(r.ex)),W-P,y+37,'800 20px '+cxFont,C.ink,'right');
-    let yy=y+62;
+    const r=L.r, hi=r.lv==='hi', col=hi?C.red:C.amb, top=y;
+    ctx.fillStyle=C.soft; cxRR(ctx,X,y,CW,L.h,20); ctx.fill();
+    ctx.fillStyle=hi?C.upS:C.amS; ctx.beginPath(); ctx.arc(X+26,y+34,14,0,7); ctx.fill(); T(String(i+1),X+26,y+39,'800 13px '+cxFont,hi?C.up:C.am,'center');
+    T(short(r.s.n)+(r.s.partial?' *':''),bx,y+34,'700 17px '+cxFont,C.ink);
+    T(r.s.r+'  ·  Budget '+fmt(r.bud)+'  →  Actual '+fmt(r.act)+' kWh/day',bx,y+54,'500 12.5px '+cxFont,C.mut);
+    // bar: budget part, then the part above budget
+    ctx.fillStyle=C.track; cxRR(ctx,bx,y+68,bw,10,5); ctx.fill();
+    const wb=Math.max(6,bw*Math.min(r.bud,r.act)/mx), wa=bw*r.act/mx;
+    ctx.fillStyle=C.base; cxRR(ctx,bx,y+68,wb,10,5); ctx.fill();
+    ctx.save(); cxRR(ctx,bx,y+68,wa,10,5); ctx.clip(); ctx.fillStyle=col; ctx.fillRect(bx+bw*r.bud/mx,y+68,wa,10); ctx.restore();
+    ctx.fillStyle=C.ink; ctx.fillRect(bx+bw*r.bud/mx-1,y+64,2,18);
+    // right: how much per day, and the % vs budget
+    const rx=X+CW-24;
+    T('+'+fmt(r.ex),rx,y+42,'800 28px '+cxFont,C.ink,'right'); T('kWh/day over budget',rx,y+60,'500 12px '+cxFont,C.mut,'right');
+    const pt=sg(r.p)+' vs budget'; ctx.font='700 12px '+cxFont; const pw=ctx.measureText(pt).width+22; ctx.fillStyle=hi?C.upS:C.amS; cxRR(ctx,rx-pw,y+68,pw,24,12); ctx.fill(); T(pt,rx-pw/2,y+84,'700 12px '+cxFont,hi?C.up:C.am,'center');
+    let yy=y+112;
     if(L.f){
-      if(L.f.tag){const tg=FUTAG[L.f.tag]||'Other'; ctx.font='700 12px '+cxFont; const w=ctx.measureText(tg).width+20; ctx.fillStyle=C.blueS; cxRR(ctx,P+32,yy-12,w,22,11); ctx.fill(); T(tg,P+42,yy+3,'700 12px '+cxFont,C.blue); if(L.f.cm) T('told by '+L.f.cm,P+32+w+10,yy+3,'500 12px '+cxFont,C.mut); yy+=24;}
-      L.lines.forEach(t=>{T(t,P+32,yy+2,'400 13.5px '+cxFont,C.ink); yy+=19;});
+      if(L.f.tag){const tg=FUTAG[L.f.tag]||'Other'; ctx.font='700 12px '+cxFont; const w=ctx.measureText(tg).width+20; ctx.fillStyle=C.blueS; cxRR(ctx,bx,yy-14,w,22,11); ctx.fill(); T(tg,bx+10,yy+1,'700 12px '+cxFont,C.blue); if(L.f.cm) T('told by '+L.f.cm,bx+w+10,yy+1,'500 12px '+cxFont,C.mut); yy+=28;}
+      L.lines.forEach(t=>{T(t,bx,yy-4,'400 13.5px '+cxFont,C.ink); yy+=19;});
     }
-    y=top+L.h;
+    y=top+L.h+12;
   });
   // footer
-  ctx.fillStyle=C.hair; ctx.fillRect(P,y+6,W-P*2,1);
-  const fl=cxWrap(ctx,'Excess kWh/day = the site\'s October average minus what national growth ('+sg(m.natYoy)+' vs Oct 2025) would explain. Red: up more than 5% in 2 or 3 of the comparisons. Yellow: up in 1.',W-P*2);
-  ctx.font='400 12px '+cxFont; fl.forEach((t,k)=>T(t,P,y+30+k*17,'400 12px '+cxFont,C.mut));
-  T('Operations · Electricity monitoring',P,y+30+fl.length*17+8,'600 11.5px '+cxFont,'#9A9AA1');
+  const fl=cxWrap(ctx,'Budget kWh/day = FY2026 monthly budget ÷ days in the month. The black tick on each bar is the budget; the colored part is usage above it. Red: more than 10% over budget. Yellow: 5 to 10% over. '+(m.n-m.nOver)+' of '+m.n+' sites are within 5% of budget or below.',CW);
+  ctx.font='400 12px '+cxFont; fl.forEach((t,k)=>T(t,X,y+18+k*17,'400 12px '+cxFont,C.mut));
+  T('Operations · Electricity monitoring',X,y+18+fl.length*17+12,'600 11.5px '+cxFont,'#9A9AA1');
 }
 function cxRender(){
   const cv=document.getElementById('cxCv'); if(!cv||!CROWS.length) return;

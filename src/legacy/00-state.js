@@ -1,4 +1,6 @@
 let DATA = /*DATA*/;
+/* FY2026 monthly kWh budget per site, keyed by site number: {no:{n,m:[Jan..Dec]}} */
+const BUDGET = /*BUDGET*/;
 const TH = 0.05, EN = 'en-US';
 const fmt = n => Math.round(n).toLocaleString(EN);
 const pct = (x,d=1) => (x>=0?'+':'−') + Math.abs(x*100).toFixed(d) + '%';
