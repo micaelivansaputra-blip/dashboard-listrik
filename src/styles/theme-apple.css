@@ -306,3 +306,17 @@ body::before{background:radial-gradient(60vmax 46vmax at 4% -4%,var(--glow1),tra
 .sec-head.dup h2{margin:0}
 .sec-head.dup small{margin-left:0;font-size:14px}
 @media (max-width:640px){.ptable th.nt,.ptable td.nt{display:none}}
+
+/* Site Concern: clearer rows + email image */
+.crow .nm{display:flex;gap:12px;align-items:flex-start;min-width:0}
+.crow .rk{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:800;background:var(--surface-2);color:var(--muted);margin-top:1px}
+.crow .nb{min-width:0}.crow .nb b{display:block;font-size:16px}
+.crow .nb small{display:block;margin-top:1px}
+.cmp{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.cp{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--surface-2);color:var(--muted);font-variant-numeric:tabular-nums}
+.cp.up{background:var(--up-soft);color:var(--up-ink)}.cp.down{background:var(--down-soft);color:var(--down-ink)}
+.cxcard{margin-top:16px}
+.cxact{margin-left:auto}
+.cxprev{margin-top:12px;border:1px solid var(--hair);border-radius:16px;background:#fff;padding:14px;overflow-x:auto}
+.cxprev canvas{display:block;width:100%;max-width:880px;height:auto;margin:0 auto}
+@media (max-width:640px){.cxact{margin-left:0}.crow .nm{gap:10px}}

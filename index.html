@@ -916,6 +916,20 @@ body::before{background:radial-gradient(60vmax 46vmax at 4% -4%,var(--glow1),tra
 .sec-head.dup small{margin-left:0;font-size:14px}
 @media (max-width:640px){.ptable th.nt,.ptable td.nt{display:none}}
 
+/* Site Concern: clearer rows + email image */
+.crow .nm{display:flex;gap:12px;align-items:flex-start;min-width:0}
+.crow .rk{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:800;background:var(--surface-2);color:var(--muted);margin-top:1px}
+.crow .nb{min-width:0}.crow .nb b{display:block;font-size:16px}
+.crow .nb small{display:block;margin-top:1px}
+.cmp{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.cp{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--surface-2);color:var(--muted);font-variant-numeric:tabular-nums}
+.cp.up{background:var(--up-soft);color:var(--up-ink)}.cp.down{background:var(--down-soft);color:var(--down-ink)}
+.cxcard{margin-top:16px}
+.cxact{margin-left:auto}
+.cxprev{margin-top:12px;border:1px solid var(--hair);border-radius:16px;background:#fff;padding:14px;overflow-x:auto}
+.cxprev canvas{display:block;width:100%;max-width:880px;height:auto;margin:0 auto}
+@media (max-width:640px){.cxact{margin-left:0}.crow .nm{gap:10px}}
+
 </style>
 
 <div class="wrap">
@@ -1073,6 +1087,16 @@ body::before{background:radial-gradient(60vmax 46vmax at 4% -4%,var(--glow1),tra
       <div class="howto"><span><i style="background:var(--up)"></i>Red: up &gt;5% in 2 or 3 of the comparisons</span><span><i style="background:var(--amber)"></i>Yellow: up in 1 comparison, keep watching</span></div>
       <div class="fusum" id="fuSum" hidden></div>
       <div class="cc" id="concern"></div>
+    </div>
+    <div class="card cxcard" id="cxCard">
+      <div class="ch"><div><h3>Email-ready image</h3><span class="sub">The same list, laid out for an email body. Download it or copy it and paste straight into the email.</span></div></div>
+      <div class="ctl">
+        <div class="f">Sites in the image<div class="seg" role="group" aria-label="Number of sites"><button type="button" data-cx="n5" aria-pressed="true">Top 5</button><button type="button" data-cx="n8" aria-pressed="false">Top 8</button></div></div>
+        <div class="qchips"><button type="button" class="chipbtn" data-cx="nt" aria-pressed="true">Include notes</button></div>
+        <div class="qchips cxact"><button type="button" class="fubtn" data-cx="dl">Download image</button><button type="button" class="fubtn ghost" data-cx="cp">Copy image</button></div>
+      </div>
+      <div class="cmsg fumsg" id="cxMsg" role="status"></div>
+      <div class="cxprev"><canvas id="cxCv" role="img" aria-label="Site concern summary image for email"></canvas></div>
     </div>
   </section>
 
@@ -2624,16 +2648,21 @@ function renderSites(list){
   document.getElementById('more').innerHTML=(!q&&STATUS==='all'&&!NOTEF&&f.length>lim)?`<button type="button" class="chipbtn" data-more aria-pressed="true">${EXPAND?'Show top '+lim:'Show all '+f.length+' sites'}</button>`:'';
 }
 
+let CROWS=[], CMETA={};
 function renderConcern(list,P){
   var __a=[list,P];
   const natYoy=P.okt.raw/P.py.raw-1;
   const rows=list.map(s=>{const a=siteAvg(s);const sig=(a.mom>TH)+(a.vsAgu>TH)+(a.yoy>TH);return {s,a,sig,ex:a.okt-a.py*(1+natYoy)};})
     .sort((x,y)=>y.ex-x.ex).slice(0,8);
+  CROWS=rows; CMETA={natYoy,dSep:P.okt.raw/P.sep.raw-1,dAgu:P.okt.raw/P.agu.raw-1,yoy:natYoy,n:list.length};
   const mx=Math.max(...rows.map(r=>r.ex),1);
-  document.getElementById('concern').innerHTML=rows.map(r=>`<div class="crow" role="button" tabindex="0" data-n="${r.s.n}"><div class="nm">${short(r.s.n)}${r.s.partial?' *':''}<small>${r.s.r} · ${fmt(r.a.okt)} kWh/day · Oct 2025 ${pct(r.a.yoy,0)} · Sep ${pct(r.a.mom,0)}</small>${typeof fuChip==='function'?'<div class="fuline">'+fuChip(r.s.n)+'</div>':''}</div>
+  const cp=(l,v)=>`<span class="cp ${cls(v)}">${l} ${pct(v,0)}</span>`;
+  document.getElementById('concern').innerHTML=rows.map((r,i)=>`<div class="crow" role="button" tabindex="0" data-n="${r.s.n}"><div class="nm"><span class="rk">${i+1}</span><div class="nb"><b>${short(r.s.n)}${r.s.partial?' *':''}</b><small>${r.s.r} · ${fmt(r.a.okt)} kWh/day in October</small>
+    <div class="cmp">${cp('vs Oct 2025',r.a.yoy)}${cp('vs Sep',r.a.mom)}${cp('vs Aug',r.a.vsAgu)}</div>${typeof fuChip==='function'?'<div class="fuline">'+fuChip(r.s.n)+'</div>':''}</div></div>
     <div class="tr"><i class="${r.sig>=2?'hi':''}" style="width:${Math.max(0,r.ex)/mx*100}%"></i></div>
     <div class="val">${r.ex>=0?'+':'−'}${fmt(Math.abs(r.ex))}<small>kWh/day above national growth</small><span class="flag ${r.sig>=2?'hi':'lo'}">${r.sig>=2?'Red':'Yellow'} · up in ${r.sig} of 3</span></div></div>`).join('');
   if(typeof LASTC!=='undefined'){LASTC=rows.map(r=>r.s.n);LASTC.args=__a;fuSummary();}
+  if(typeof cxRender==='function') cxRender();
 }
 
 function renderProgram(){
@@ -3505,6 +3534,88 @@ function fuCopyAll(){
   try{const U=await claude.use('user'); if(U&&U.can&&U.can('data.write')===false) FUCAN=false;}catch(e){}
   DB.collection('followups').onSnapshot(s=>{FULOCAL=false;FU={};s.docs.forEach(d=>{FU[d.id]=d.data();});fuRefresh();},()=>{});
 }catch(e){}})();
+
+/* ---------- Site Concern: email-ready image (PNG) ----------
+   Drawn on a canvas so the picture is crisp and always light, whatever theme the page is in.
+   Download saves a PNG; Copy puts the image on the clipboard, ready to paste into an email body. */
+const CX={rows:5,notes:true};
+const cxFont='Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif';
+function cxDate(){const l=(DATA.meta&&DATA.meta.last)||''; const m=/^(\d{4})-(\d\d)-(\d\d)$/.exec(l); if(!m) return ''; return (+m[3])+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+m[2]-1]+' '+m[1];}
+function cxWrap(ctx,text,maxW){const out=[];let line='';String(text).split(/\s+/).forEach(w=>{const t=line?line+' '+w:w; if(ctx.measureText(t).width>maxW&&line){out.push(line);line=w;}else line=t;}); if(line) out.push(line); return out;}
+function cxRR(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+function cxDraw(cv,rows,opt){
+  const S=2, W=880, P=40, C={ink:'#1D1D1F',mut:'#6E6E73',hair:'#E6E6EB',bg:'#FFFFFF',soft:'#F5F5F7',up:'#D70015',upS:'#FFEFED',dn:'#1B7F37',am:'#B26A00',amS:'#FFF3DD',red:'#FF3B30',amb:'#FF9F0A',blue:'#0071E3',blueS:'#E8F2FD'};
+  const tmp=document.createElement('canvas').getContext('2d'); tmp.font='400 13px '+cxFont;
+  // measure note heights first so the canvas is tall enough
+  const lay=rows.map(r=>{const f=FU[fuId(r.s.n)]; const has=opt.notes&&f&&(f.reason||f.tag); let lines=[]; if(has&&f.reason) lines=cxWrap(tmp,f.reason,W-P*2-32-(f.tag?0:0)).slice(0,3); return {r,f:has?f:null,lines,h:62+(has?(f.tag?24:0)+lines.length*19+(lines.length?4:0):0)};});
+  const head=170, colH=34, foot=96, H=head+colH+lay.reduce((t,l)=>t+l.h,0)+foot;
+  cv.width=W*S; cv.height=H*S; const ctx=cv.getContext('2d'); ctx.scale(S,S);
+  ctx.fillStyle=C.bg; ctx.fillRect(0,0,W,H); ctx.textBaseline='alphabetic';
+  const T=(s,x,y,font,color,al)=>{ctx.font=font;ctx.fillStyle=color;ctx.textAlign=al||'left';ctx.fillText(s,x,y);};
+  // header
+  ctx.fillStyle=C.amb; cxRR(ctx,P,38,28,4,2); ctx.fill();
+  T('ELECTRICITY · SITE CONCERN',P,66,'700 12px '+cxFont,C.mut);
+  T('Sites using more electricity than expected',P,102,'800 28px '+cxFont,C.ink);
+  const m=CMETA, sg=v=>(v>=0?'+':'−')+Math.abs(v*100).toFixed(1)+'%';
+  T('Data through '+cxDate()+' · '+m.n+' sites',P,128,'500 14px '+cxFont,C.mut);
+  // summary chips
+  let cx0=P; const chip=(l,v)=>{const t=l+' '+sg(v); ctx.font='700 12.5px '+cxFont; const w=ctx.measureText(t).width+22; ctx.fillStyle=v>TH?C.upS:v<-TH?'#E8F8ED':C.soft; cxRR(ctx,cx0,140,w,24,12); ctx.fill(); T(t,cx0+11,156.5,'700 12.5px '+cxFont,v>TH?C.up:v<-TH?C.dn:C.mut); cx0+=w+8;};
+  chip('October vs Sep',m.dSep); chip('vs Aug',m.dAgu); chip('vs Oct 2025',m.yoy);
+  // column header
+  let y=head; ctx.fillStyle=C.soft; cxRR(ctx,P-12,y,W-P*2+24,colH-6,10); ctx.fill();
+  const ch='700 11px '+cxFont; T('SITE',P+32,y+19,ch,C.mut); T('OCT kWh/DAY',410,y+19,ch,C.mut,'right'); T('VS OCT 2025',500,y+19,ch,C.mut,'right'); T('VS SEP',575,y+19,ch,C.mut,'right'); T('EXCESS kWh/DAY',W-P,y+19,ch,C.mut,'right');
+  y+=colH;
+  const mx=Math.max(...rows.map(r=>r.ex),1);
+  lay.forEach((L,i)=>{
+    const r=L.r, hi=r.sig>=2, col=hi?C.red:C.amb, top=y;
+    if(i>0){ctx.fillStyle=C.hair;ctx.fillRect(P,y,W-P*2,1);}
+    // rank
+    ctx.fillStyle=hi?C.upS:C.amS; ctx.beginPath(); ctx.arc(P+11,y+31,11,0,7); ctx.fill(); T(String(i+1),P+11,y+35.5,'800 12px '+cxFont,hi?C.up:C.am,'center');
+    T(short(r.s.n)+(r.s.partial?' *':''),P+32,y+29,'700 16px '+cxFont,C.ink); T(r.s.r+(hi?' · Red':' · Yellow')+' · up in '+r.sig+' of 3',P+32,y+47,'500 12px '+cxFont,hi?C.up:C.am);
+    T(fmt(r.a.okt),410,y+34,'600 15px '+cxFont,C.ink,'right');
+    const pc=(v,x)=>T(sg(v),x,y+34,'700 14px '+cxFont,v>TH?C.up:v<-TH?C.dn:C.mut,'right'); pc(r.a.yoy,500); pc(r.a.mom,575);
+    // excess bar + value
+    const bx=600, bw=120; ctx.fillStyle=C.soft; cxRR(ctx,bx,y+25,bw,10,5); ctx.fill(); ctx.fillStyle=col; cxRR(ctx,bx,y+25,Math.max(8,bw*Math.max(0,r.ex)/mx),10,5); ctx.fill();
+    T((r.ex>=0?'+':'−')+fmt(Math.abs(r.ex)),W-P,y+37,'800 20px '+cxFont,C.ink,'right');
+    let yy=y+62;
+    if(L.f){
+      if(L.f.tag){const tg=FUTAG[L.f.tag]||'Other'; ctx.font='700 12px '+cxFont; const w=ctx.measureText(tg).width+20; ctx.fillStyle=C.blueS; cxRR(ctx,P+32,yy-12,w,22,11); ctx.fill(); T(tg,P+42,yy+3,'700 12px '+cxFont,C.blue); if(L.f.cm) T('told by '+L.f.cm,P+32+w+10,yy+3,'500 12px '+cxFont,C.mut); yy+=24;}
+      L.lines.forEach(t=>{T(t,P+32,yy+2,'400 13.5px '+cxFont,C.ink); yy+=19;});
+    }
+    y=top+L.h;
+  });
+  // footer
+  ctx.fillStyle=C.hair; ctx.fillRect(P,y+6,W-P*2,1);
+  const fl=cxWrap(ctx,'Excess kWh/day = the site\'s October average minus what national growth ('+sg(m.natYoy)+' vs Oct 2025) would explain. Red: up more than 5% in 2 or 3 of the comparisons. Yellow: up in 1.',W-P*2);
+  ctx.font='400 12px '+cxFont; fl.forEach((t,k)=>T(t,P,y+30+k*17,'400 12px '+cxFont,C.mut));
+  T('Operations · Electricity monitoring',P,y+30+fl.length*17+8,'600 11.5px '+cxFont,'#9A9AA1');
+}
+function cxRender(){
+  const cv=document.getElementById('cxCv'); if(!cv||!CROWS.length) return;
+  const go=()=>{try{cxDraw(cv,CROWS.slice(0,CX.rows),CX);}catch(e){}};
+  go(); if(document.fonts&&document.fonts.ready) document.fonts.ready.then(go);
+}
+function cxBlob(){const cv=document.getElementById('cxCv'); return new Promise((res,rej)=>cv.toBlob(b=>b?res(b):rej(new Error('blob')),'image/png'));}
+function cxMsg(t,c){const m=document.getElementById('cxMsg'); if(m){m.textContent=t;m.className='fumsg '+(c||'');}}
+async function cxDownload(){
+  const name='site-concern-'+((DATA.meta&&DATA.meta.last)||'latest')+'.png';
+  try{
+    const b=await cxBlob(); let dl=null;
+    try{ if(window.claude&&claude.use) dl=await claude.use('downloads'); }catch(e){}
+    if(dl){ await dl.save({filename:name,data:b}); cxMsg('Saved '+name,'ok'); return; }
+    const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),4000); cxMsg('Downloaded '+name,'ok');
+  }catch(e){ cxMsg(e&&e.code==='declined'?'Download cancelled.':'Could not download. Right-click the image and choose Save image.','err'); }
+}
+async function cxCopy(){
+  try{ const b=await cxBlob(); await navigator.clipboard.write([new ClipboardItem({'image/png':b})]); cxMsg('Image copied. Paste it into your email body (Ctrl+V).','ok'); }
+  catch(e){ cxMsg('Copy is blocked here. Use Download image instead.','err'); }
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('#cxCard [data-cx]'); if(!b) return; const k=b.dataset.cx;
+  if(k==='dl') cxDownload(); else if(k==='cp') cxCopy();
+  else if(k==='n5'||k==='n8'){CX.rows=k==='n5'?5:8; document.querySelectorAll('#cxCard [data-cx^=n]').forEach(x=>x.setAttribute('aria-pressed',String(x===b))); cxRender();}
+  else if(k==='nt'){CX.notes=!CX.notes; b.setAttribute('aria-pressed',String(CX.notes)); cxRender();}
+});
 
 /* generated dataset: see tools/ and README. Replace by re-running the data prep, not by hand. */
 const ADMITS_DATA = {"meta":{"periodA":"Sep 2025","periodB":"Sep 2026","kwh":"Invoice kWh, main meters (WBP, LWBP, Single), multiplied by CT","admits":"All formats (Regular, VIP, Junior)","built":"2026-10-13","sources":["Actual Invoice Electricity.xlsx (RAW)","Man Hour Usage (tabs September 2025, Sep 2026)"]},"sites":[{"no":2,"name":"LIPPO MALL NUSANTARA","a25":6759,"a26":14011,"k25":35600,"k26":39705},{"no":3,"name":"PALEMBANG ICON","a25":33057,"a26":25950,"k25":46784.0,"k26":52128.0},{"no":4,"name":"LIPPO PLAZA MANADO","a25":19289,"a26":16723,"k25":51264.0,"k26":54528.0},{"no":5,"name":"PONOROGO CITY CENTER","a25":6648,"a26":8217,"k25":26928.0,"k26":26880.0},{"no":6,"name":"LM KUTA","a25":6222,"a26":7973,"k25":35889.6,"k26":34788.8},{"no":7,"name":"SUN PLAZA","a25":27763,"a26":29203,"k25":95680.0,"k26":99776.0},{"no":8,"name":"LIPPO PLAZA MEDAN","a25":11764,"a26":9115,"k25":28543.2,"k26":28467.6},{"no":10,"name":"LIPPO PLAZA JOGJA","a25":12802,"a26":9979,"k25":39830.2,"k26":24008.9},{"no":11,"name":"MAXXBOX LIPPO VILLAGE","a25":14902,"a26":9934,"k25":64280.0,"k26":61915.0},{"no":13,"name":"LIPPO PLAZA JAMBI","a25":19066,"a26":16578,"k25":42720.0,"k26":41880.0},{"no":14,"name":"MALL LIPPO CIKARANG","a25":14858,"a26":12465,"k25":53136.0,"k26":50976.0},{"no":16,"name":"LIPPO PLAZA BUTON","a25":5443,"a26":6159,"k25":17664.6,"k26":15374.5},{"no":17,"name":"LIPPO PLAZA EKALOKASARI","a25":8694,"a26":11182,"k25":null,"k26":null},{"no":19,"name":"LIPPO PLAZA KUPANG","a25":23387,"a26":17402,"k25":23600.0,"k26":21104.0},{"no":20,"name":"MALL OF SERANG","a25":25519,"a26":22181,"k25":15520,"k26":16640},{"no":21,"name":"LIPPO PLAZA KENDARI","a25":6977,"a26":9921,"k25":33600,"k26":6000.0,"flag":"unreliable","note":"CT changed from 120 to 1 after a meter replacement (Nov 2025). Invoice kWh is not comparable with last year until engineering confirms the billing basis."},{"no":22,"name":"JAVA SUPERMAL","a25":23907,"a26":17682,"k25":4544.0,"k26":2867.2},{"no":24,"name":"LIPPO PLAZA BATU","a25":9247,"a26":7359,"k25":5994,"k26":5461},{"no":26,"name":"ISTANA PLAZA","a25":11002,"a26":8458,"k25":19528.8,"k26":22021.2},{"no":27,"name":"MALANG TOWN SQUARE","a25":25926,"a26":16963,"k25":38640.0,"k26":36240},{"no":28,"name":"CITIMALL SAMPIT","a25":11056,"a26":12776,"k25":27500.0,"k26":32220.0},{"no":30,"name":"PLAZA RENON","a25":18724,"a26":14345,"k25":18256.0,"k26":15760},{"no":31,"name":"LIVING PLAZA BALIKPAPAN","a25":36385,"a26":31882,"k25":63111.1,"k26":62815.3},{"no":32,"name":"PLUIT VILLAGE","a25":10765,"a26":9847,"k25":49760,"k26":49280},{"no":33,"name":"LIPPO PLAZA LUBUK LINGGAU","a25":9453,"a26":11126,"k25":30688.0,"k26":32352.0},{"no":34,"name":"PACIFIC MALL TEGAL","a25":13306,"a26":10227,"k25":45261,"k26":41153},{"no":35,"name":"LIPPO PLAZA KEBOEN RAYA BOGOR","a25":10588,"a26":14510,"k25":26485.1,"k26":35470.3},{"no":37,"name":"MALL PHINISI POINT","a25":30244,"a26":23360,"k25":59518.9,"k26":51837.0},{"no":38,"name":"DEPOK TOWN SQUARE","a25":19600,"a26":14744,"k25":58240,"k26":57920},{"no":39,"name":"CIBUBUR JUNCTION","a25":8760,"a26":11303,"k25":42810.0,"k26":52900},{"no":40,"name":"KALIBATA CITY SQUARE","a25":7246,"a26":8146,"k25":17923.2,"k26":22272.8},{"no":41,"name":"PLAZA MEDAN FAIR","a25":47402,"a26":40170,"k25":63500,"k26":69223,"note":"The new meter reads kWh directly (CT 200 to 1). The kWh change shown is a real change."},{"no":42,"name":"CITIMALL KETAPANG","a25":5581,"a26":5773,"k25":27253.0,"k26":24775.8},{"no":43,"name":"LIPPO PLAZA JEMBER","a25":18121,"a26":10063,"k25":37120,"k26":38304.0},{"no":44,"name":"TAMINI SQUARE","a25":13327,"a26":18654,"k25":34000,"k26":33800.0},{"no":45,"name":"Q MALL BANJARBARU","a25":26418,"a26":21788,"k25":25420.4,"k26":34288.4},{"no":47,"name":"CITIMALL PRABUMULIH","a25":7313,"a26":8722,"k25":21683.9,"k26":22774.6},{"no":49,"name":"LIVING WORLD PEKANBARU","a25":34751,"a26":31802,"k25":66096.0,"k26":72265.9},{"no":50,"name":"MAL BOTANIA 2","a25":15013,"a26":8513,"k25":48345,"k26":32718.7},{"no":51,"name":"LIPPO PLAZA SUNSET","a25":9273,"a26":9681,"k25":26155.2,"k26":27288.0},{"no":52,"name":"SIDEWALK JIMBARAN","a25":9806,"a26":7105,"k25":33600,"k26":31600},{"no":53,"name":"CITY OF TOMORROW","a25":6432,"a26":4538,"k25":29147.8,"k26":29003},{"no":54,"name":"MAL MANDAU CITY","a25":14788,"a26":8457,"k25":37768.0,"k26":35388.8},{"no":56,"name":"GAJAH MADA PLAZA","a25":17325,"a26":20379,"k25":38720,"k26":48472.0,"note":"Two meters are billed (CT 80 and CT 100). The daily file reads only one of them."},{"no":57,"name":"DISTRIK 1 MEIKARTA","a25":5004,"a26":4314,"k25":20728.0,"k26":19360},{"no":58,"name":"BINJAI SUPERMALL","a25":19218,"a26":24988,"k25":24469.4,"k26":35505.0,"flag":"meter","note":"A second LWBP meter (CT 50) appears from Jul 2026 and adds about 8,300 kWh a month, which is not in last year's base."},{"no":60,"name":"LIPPO PLAZA SIDOARJO","a25":15653,"a26":9239,"k25":null,"k26":24278.7,"note":"No September 2025 invoice, so kWh cannot be compared. Admits exist for both years."},{"no":61,"name":"MANGGA DUA SQUARE","a25":3740,"a26":8863,"k25":22454,"k26":25743.6},{"no":62,"name":"THE PARK PEJATEN","a25":11825,"a26":10573,"k25":63296,"k26":62455.7},{"no":63,"name":"BLU PLAZA BEKASI","a25":2291,"a26":3993,"k25":19382.4,"k26":20144.0},{"no":64,"name":"SIANTAR CITY SQUARE","a25":6032,"a26":7776,"k25":14431.2,"k26":14077.2},{"no":65,"name":"MALL PEKANBARU","a25":7358,"a26":5695,"k25":18746,"k26":17573},{"no":66,"name":"PONDOK KELAPA TOWN SQUARE","a25":3158,"a26":4282,"k25":25008.0,"k26":25856.0},{"no":67,"name":"KEBAYORAN PARK MALL","a25":5884,"a26":7739,"k25":20407.2,"k26":20506.4},{"no":68,"name":"CITIPLAZA KUTABUMI","a25":4361,"a26":13814,"k25":16700.0,"k26":19400.0},{"no":69,"name":"SENAYAN PARK","a25":10799,"a26":7653,"k25":80451.4,"k26":96364.5,"flag":"estimated","note":"Regular admits are missing in the source sheet (#REF!). Rebuilt from the daily numbers, with the blank day (8 Sep) filled at the average."},{"no":70,"name":"MALL THE GALERIA","a25":null,"a26":6574,"k25":null,"k26":35536.0},{"no":71,"name":"K-SQUARE BATAM","a25":null,"a26":13450,"k25":null,"k26":28000},{"no":72,"name":"Paragon Square Mall","a25":null,"a26":13787,"k25":null,"k26":28231.4}]};

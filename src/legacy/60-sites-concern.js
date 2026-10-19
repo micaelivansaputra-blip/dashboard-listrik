@@ -47,16 +47,21 @@ function renderSites(list){
   document.getElementById('more').innerHTML=(!q&&STATUS==='all'&&!NOTEF&&f.length>lim)?`<button type="button" class="chipbtn" data-more aria-pressed="true">${EXPAND?'Show top '+lim:'Show all '+f.length+' sites'}</button>`:'';
 }
 
+let CROWS=[], CMETA={};
 function renderConcern(list,P){
   var __a=[list,P];
   const natYoy=P.okt.raw/P.py.raw-1;
   const rows=list.map(s=>{const a=siteAvg(s);const sig=(a.mom>TH)+(a.vsAgu>TH)+(a.yoy>TH);return {s,a,sig,ex:a.okt-a.py*(1+natYoy)};})
     .sort((x,y)=>y.ex-x.ex).slice(0,8);
+  CROWS=rows; CMETA={natYoy,dSep:P.okt.raw/P.sep.raw-1,dAgu:P.okt.raw/P.agu.raw-1,yoy:natYoy,n:list.length};
   const mx=Math.max(...rows.map(r=>r.ex),1);
-  document.getElementById('concern').innerHTML=rows.map(r=>`<div class="crow" role="button" tabindex="0" data-n="${r.s.n}"><div class="nm">${short(r.s.n)}${r.s.partial?' *':''}<small>${r.s.r} · ${fmt(r.a.okt)} kWh/day · Oct 2025 ${pct(r.a.yoy,0)} · Sep ${pct(r.a.mom,0)}</small>${typeof fuChip==='function'?'<div class="fuline">'+fuChip(r.s.n)+'</div>':''}</div>
+  const cp=(l,v)=>`<span class="cp ${cls(v)}">${l} ${pct(v,0)}</span>`;
+  document.getElementById('concern').innerHTML=rows.map((r,i)=>`<div class="crow" role="button" tabindex="0" data-n="${r.s.n}"><div class="nm"><span class="rk">${i+1}</span><div class="nb"><b>${short(r.s.n)}${r.s.partial?' *':''}</b><small>${r.s.r} · ${fmt(r.a.okt)} kWh/day in October</small>
+    <div class="cmp">${cp('vs Oct 2025',r.a.yoy)}${cp('vs Sep',r.a.mom)}${cp('vs Aug',r.a.vsAgu)}</div>${typeof fuChip==='function'?'<div class="fuline">'+fuChip(r.s.n)+'</div>':''}</div></div>
     <div class="tr"><i class="${r.sig>=2?'hi':''}" style="width:${Math.max(0,r.ex)/mx*100}%"></i></div>
     <div class="val">${r.ex>=0?'+':'−'}${fmt(Math.abs(r.ex))}<small>kWh/day above national growth</small><span class="flag ${r.sig>=2?'hi':'lo'}">${r.sig>=2?'Red':'Yellow'} · up in ${r.sig} of 3</span></div></div>`).join('');
   if(typeof LASTC!=='undefined'){LASTC=rows.map(r=>r.s.n);LASTC.args=__a;fuSummary();}
+  if(typeof cxRender==='function') cxRender();
 }
 
 function renderProgram(){
