@@ -57,13 +57,13 @@ function budgetFor(s){
 const CT={hi:.10,lo:.05};   // Red: more than 10% above budget. Yellow: 5 to 10% above
 function renderConcern(list,P){
   var __a=[list,P];
-  const all=list.map(s=>{const a=siteAvg(s),b=budgetFor(s); if(!b||!Number.isFinite(a.okt)) return null; const p=a.okt/b.perDay-1; return {s,a,b,act:a.okt,bud:b.perDay,ex:a.okt-b.perDay,p,lv:p>CT.hi?'hi':p>CT.lo?'lo':'ok'};}).filter(Boolean);
+  const all=list.map(s=>{const a=siteAvg(s),b=budgetFor(s); if(!b||!Number.isFinite(a.okt)) return null; const p=a.okt/b.perDay-1; const l7=s.v.slice(-7).filter(x=>x!=null&&Number.isFinite(x)); const p7=l7.length?(l7.reduce((q,x)=>q+x,0)/l7.length)/b.perDay-1:p; const dt=p7-p; return {s,a,b,act:a.okt,bud:b.perDay,ex:a.okt-b.perDay,p,p7,tr:dt>.03?'up':dt<-.03?'down':'flat',lv:p>CT.hi?'hi':p>CT.lo?'lo':'ok'};}).filter(Boolean);
   const over=all.filter(r=>r.lv!=='ok').sort((x,y)=>y.ex-x.ex), rows=over.slice(0,8);
   const ta=all.reduce((t,r)=>t+r.act,0), tb=all.reduce((t,r)=>t+r.bud,0);
   CROWS=rows; CMETA={n:all.length,nOver:over.length,nRed:over.filter(r=>r.lv==='hi').length,ta,tb,tp:tb?ta/tb-1:0,mon:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][all[0]?all[0].b.mi:0]};
   const mx=Math.max(...rows.map(r=>r.ex),1);
   document.getElementById('concern').innerHTML=rows.length?rows.map((r,i)=>`<div class="crow" role="button" tabindex="0" data-n="${r.s.n}"><div class="nm"><span class="rk">${i+1}</span><div class="nb"><b>${short(r.s.n)}${r.s.partial?' *':''}</b><small>${r.s.r}</small>
-    <div class="cmp"><span class="cp">Budget ${fmt(r.bud)}/day</span><span class="cp ${r.lv==='hi'?'up':'warn'}">Actual ${fmt(r.act)}/day</span></div>${typeof fuChip==='function'?'<div class="fuline">'+fuChip(r.s.n)+'</div>':''}</div></div>
+    <div class="cmp"><span class="cp">Budget ${fmt(r.bud)}/day</span><span class="cp ${r.lv==='hi'?'up':'warn'}">Actual ${fmt(r.act)}/day</span><span class="cp ${r.tr==='up'?'up':r.tr==='down'?'down':''}">Last 7 days ${pct(r.p7,0)} ${r.tr==='up'?'↑ still rising':r.tr==='down'?'↓ easing':'→ steady'}</span></div>${typeof fuChip==='function'?'<div class="fuline">'+fuChip(r.s.n)+'</div>':''}</div></div>
     <div class="tr"><i class="${r.lv==='hi'?'hi':''}" style="width:${Math.max(0,r.ex)/mx*100}%"></i></div>
     <div class="val">+${fmt(r.ex)}<small>kWh/day above budget</small><span class="flag ${r.lv}">${r.lv==='hi'?'Red':'Yellow'} · ${pct(r.p,0)} vs budget</span></div></div>`).join(''):'<div class="empty">No site is more than 5% above its budget.</div>';
   const sm=document.getElementById('cSum'); if(sm) sm.innerHTML=`<div class="cs"><small>Budget</small><b>${fmt(CMETA.tb)}</b><span>kWh/day, ${CMETA.n} sites</span></div><div class="cs"><small>Actual</small><b>${fmt(CMETA.ta)}</b><span>kWh/day so far</span></div><div class="cs ${cls(CMETA.tp)}"><small>vs budget</small><b>${pct(CMETA.tp)}</b><span>${CMETA.ta>=CMETA.tb?'+':'−'}${fmt(Math.abs(CMETA.ta-CMETA.tb))} kWh/day</span></div><div class="cs"><small>Over budget</small><b>${CMETA.nOver}</b><span>of ${CMETA.n} sites, ${CMETA.nRed} red</span></div>`;

@@ -76,9 +76,10 @@ function cxCaption(){
   L.push(id?`Ini update site yang listriknya lagi di atas budget (per ${dt}):`:`Quick update on the sites running above their electricity budget (as of ${dt}):`); L.push('');
   rows.forEach((r,i)=>{
     const pc=Math.abs(r.p*100).toFixed(0);
-    L.push(`${i+1}. ${short(r.s.n)} (${r.s.r}): +${nf(r.ex)} kWh/${id?'hari':'day'} (+${pc}%)`);
+    L.push(`${i+1}. ${short(r.s.n)} (${r.s.r}): +${nf(r.ex)} kWh/${id?'hari':'day'} (+${pc}%)${r.tr==='up'?' ↑':r.tr==='down'?' ↓':''}`);
     const f=CX.capNotes&&FU[fuId(r.s.n)]; if(f&&(f.reason||f.tag)){const tg=f.tag?((id?TGI[f.tag]:FUTAG[f.tag])||''):''; L.push('    '+(id?'Alasan: ':'Reason: ')+[tg,f.reason].filter(Boolean).join(' – ')+(f.cm?' ('+f.cm+')':''));}
   });
+  if(rows.some(r=>r.tr!=='flat')){L.push(''); L.push(id?'↑ masih naik, ↓ mulai turun (7 hari terakhir)':'↑ still rising, ↓ easing (last 7 days)');}
   L.push('');
   L.push(id?'Mohon bantuannya untuk follow up ke CM masing-masing ya kakak-kakak, thanks banget! 🙏':'Could you help follow up with each CM, please? Thanks a lot! 🙏');
   return L.join('\n');
