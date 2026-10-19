@@ -329,3 +329,6 @@ body::before{background:radial-gradient(60vmax 46vmax at 4% -4%,var(--glow1),tra
 .cs.up b{color:var(--up-ink)}.cs.down b{color:var(--down-ink)}
 .cp.warn{background:var(--amber-soft);color:var(--amber-ink)}
 @media (max-width:760px){.csum{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.capta{width:100%;box-sizing:border-box;font:inherit;font-size:14.5px;line-height:1.55;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;resize:vertical;min-height:220px}
+.capta:focus-visible{outline:3px solid var(--blue);outline-offset:1px}

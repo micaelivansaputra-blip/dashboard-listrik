@@ -1,7 +1,7 @@
 /* ---------- Site Concern: email-ready image (PNG) ----------
    Drawn on a canvas so the picture is crisp and always light, whatever theme the page is in.
    Download saves a PNG; Copy puts the image on the clipboard, ready to paste into an email body. */
-const CX={rows:5,notes:true};
+const CX={rows:5,notes:false,capNotes:true,lang:'id',edited:false};
 const cxFont='Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif';
 function cxDate(){const l=(DATA.meta&&DATA.meta.last)||''; const m=/^(\d{4})-(\d\d)-(\d\d)$/.exec(l); if(!m) return ''; return (+m[3])+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+m[2]-1]+' '+m[1];}
 function cxWrap(ctx,text,maxW){const out=[];let line='';String(text).split(/\s+/).forEach(w=>{const t=line?line+' '+w:w; if(ctx.measureText(t).width>maxW&&line){out.push(line);line=w;}else line=t;}); if(line) out.push(line); return out;}
@@ -62,13 +62,47 @@ function cxDraw(cv,rows,opt){
   ctx.font='400 12px '+cxFont; fl.forEach((t,k)=>T(t,X,y+18+k*17,'400 12px '+cxFont,C.mut));
   T('Operations · Electricity monitoring',X,y+18+fl.length*17+12,'600 11.5px '+cxFont,'#9A9AA1');
 }
+
+/* ---------- caption to send together with the image ---------- */
+function cxCaption(){
+  const rows=CROWS.slice(0,CX.rows), m=CMETA, id=CX.lang==='id'; if(!m||!m.n) return '';
+  const nf=v=>Math.round(v).toLocaleString(id?'id-ID':'en-US'), pf=v=>(v>=0?'+':'−')+Math.abs(v*100).toFixed(1).replace('.',id?',':'.')+'%';
+  const l=(DATA.meta&&DATA.meta.last)||'', mm=/^(\d{4})-(\d\d)-(\d\d)$/.exec(l);
+  const MO=id?['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des']:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const dt=mm?(+mm[3])+' '+MO[+mm[2]-1]+' '+mm[1]:'';
+  const h=new Date().getHours(), sal=id?(h<11?'pagi':h<15?'siang':h<18?'sore':'malam'):(h<12?'morning':h<18?'afternoon':'evening');
+  const up=m.ta>=m.tb, diff=nf(Math.abs(m.ta-m.tb));
+  const L=[];
+  L.push(id?'Selamat '+sal+' Kak,':'Good '+sal+',');
+  L.push('');
+  L.push(id?`Berikut update Site Concern listrik sampai ${dt} (${m.n} site).`:`Here is the electricity Site Concern update through ${dt} (${m.n} sites).`);
+  L.push('');
+  L.push(id?`Rata-rata pemakaian ${nf(m.ta)} kWh/hari, ${pf(Math.abs(m.tp)).replace(/^[+−]/,'')} ${up?'di atas':'di bawah'} budget (${nf(m.tb)} kWh/hari), selisih ${diff} kWh/hari.`
+           :`Average usage is ${nf(m.ta)} kWh/day, ${pf(Math.abs(m.tp)).replace(/^[+−]/,'')} ${up?'above':'below'} budget (${nf(m.tb)} kWh/day), a gap of ${diff} kWh/day.`);
+  L.push(id?`${m.nOver} dari ${m.n} site lebih dari 5% di atas budget, ${m.nRed} di antaranya merah (lebih dari 10%).`:`${m.nOver} of ${m.n} sites are more than 5% above budget, ${m.nRed} of them red (more than 10%).`);
+  if(rows.length){
+    L.push(''); L.push(id?`${rows.length} site dengan kenaikan terbesar dari budget:`:`Top ${rows.length} sites above budget:`);
+    rows.forEach((r,i)=>{
+      L.push(`${i+1}. ${short(r.s.n)}: +${nf(r.ex)} kWh/${id?'hari':'day'} (${pf(r.p)})`);
+      const f=CX.capNotes&&FU[fuId(r.s.n)]; if(f&&(f.reason||f.tag)){const TGI={extra:'Tambahan jam tayang / acara',ac:'Jadwal atau setelan AC',reno:'Renovasi / pekerjaan tenant',meter:'Masalah meter atau data',weather:'Cuaca',other:'Lainnya'}; const tg=f.tag?((id?TGI[f.tag]:FUTAG[f.tag])||''):''; L.push('   '+(id?'Alasan: ':'Reason: ')+[tg,f.reason].filter(Boolean).join(' – ')+(f.cm?' ('+f.cm+')':''));}
+    });
+  }
+  L.push(''); L.push(id?'Detail ada di gambar terlampir. Terima kasih, Kak.':'Details are in the attached image. Thank you.');
+  return L.join('\n');
+}
+function cxCapRender(force){const t=document.getElementById('cxCap'); if(!t) return; if(CX.edited&&!force) return; CX.edited=false; t.value=cxCaption();}
+async function cxCopyCap(){
+  const t=document.getElementById('cxCap'); if(!t) return;
+  try{ await navigator.clipboard.writeText(t.value); cxMsg('Caption copied.','ok','cxCapMsg'); }
+  catch(e){ t.focus(); t.select(); try{ document.execCommand('copy'); cxMsg('Caption copied.','ok','cxCapMsg'); }catch(x){ cxMsg('Select the text and copy it.','err','cxCapMsg'); } }
+}
 function cxRender(){
   const cv=document.getElementById('cxCv'); if(!cv||!CROWS.length) return;
   const go=()=>{try{cxDraw(cv,CROWS.slice(0,CX.rows),CX);}catch(e){}};
-  go(); if(document.fonts&&document.fonts.ready) document.fonts.ready.then(go);
+  go(); cxCapRender(); if(document.fonts&&document.fonts.ready) document.fonts.ready.then(go);
 }
 function cxBlob(){const cv=document.getElementById('cxCv'); return new Promise((res,rej)=>cv.toBlob(b=>b?res(b):rej(new Error('blob')),'image/png'));}
-function cxMsg(t,c){const m=document.getElementById('cxMsg'); if(m){m.textContent=t;m.className='fumsg '+(c||'');}}
+function cxMsg(t,c,id){const m=document.getElementById(id||'cxMsg'); if(m){m.textContent=t;m.className='fumsg '+(c||'');}}
 async function cxDownload(){
   const name='site-concern-'+((DATA.meta&&DATA.meta.last)||'latest')+'.png';
   try{
@@ -83,8 +117,13 @@ async function cxCopy(){
   catch(e){ cxMsg('Copy is blocked here. Use Download image instead.','err'); }
 }
 document.addEventListener('click',e=>{
-  const b=e.target.closest('#cxCard [data-cx]'); if(!b) return; const k=b.dataset.cx;
+  const b=e.target.closest('#cxCard [data-cx], #capCard [data-cx]'); if(!b) return; const k=b.dataset.cx;
+  const seg=(sel,on)=>document.querySelectorAll(sel).forEach(x=>x.setAttribute('aria-pressed',String(x===on)));
   if(k==='dl') cxDownload(); else if(k==='cp') cxCopy();
-  else if(k==='n5'||k==='n8'){CX.rows=k==='n5'?5:8; document.querySelectorAll('#cxCard [data-cx^=n]').forEach(x=>x.setAttribute('aria-pressed',String(x===b))); cxRender();}
-  else if(k==='nt'){CX.notes=!CX.notes; b.setAttribute('aria-pressed',String(CX.notes)); cxRender();}
+  else if(k==='n5'||k==='n8'){CX.rows=k==='n5'?5:8; seg('[data-cx^=n]',b); cxRender(); cxCapRender(true);}
+  else if(k==='cc') cxCopyCap();
+  else if(k==='cr') cxCapRender(true);
+  else if(k==='lid'||k==='len'){CX.lang=k==='lid'?'id':'en'; seg('[data-cx=lid],[data-cx=len]',b); cxCapRender(true);}
+  else if(k==='cn'){CX.capNotes=!CX.capNotes; b.setAttribute('aria-pressed',String(CX.capNotes)); cxCapRender(true);}
 });
+document.addEventListener('input',e=>{if(e.target&&e.target.id==='cxCap') CX.edited=true;});
