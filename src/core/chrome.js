@@ -67,5 +67,33 @@ const Chrome = (function () {
     ['pgNav', 'pgSub', 'asof'].forEach(id => $(id) && mo.observe($(id), cfg));
     sync();
   }
-  return { start, sync };
+  /* ---- sidebar (wide screens): brand, dashboard switch and every page, grouped ---- */
+  let side, snav, sideSig = '';
+  function sideBuild() {
+    side = document.createElement('aside'); side.className = 'sidebar'; side.id = 'sidebar'; side.setAttribute('aria-label', 'Navigation');
+    side.innerHTML = '<div class="sb-top" id="sbTop"></div><nav class="snav" id="sideNav"></nav><div class="sb-foot" id="sbFoot"></div>';
+    document.body.appendChild(side); snav = side.querySelector('#sideNav');
+    const bar = document.querySelector('header.bar'), inner = bar.querySelector('.bar-in');
+    const brand = inner.querySelector('.brand'), tabs = $('appTabs');
+    const mk = el => { const a = document.createComment('slot'); el.parentNode.insertBefore(a, el); return a; };
+    const aB = mk(brand), aT = mk(tabs), top = side.querySelector('#sbTop');
+    const mq = matchMedia('(min-width:1100px)');
+    const place = () => {
+      if (mq.matches) { top.appendChild(brand); top.appendChild(tabs); document.body.classList.add('has-side'); }
+      else { aB.after(brand); aT.after(tabs); document.body.classList.remove('has-side'); }
+      window.dispatchEvent(new Event('resize'));
+    };
+    (mq.addEventListener ? mq.addEventListener('change', place) : mq.addListener(place)); place();
+  }
+  const ICON = { overview: 'overview', compare: 'compare', trends: 'trends', sites: 'sites', concerns: 'concerns', zoec: 'zoec', costs: 'costs' };
+  function side_() {
+    if (!side) return;
+    const t = (typeof Pager !== 'undefined' && Pager.tree) ? Pager.tree() : [];
+    const sig = JSON.stringify(t); if (sig === sideSig) return; sideSig = sig;
+    const esc = x => String(x).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    snav.innerHTML = t.map(g => '<div class="snav-h">' + esc(g.label) + '</div>' + g.items.map(i => '<button type="button" data-pg="' + i.id + '" data-g="' + (ICON[g.g] || g.g) + '" aria-current="' + i.on + '"><span>' + esc(i.label) + '</span></button>').join('')).join('');
+  }
+  const _start = start;
+  function start2() { _start(); try { sideBuild(); side_(); } catch (e) { } }
+  return { start: start2, sync, side: side_ };
 })();

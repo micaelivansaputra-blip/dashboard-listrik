@@ -39,7 +39,12 @@ const Pager = (function () {
     });
   }
 
-  function sync() {
+  function sync() { syncInner(); if (typeof Chrome !== 'undefined' && Chrome.side) Chrome.side(); }
+  function tree() {
+    const c = cur[APP];
+    return GROUPS[APP].map(g => ({ g: g.id, label: g.label, items: g.items.filter(ok).map(id => ({ id, label: label(id), on: id === c })) })).filter(x => x.items.length);
+  }
+  function syncInner() {
     const app = APP, groups = GROUPS[app], all = groups.reduce((a, g) => a.concat(g.items), []);
     const avail = all.filter(ok);
     let c = cur[app]; if (!avail.includes(c)) c = avail[0] || null; cur[app] = c;
@@ -72,10 +77,10 @@ const Pager = (function () {
   }
 
   document.addEventListener('click', e => {
-    const b = e.target.closest('#pgNav [data-pg],#pgSub [data-pg]');
+    const b = e.target.closest('#pgNav [data-pg],#pgSub [data-pg],#sideNav [data-pg]');
     if (b) show(b.dataset.pg);
   });
   GROUPS.elec.forEach(g => g.items.forEach(id => Router.register(id.slice(2), id)));
 
-  return { sync, show, has: id => GROUPS[APP].some(g => g.items.includes(id)), current: () => cur[APP], groups: GROUPS };
+  return { sync, show, tree, has: id => GROUPS[APP].some(g => g.items.includes(id)), current: () => cur[APP], groups: GROUPS };
 })();
