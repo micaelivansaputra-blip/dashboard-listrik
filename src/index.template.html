@@ -163,11 +163,13 @@
       <div class="csum" id="cSum"></div>
       <div class="fusum" id="fuSum" hidden></div>
       <div class="cc" id="concern"></div>
+      <div class="cc svbox" id="saving"></div>
     </div>
     <div class="card cxcard" id="cxCard">
       <div class="ch"><div><h3>Email-ready image</h3><span class="sub">The same ranking, laid out for an email body. Download it or copy it and paste straight into the email.</span></div></div>
       <div class="ctl">
         <div class="f">Sites in the image<div class="seg" role="group" aria-label="Number of sites"><button type="button" data-cx="n5" aria-pressed="true">Top 5</button><button type="button" data-cx="n8" aria-pressed="false">Top 8</button></div></div>
+        <div class="f">Saving sites<div class="seg" role="group" aria-label="Saving sites in the image"><button type="button" data-cx="s0" aria-pressed="false">Off</button><button type="button" data-cx="s3" aria-pressed="true">3</button><button type="button" data-cx="s5" aria-pressed="false">5</button></div></div>
         
         <div class="qchips cxact"><button type="button" class="fubtn" data-cx="dl">Download image</button><button type="button" class="fubtn ghost" data-cx="cp">Copy image</button></div>
       </div>
@@ -178,10 +180,10 @@
       <div class="ch"><div><h3>Caption to send with the image</h3><span class="sub">A short message for the RMs, written from the numbers above. Edit it if you like, then copy it.</span></div></div>
       <div class="ctl">
         <div class="f">Language<div class="seg" role="group" aria-label="Caption language"><button type="button" data-cx="lid" aria-pressed="true">Indonesia</button><button type="button" data-cx="len" aria-pressed="false">English</button></div></div>
-        <div class="qchips"><button type="button" class="chipbtn" data-cx="cn" aria-pressed="true">Include notes</button><button type="button" class="chipbtn" data-cx="ct" aria-pressed="false">Include trend (↑ ↓)</button><button type="button" class="chipbtn" data-cx="cr">Reset text</button></div>
+        <div class="qchips"><button type="button" class="chipbtn" data-cx="cn" aria-pressed="true">Include notes</button><button type="button" class="chipbtn" data-cx="cs" aria-pressed="true">Include saving sites</button><button type="button" class="chipbtn" data-cx="ct" aria-pressed="false">Include trend (↑ ↓)</button><button type="button" class="chipbtn" data-cx="cr">Reset text</button></div>
         <div class="qchips cxact"><button type="button" class="fubtn" data-cx="cc">Copy caption</button></div>
       </div>
-      <textarea class="capta" id="cxCap" rows="14" spellcheck="false" aria-label="Caption text"></textarea>
+      <textarea class="capta" id="cxCap" rows="18" spellcheck="false" aria-label="Caption text"></textarea>
       <div class="cmsg fumsg" id="cxCapMsg" role="status"></div>
     </div>
   </section>

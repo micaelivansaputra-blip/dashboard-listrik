@@ -1055,6 +1055,15 @@ h2{font-weight:700;letter-spacing:-.02em}
   #pgNav{background:color-mix(in srgb,var(--surface) 88%,transparent);box-shadow:0 8px 30px rgba(0,0,0,.14),0 0 0 .5px var(--hair)}
 }
 
+/* saving sites (under budget) */
+.flag.ok{background:var(--down-soft);color:var(--down-ink)}
+.svbox{margin-top:22px;padding-top:6px;border-top:1px solid var(--hair)}
+.svbox:empty{display:none}
+.sv-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;padding:14px 0 4px}
+.sv-h b{font-size:17px;font-weight:700}
+.sv-h small{color:var(--muted);font-size:13px}
+.crow.sv .tr i.sv-i{background:var(--down)}
+
 </style>
 
 <div class="wrap">
@@ -1213,11 +1222,13 @@ h2{font-weight:700;letter-spacing:-.02em}
       <div class="csum" id="cSum"></div>
       <div class="fusum" id="fuSum" hidden></div>
       <div class="cc" id="concern"></div>
+      <div class="cc svbox" id="saving"></div>
     </div>
     <div class="card cxcard" id="cxCard">
       <div class="ch"><div><h3>Email-ready image</h3><span class="sub">The same ranking, laid out for an email body. Download it or copy it and paste straight into the email.</span></div></div>
       <div class="ctl">
         <div class="f">Sites in the image<div class="seg" role="group" aria-label="Number of sites"><button type="button" data-cx="n5" aria-pressed="true">Top 5</button><button type="button" data-cx="n8" aria-pressed="false">Top 8</button></div></div>
+        <div class="f">Saving sites<div class="seg" role="group" aria-label="Saving sites in the image"><button type="button" data-cx="s0" aria-pressed="false">Off</button><button type="button" data-cx="s3" aria-pressed="true">3</button><button type="button" data-cx="s5" aria-pressed="false">5</button></div></div>
         
         <div class="qchips cxact"><button type="button" class="fubtn" data-cx="dl">Download image</button><button type="button" class="fubtn ghost" data-cx="cp">Copy image</button></div>
       </div>
@@ -1228,10 +1239,10 @@ h2{font-weight:700;letter-spacing:-.02em}
       <div class="ch"><div><h3>Caption to send with the image</h3><span class="sub">A short message for the RMs, written from the numbers above. Edit it if you like, then copy it.</span></div></div>
       <div class="ctl">
         <div class="f">Language<div class="seg" role="group" aria-label="Caption language"><button type="button" data-cx="lid" aria-pressed="true">Indonesia</button><button type="button" data-cx="len" aria-pressed="false">English</button></div></div>
-        <div class="qchips"><button type="button" class="chipbtn" data-cx="cn" aria-pressed="true">Include notes</button><button type="button" class="chipbtn" data-cx="ct" aria-pressed="false">Include trend (↑ ↓)</button><button type="button" class="chipbtn" data-cx="cr">Reset text</button></div>
+        <div class="qchips"><button type="button" class="chipbtn" data-cx="cn" aria-pressed="true">Include notes</button><button type="button" class="chipbtn" data-cx="cs" aria-pressed="true">Include saving sites</button><button type="button" class="chipbtn" data-cx="ct" aria-pressed="false">Include trend (↑ ↓)</button><button type="button" class="chipbtn" data-cx="cr">Reset text</button></div>
         <div class="qchips cxact"><button type="button" class="fubtn" data-cx="cc">Copy caption</button></div>
       </div>
-      <textarea class="capta" id="cxCap" rows="14" spellcheck="false" aria-label="Caption text"></textarea>
+      <textarea class="capta" id="cxCap" rows="18" spellcheck="false" aria-label="Caption text"></textarea>
       <div class="cmsg fumsg" id="cxCapMsg" role="status"></div>
     </div>
   </section>
@@ -2819,7 +2830,7 @@ function renderSites(list){
   document.getElementById('more').innerHTML=(!q&&STATUS==='all'&&!NOTEF&&f.length>lim)?`<button type="button" class="chipbtn" data-more aria-pressed="true">${EXPAND?'Show top '+lim:'Show all '+f.length+' sites'}</button>`:'';
 }
 
-let CROWS=[], CMETA={};
+let CROWS=[], CSAVE=[], CMETA={};
 /* FY2026 budget for the month of the latest data, as kWh per day */
 function budgetFor(s){
   const m=/^\d+/.exec(s.n), b=m&&BUDGET[+m[0]]; if(!b) return null;
@@ -2832,12 +2843,14 @@ function renderConcern(list,P){
   const all=list.map(s=>{const a=siteAvg(s),b=budgetFor(s); if(!b||!Number.isFinite(a.okt)) return null; const p=a.okt/b.perDay-1; const l7=s.v.slice(-7).filter(x=>x!=null&&Number.isFinite(x)); const p7=l7.length?(l7.reduce((q,x)=>q+x,0)/l7.length)/b.perDay-1:p; const dt=p7-p; const lv1=s.v[s.v.length-1], pl=Number.isFinite(lv1)?lv1/b.perDay-1:null; return {s,a,last:lv1,pl,spike:pl!=null&&pl-p>.20,b,act:a.okt,bud:b.perDay,ex:a.okt-b.perDay,p,p7,tr:dt>.03?'up':dt<-.03?'down':'flat',lv:p>CT.hi?'hi':p>CT.lo?'lo':'ok'};}).filter(Boolean);
   const over=all.filter(r=>r.lv!=='ok').sort((x,y)=>y.ex-x.ex), rows=over.slice(0,8);
   const ta=all.reduce((t,r)=>t+r.act,0), tb=all.reduce((t,r)=>t+r.bud,0);
-  CROWS=rows; CMETA={n:all.length,nOver:over.length,nRed:over.filter(r=>r.lv==='hi').length,ta,tb,tp:tb?ta/tb-1:0,mon:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][all[0]?all[0].b.mi:0]};
+  const sav=all.filter(r=>r.p<-CT.lo).sort((x,y)=>x.ex-y.ex); CSAVE=sav.slice(0,8);
+  CROWS=rows; CMETA={nSave:sav.length,n:all.length,nOver:over.length,nRed:over.filter(r=>r.lv==='hi').length,ta,tb,tp:tb?ta/tb-1:0,mon:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][all[0]?all[0].b.mi:0]};
   const mx=Math.max(...rows.map(r=>r.ex),1);
   document.getElementById('concern').innerHTML=rows.length?rows.map((r,i)=>`<div class="crow" role="button" tabindex="0" data-n="${r.s.n}"><div class="nm"><span class="rk">${i+1}</span><div class="nb"><b>${short(r.s.n)}${r.s.partial?' *':''}</b><small>${r.s.r}</small>
     <div class="cmp"><span class="cp">Budget ${fmt(r.bud)}/day</span><span class="cp ${r.lv==='hi'?'up':'warn'}">Actual ${fmt(r.act)}/day</span><span class="cp ${r.tr==='up'?'up':r.tr==='down'?'down':''}">Last 7 days ${pct(r.p7,0)} ${r.tr==='up'?'↑ still rising':r.tr==='down'?'↓ easing':'→ steady'}</span></div>${typeof fuChip==='function'?'<div class="fuline">'+fuChip(r.s.n)+'</div>':''}</div></div>
     <div class="tr"><i class="${r.lv==='hi'?'hi':''}" style="width:${Math.max(0,r.ex)/mx*100}%"></i></div>
     <div class="val">+${fmt(r.ex)}<small>kWh/day above budget</small><span class="flag ${r.lv}">${r.lv==='hi'?'Red':'Yellow'} · ${pct(r.p,0)} vs budget</span></div></div>`).join(''):'<div class="empty">No site is more than 5% above its budget.</div>';
+  const sv=document.getElementById('saving'); if(sv){const mxs=Math.max(...CSAVE.map(r=>-r.ex),1); sv.innerHTML=CSAVE.length?`<div class="sv-h"><b>Saving vs budget</b><small>${sav.length} site${sav.length===1?'':'s'} more than 5% below budget · biggest savings first</small></div>`+CSAVE.map((r,i)=>`<div class="crow sv" role="button" tabindex="0" data-n="${r.s.n}"><div class="nm"><span class="rk">${i+1}</span><div class="nb"><b>${short(r.s.n)}${r.s.partial?' *':''}</b><small>${r.s.r}</small><div class="cmp"><span class="cp">Budget ${fmt(r.bud)}/day</span><span class="cp down">Actual ${fmt(r.act)}/day</span></div></div></div><div class="tr"><i class="sv-i" style="width:${-r.ex/mxs*100}%"></i></div><div class="val">−${fmt(-r.ex)}<small>kWh/day below budget</small><span class="flag ok">${pct(r.p,0)} vs budget</span></div></div>`).join(''):'';}
   const sm=document.getElementById('cSum'); if(sm) sm.innerHTML=`<div class="cs"><small>Budget</small><b>${fmt(CMETA.tb)}</b><span>kWh/day, ${CMETA.n} sites</span></div><div class="cs"><small>Actual</small><b>${fmt(CMETA.ta)}</b><span>kWh/day so far</span></div><div class="cs ${cls(CMETA.tp)}"><small>vs budget</small><b>${pct(CMETA.tp)}</b><span>${CMETA.ta>=CMETA.tb?'+':'−'}${fmt(Math.abs(CMETA.ta-CMETA.tb))} kWh/day</span></div><div class="cs"><small>Over budget</small><b>${CMETA.nOver}</b><span>of ${CMETA.n} sites, ${CMETA.nRed} red</span></div>`;
   if(typeof LASTC!=='undefined'){LASTC=rows.map(r=>r.s.n);LASTC.args=__a;fuSummary();}
   if(typeof cxRender==='function') cxRender();
@@ -3716,18 +3729,20 @@ function fuCopyAll(){
 /* ---------- Site Concern: email-ready image (PNG) ----------
    Drawn on a canvas so the picture is crisp and always light, whatever theme the page is in.
    Download saves a PNG; Copy puts the image on the clipboard, ready to paste into an email body. */
-const CX={rows:5,notes:false,capNotes:true,capTrend:false,lang:'id',edited:false};
+const CX={rows:5,notes:false,capNotes:true,capTrend:false,savN:3,capSave:true,lang:'id',edited:false};
 const cxFont='Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif';
 function cxDate(){const l=(DATA.meta&&DATA.meta.last)||''; const m=/^(\d{4})-(\d\d)-(\d\d)$/.exec(l); if(!m) return ''; return (+m[3])+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+m[2]-1]+' '+m[1];}
 function cxWrap(ctx,text,maxW){const out=[];let line='';String(text).split(/\s+/).forEach(w=>{const t=line?line+' '+w:w; if(ctx.measureText(t).width>maxW&&line){out.push(line);line=w;}else line=t;}); if(line) out.push(line); return out;}
 function cxRR(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
-function cxDraw(cv,rows,opt){
+function cxDraw(cv,rows,opt,sav){
+  sav=sav||[];
   const S=2, W=880, X=32, CW=W-X*2;
   const C={ink:'#1D1D1F',mut:'#6E6E73',soft:'#F5F5F7',track:'#E3E3E8',base:'#AFC0D8',red:'#FF3B30',amb:'#FF9F0A',up:'#D70015',upS:'#FFEFED',am:'#B26A00',amS:'#FFF3DD',blue:'#0071E3',blueS:'#E8F2FD',dn:'#1B7F37'};
   const tmp=document.createElement('canvas').getContext('2d'); tmp.font='400 13.5px '+cxFont;
   const lay=rows.map(r=>{const f=FU[fuId(r.s.n)]; const has=opt.notes&&f&&(f.reason||f.tag); const lines=has&&f.reason?cxWrap(tmp,f.reason,CW-54-24-8).slice(0,3):[]; const nh=has?(f.tag?28:0)+lines.length*19+8:0; return {r,f:has?f:null,lines,h:100+nh};});
   const m=CMETA, heroH=200, listTop=heroH+X+64, foot=110;
-  const H=listTop+(lay.length?lay.reduce((t,l)=>t+l.h+12,0):70)+foot;
+  const svH=sav.length?60+sav.length*84:0;
+  const H=listTop+(lay.length?lay.reduce((t,l)=>t+l.h+12,0):70)+svH+foot;
   cv.width=W*S; cv.height=H*S; const ctx=cv.getContext('2d'); ctx.scale(S,S); ctx.textBaseline='alphabetic';
   ctx.fillStyle='#FFFFFF'; ctx.fillRect(0,0,W,H);
   const T=(t,x,y,font,color,al)=>{ctx.font=font;ctx.fillStyle=color;ctx.textAlign=al||'left';ctx.fillText(t,x,y);};
@@ -3772,8 +3787,24 @@ function cxDraw(cv,rows,opt){
     }
     y=top+L.h+12;
   });
+  // saving sites
+  if(sav.length){
+    const gS='#E8F8ED', gC='#1B7F37', gB='#34C759';
+    y+=14; T('Saving vs budget · congrats!',X,y+22,'800 18px '+cxFont,C.ink);
+    T(m.nSave+' site'+(m.nSave===1?'':'s')+' more than 5% below budget',X+CW,y+22,'500 12.5px '+cxFont,C.mut,'right');
+    y+=40;
+    sav.forEach((r,i)=>{
+      ctx.fillStyle=gS; cxRR(ctx,X,y,CW,72,20); ctx.fill();
+      T('✓',X+26,y+42,'800 16px '+cxFont,gC,'center');
+      T(short(r.s.n)+(r.s.partial?' *':''),bx,y+31,'700 17px '+cxFont,C.ink);
+      T(r.s.r+'  ·  Budget '+fmt(r.bud)+'  →  Actual '+fmt(r.act)+' kWh/day',bx,y+52,'500 12.5px '+cxFont,C.mut);
+      const rx=X+CW-24;
+      T('−'+fmt(-r.ex),rx,y+36,'800 26px '+cxFont,gC,'right'); T('kWh/day below budget · '+sg(r.p),rx,y+55,'600 12px '+cxFont,C.mut,'right');
+      y+=84;
+    });
+  }
   // footer
-  const fl=cxWrap(ctx,'Budget kWh/day = FY2026 monthly budget ÷ days in the month. The black tick on each bar is the budget; the colored part is usage above it. Red: more than 10% over budget. Yellow: 5 to 10% over. '+(m.n-m.nOver)+' of '+m.n+' sites are within 5% of budget or below.',CW);
+  const fl=cxWrap(ctx,'Budget kWh/day = FY2026 monthly budget ÷ days in the month. The black tick on each bar is the budget; the colored part is usage above it. Red: more than 10% over budget. Yellow: 5 to 10% over. '+(m.n-m.nOver)+' of '+m.n+' sites are within 5% of budget or below.'+((rows.concat(sav)).some(r=>r.s.partial)?' * Partial data for this site.':''),CW);
   ctx.font='400 12px '+cxFont; fl.forEach((t,k)=>T(t,X,y+18+k*17,'400 12px '+cxFont,C.mut));
   T('Operations · Electricity monitoring',X,y+18+fl.length*17+12,'600 11.5px '+cxFont,'#9A9AA1');
 }
@@ -3798,7 +3829,12 @@ function cxCaption(){
   });
   if(CX.capTrend&&rows.some(r=>r.tr!=='flat')){L.push(''); L.push(id?'↑ masih naik, ↓ mulai turun (7 hari terakhir)':'↑ still rising, ↓ easing (last 7 days)');}
   L.push('');
-  L.push(id?'Mohon bantuannya untuk follow up-nya ya kak, terima kasih.':'Please help follow up, thank you.');
+  const sv=CX.capSave?CSAVE.slice(0,CX.savN||3):[];
+  if(!sv.length){ L.push(id?'Mohon bantuannya untuk follow up-nya ya kak, terima kasih.':'Please help follow up, thank you.'); return L.join('\n'); }
+  L.push(id?'Mohon bantuannya untuk follow up-nya ya kak 🙏':'Please help follow up on these 🙏'); L.push('');
+  L.push(id?'Selamat juga untuk site yang berhasil hemat dari budget 🎉':'And congrats to the sites saving against budget 🎉'); L.push('');
+  sv.forEach((r,i)=>L.push(`${i+1}. ${short(r.s.n)} (${r.s.r}): −${nf(-r.ex)} kWh/${id?'hari':'day'} (−${Math.abs(r.p*100).toFixed(0)}%)`));
+  L.push(''); L.push(id?'Terima kasih kak, pertahankan ya!':'Thank you, keep it up!');
   return L.join('\n');
 }
 function cxCapRender(force){const t=document.getElementById('cxCap'); if(!t) return; if(CX.edited&&!force) return; CX.edited=false; t.value=cxCaption();}
@@ -3808,8 +3844,8 @@ async function cxCopyCap(){
   catch(e){ t.focus(); t.select(); try{ document.execCommand('copy'); cxMsg('Caption copied.','ok','cxCapMsg'); }catch(x){ cxMsg('Select the text and copy it.','err','cxCapMsg'); } }
 }
 function cxRender(){
-  const cv=document.getElementById('cxCv'); if(!cv||!CROWS.length) return;
-  const go=()=>{try{cxDraw(cv,CROWS.slice(0,CX.rows),CX);}catch(e){}};
+  const cv=document.getElementById('cxCv'); if(!cv||!(CROWS.length||CSAVE.length)) return;
+  const go=()=>{try{cxDraw(cv,CROWS.slice(0,CX.rows),CX,CSAVE.slice(0,CX.savN));}catch(e){}};
   go(); cxCapRender(); if(document.fonts&&document.fonts.ready) document.fonts.ready.then(go);
 }
 function cxBlob(){const cv=document.getElementById('cxCv'); return new Promise((res,rej)=>cv.toBlob(b=>b?res(b):rej(new Error('blob')),'image/png'));}
@@ -3831,11 +3867,13 @@ document.addEventListener('click',e=>{
   const b=e.target.closest('#cxCard [data-cx], #capCard [data-cx]'); if(!b) return; const k=b.dataset.cx;
   const seg=(sel,on)=>document.querySelectorAll(sel).forEach(x=>x.setAttribute('aria-pressed',String(x===on)));
   if(k==='dl') cxDownload(); else if(k==='cp') cxCopy();
+  else if(k==='s0'||k==='s3'||k==='s5'){CX.savN=k==='s0'?0:k==='s3'?3:5; seg('[data-cx^=s]:not([data-cx=sc])',b); cxRender(); cxCapRender(true);}
   else if(k==='n5'||k==='n8'){CX.rows=k==='n5'?5:8; seg('[data-cx^=n]',b); cxRender(); cxCapRender(true);}
   else if(k==='cc') cxCopyCap();
   else if(k==='cr') cxCapRender(true);
   else if(k==='lid'||k==='len'){CX.lang=k==='lid'?'id':'en'; seg('[data-cx=lid],[data-cx=len]',b); cxCapRender(true);}
   else if(k==='cn'){CX.capNotes=!CX.capNotes; b.setAttribute('aria-pressed',String(CX.capNotes)); cxCapRender(true);}
+  else if(k==='cs'){CX.capSave=!CX.capSave; b.setAttribute('aria-pressed',String(CX.capSave)); cxCapRender(true);}
   else if(k==='ct'){CX.capTrend=!CX.capTrend; b.setAttribute('aria-pressed',String(CX.capTrend)); cxCapRender(true);}
 });
 document.addEventListener('input',e=>{if(e.target&&e.target.id==='cxCap') CX.edited=true;});

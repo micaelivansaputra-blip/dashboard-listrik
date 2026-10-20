@@ -47,7 +47,7 @@ function renderSites(list){
   document.getElementById('more').innerHTML=(!q&&STATUS==='all'&&!NOTEF&&f.length>lim)?`<button type="button" class="chipbtn" data-more aria-pressed="true">${EXPAND?'Show top '+lim:'Show all '+f.length+' sites'}</button>`:'';
 }
 
-let CROWS=[], CMETA={};
+let CROWS=[], CSAVE=[], CMETA={};
 /* FY2026 budget for the month of the latest data, as kWh per day */
 function budgetFor(s){
   const m=/^\d+/.exec(s.n), b=m&&BUDGET[+m[0]]; if(!b) return null;
@@ -60,12 +60,14 @@ function renderConcern(list,P){
   const all=list.map(s=>{const a=siteAvg(s),b=budgetFor(s); if(!b||!Number.isFinite(a.okt)) return null; const p=a.okt/b.perDay-1; const l7=s.v.slice(-7).filter(x=>x!=null&&Number.isFinite(x)); const p7=l7.length?(l7.reduce((q,x)=>q+x,0)/l7.length)/b.perDay-1:p; const dt=p7-p; const lv1=s.v[s.v.length-1], pl=Number.isFinite(lv1)?lv1/b.perDay-1:null; return {s,a,last:lv1,pl,spike:pl!=null&&pl-p>.20,b,act:a.okt,bud:b.perDay,ex:a.okt-b.perDay,p,p7,tr:dt>.03?'up':dt<-.03?'down':'flat',lv:p>CT.hi?'hi':p>CT.lo?'lo':'ok'};}).filter(Boolean);
   const over=all.filter(r=>r.lv!=='ok').sort((x,y)=>y.ex-x.ex), rows=over.slice(0,8);
   const ta=all.reduce((t,r)=>t+r.act,0), tb=all.reduce((t,r)=>t+r.bud,0);
-  CROWS=rows; CMETA={n:all.length,nOver:over.length,nRed:over.filter(r=>r.lv==='hi').length,ta,tb,tp:tb?ta/tb-1:0,mon:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][all[0]?all[0].b.mi:0]};
+  const sav=all.filter(r=>r.p<-CT.lo).sort((x,y)=>x.ex-y.ex); CSAVE=sav.slice(0,8);
+  CROWS=rows; CMETA={nSave:sav.length,n:all.length,nOver:over.length,nRed:over.filter(r=>r.lv==='hi').length,ta,tb,tp:tb?ta/tb-1:0,mon:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][all[0]?all[0].b.mi:0]};
   const mx=Math.max(...rows.map(r=>r.ex),1);
   document.getElementById('concern').innerHTML=rows.length?rows.map((r,i)=>`<div class="crow" role="button" tabindex="0" data-n="${r.s.n}"><div class="nm"><span class="rk">${i+1}</span><div class="nb"><b>${short(r.s.n)}${r.s.partial?' *':''}</b><small>${r.s.r}</small>
     <div class="cmp"><span class="cp">Budget ${fmt(r.bud)}/day</span><span class="cp ${r.lv==='hi'?'up':'warn'}">Actual ${fmt(r.act)}/day</span><span class="cp ${r.tr==='up'?'up':r.tr==='down'?'down':''}">Last 7 days ${pct(r.p7,0)} ${r.tr==='up'?'↑ still rising':r.tr==='down'?'↓ easing':'→ steady'}</span></div>${typeof fuChip==='function'?'<div class="fuline">'+fuChip(r.s.n)+'</div>':''}</div></div>
     <div class="tr"><i class="${r.lv==='hi'?'hi':''}" style="width:${Math.max(0,r.ex)/mx*100}%"></i></div>
     <div class="val">+${fmt(r.ex)}<small>kWh/day above budget</small><span class="flag ${r.lv}">${r.lv==='hi'?'Red':'Yellow'} · ${pct(r.p,0)} vs budget</span></div></div>`).join(''):'<div class="empty">No site is more than 5% above its budget.</div>';
+  const sv=document.getElementById('saving'); if(sv){const mxs=Math.max(...CSAVE.map(r=>-r.ex),1); sv.innerHTML=CSAVE.length?`<div class="sv-h"><b>Saving vs budget</b><small>${sav.length} site${sav.length===1?'':'s'} more than 5% below budget · biggest savings first</small></div>`+CSAVE.map((r,i)=>`<div class="crow sv" role="button" tabindex="0" data-n="${r.s.n}"><div class="nm"><span class="rk">${i+1}</span><div class="nb"><b>${short(r.s.n)}${r.s.partial?' *':''}</b><small>${r.s.r}</small><div class="cmp"><span class="cp">Budget ${fmt(r.bud)}/day</span><span class="cp down">Actual ${fmt(r.act)}/day</span></div></div></div><div class="tr"><i class="sv-i" style="width:${-r.ex/mxs*100}%"></i></div><div class="val">−${fmt(-r.ex)}<small>kWh/day below budget</small><span class="flag ok">${pct(r.p,0)} vs budget</span></div></div>`).join(''):'';}
   const sm=document.getElementById('cSum'); if(sm) sm.innerHTML=`<div class="cs"><small>Budget</small><b>${fmt(CMETA.tb)}</b><span>kWh/day, ${CMETA.n} sites</span></div><div class="cs"><small>Actual</small><b>${fmt(CMETA.ta)}</b><span>kWh/day so far</span></div><div class="cs ${cls(CMETA.tp)}"><small>vs budget</small><b>${pct(CMETA.tp)}</b><span>${CMETA.ta>=CMETA.tb?'+':'−'}${fmt(Math.abs(CMETA.ta-CMETA.tb))} kWh/day</span></div><div class="cs"><small>Over budget</small><b>${CMETA.nOver}</b><span>of ${CMETA.n} sites, ${CMETA.nRed} red</span></div>`;
   if(typeof LASTC!=='undefined'){LASTC=rows.map(r=>r.s.n);LASTC.args=__a;fuSummary();}
   if(typeof cxRender==='function') cxRender();

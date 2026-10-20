@@ -110,3 +110,12 @@ h2{font-weight:700;letter-spacing:-.02em}
   .pagehead{padding-top:14px}
   #pgNav{background:color-mix(in srgb,var(--surface) 88%,transparent);box-shadow:0 8px 30px rgba(0,0,0,.14),0 0 0 .5px var(--hair)}
 }
+
+/* saving sites (under budget) */
+.flag.ok{background:var(--down-soft);color:var(--down-ink)}
+.svbox{margin-top:22px;padding-top:6px;border-top:1px solid var(--hair)}
+.svbox:empty{display:none}
+.sv-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;padding:14px 0 4px}
+.sv-h b{font-size:17px;font-weight:700}
+.sv-h small{color:var(--muted);font-size:13px}
+.crow.sv .tr i.sv-i{background:var(--down)}

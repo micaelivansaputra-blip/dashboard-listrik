@@ -1,18 +1,20 @@
 /* ---------- Site Concern: email-ready image (PNG) ----------
    Drawn on a canvas so the picture is crisp and always light, whatever theme the page is in.
    Download saves a PNG; Copy puts the image on the clipboard, ready to paste into an email body. */
-const CX={rows:5,notes:false,capNotes:true,capTrend:false,lang:'id',edited:false};
+const CX={rows:5,notes:false,capNotes:true,capTrend:false,savN:3,capSave:true,lang:'id',edited:false};
 const cxFont='Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif';
 function cxDate(){const l=(DATA.meta&&DATA.meta.last)||''; const m=/^(\d{4})-(\d\d)-(\d\d)$/.exec(l); if(!m) return ''; return (+m[3])+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+m[2]-1]+' '+m[1];}
 function cxWrap(ctx,text,maxW){const out=[];let line='';String(text).split(/\s+/).forEach(w=>{const t=line?line+' '+w:w; if(ctx.measureText(t).width>maxW&&line){out.push(line);line=w;}else line=t;}); if(line) out.push(line); return out;}
 function cxRR(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
-function cxDraw(cv,rows,opt){
+function cxDraw(cv,rows,opt,sav){
+  sav=sav||[];
   const S=2, W=880, X=32, CW=W-X*2;
   const C={ink:'#1D1D1F',mut:'#6E6E73',soft:'#F5F5F7',track:'#E3E3E8',base:'#AFC0D8',red:'#FF3B30',amb:'#FF9F0A',up:'#D70015',upS:'#FFEFED',am:'#B26A00',amS:'#FFF3DD',blue:'#0071E3',blueS:'#E8F2FD',dn:'#1B7F37'};
   const tmp=document.createElement('canvas').getContext('2d'); tmp.font='400 13.5px '+cxFont;
   const lay=rows.map(r=>{const f=FU[fuId(r.s.n)]; const has=opt.notes&&f&&(f.reason||f.tag); const lines=has&&f.reason?cxWrap(tmp,f.reason,CW-54-24-8).slice(0,3):[]; const nh=has?(f.tag?28:0)+lines.length*19+8:0; return {r,f:has?f:null,lines,h:100+nh};});
   const m=CMETA, heroH=200, listTop=heroH+X+64, foot=110;
-  const H=listTop+(lay.length?lay.reduce((t,l)=>t+l.h+12,0):70)+foot;
+  const svH=sav.length?60+sav.length*84:0;
+  const H=listTop+(lay.length?lay.reduce((t,l)=>t+l.h+12,0):70)+svH+foot;
   cv.width=W*S; cv.height=H*S; const ctx=cv.getContext('2d'); ctx.scale(S,S); ctx.textBaseline='alphabetic';
   ctx.fillStyle='#FFFFFF'; ctx.fillRect(0,0,W,H);
   const T=(t,x,y,font,color,al)=>{ctx.font=font;ctx.fillStyle=color;ctx.textAlign=al||'left';ctx.fillText(t,x,y);};
@@ -57,8 +59,24 @@ function cxDraw(cv,rows,opt){
     }
     y=top+L.h+12;
   });
+  // saving sites
+  if(sav.length){
+    const gS='#E8F8ED', gC='#1B7F37', gB='#34C759';
+    y+=14; T('Saving vs budget · congrats!',X,y+22,'800 18px '+cxFont,C.ink);
+    T(m.nSave+' site'+(m.nSave===1?'':'s')+' more than 5% below budget',X+CW,y+22,'500 12.5px '+cxFont,C.mut,'right');
+    y+=40;
+    sav.forEach((r,i)=>{
+      ctx.fillStyle=gS; cxRR(ctx,X,y,CW,72,20); ctx.fill();
+      T('✓',X+26,y+42,'800 16px '+cxFont,gC,'center');
+      T(short(r.s.n)+(r.s.partial?' *':''),bx,y+31,'700 17px '+cxFont,C.ink);
+      T(r.s.r+'  ·  Budget '+fmt(r.bud)+'  →  Actual '+fmt(r.act)+' kWh/day',bx,y+52,'500 12.5px '+cxFont,C.mut);
+      const rx=X+CW-24;
+      T('−'+fmt(-r.ex),rx,y+36,'800 26px '+cxFont,gC,'right'); T('kWh/day below budget · '+sg(r.p),rx,y+55,'600 12px '+cxFont,C.mut,'right');
+      y+=84;
+    });
+  }
   // footer
-  const fl=cxWrap(ctx,'Budget kWh/day = FY2026 monthly budget ÷ days in the month. The black tick on each bar is the budget; the colored part is usage above it. Red: more than 10% over budget. Yellow: 5 to 10% over. '+(m.n-m.nOver)+' of '+m.n+' sites are within 5% of budget or below.',CW);
+  const fl=cxWrap(ctx,'Budget kWh/day = FY2026 monthly budget ÷ days in the month. The black tick on each bar is the budget; the colored part is usage above it. Red: more than 10% over budget. Yellow: 5 to 10% over. '+(m.n-m.nOver)+' of '+m.n+' sites are within 5% of budget or below.'+((rows.concat(sav)).some(r=>r.s.partial)?' * Partial data for this site.':''),CW);
   ctx.font='400 12px '+cxFont; fl.forEach((t,k)=>T(t,X,y+18+k*17,'400 12px '+cxFont,C.mut));
   T('Operations · Electricity monitoring',X,y+18+fl.length*17+12,'600 11.5px '+cxFont,'#9A9AA1');
 }
@@ -83,7 +101,12 @@ function cxCaption(){
   });
   if(CX.capTrend&&rows.some(r=>r.tr!=='flat')){L.push(''); L.push(id?'↑ masih naik, ↓ mulai turun (7 hari terakhir)':'↑ still rising, ↓ easing (last 7 days)');}
   L.push('');
-  L.push(id?'Mohon bantuannya untuk follow up-nya ya kak, terima kasih.':'Please help follow up, thank you.');
+  const sv=CX.capSave?CSAVE.slice(0,CX.savN||3):[];
+  if(!sv.length){ L.push(id?'Mohon bantuannya untuk follow up-nya ya kak, terima kasih.':'Please help follow up, thank you.'); return L.join('\n'); }
+  L.push(id?'Mohon bantuannya untuk follow up-nya ya kak 🙏':'Please help follow up on these 🙏'); L.push('');
+  L.push(id?'Selamat juga untuk site yang berhasil hemat dari budget 🎉':'And congrats to the sites saving against budget 🎉'); L.push('');
+  sv.forEach((r,i)=>L.push(`${i+1}. ${short(r.s.n)} (${r.s.r}): −${nf(-r.ex)} kWh/${id?'hari':'day'} (−${Math.abs(r.p*100).toFixed(0)}%)`));
+  L.push(''); L.push(id?'Terima kasih kak, pertahankan ya!':'Thank you, keep it up!');
   return L.join('\n');
 }
 function cxCapRender(force){const t=document.getElementById('cxCap'); if(!t) return; if(CX.edited&&!force) return; CX.edited=false; t.value=cxCaption();}
@@ -93,8 +116,8 @@ async function cxCopyCap(){
   catch(e){ t.focus(); t.select(); try{ document.execCommand('copy'); cxMsg('Caption copied.','ok','cxCapMsg'); }catch(x){ cxMsg('Select the text and copy it.','err','cxCapMsg'); } }
 }
 function cxRender(){
-  const cv=document.getElementById('cxCv'); if(!cv||!CROWS.length) return;
-  const go=()=>{try{cxDraw(cv,CROWS.slice(0,CX.rows),CX);}catch(e){}};
+  const cv=document.getElementById('cxCv'); if(!cv||!(CROWS.length||CSAVE.length)) return;
+  const go=()=>{try{cxDraw(cv,CROWS.slice(0,CX.rows),CX,CSAVE.slice(0,CX.savN));}catch(e){}};
   go(); cxCapRender(); if(document.fonts&&document.fonts.ready) document.fonts.ready.then(go);
 }
 function cxBlob(){const cv=document.getElementById('cxCv'); return new Promise((res,rej)=>cv.toBlob(b=>b?res(b):rej(new Error('blob')),'image/png'));}
@@ -116,11 +139,13 @@ document.addEventListener('click',e=>{
   const b=e.target.closest('#cxCard [data-cx], #capCard [data-cx]'); if(!b) return; const k=b.dataset.cx;
   const seg=(sel,on)=>document.querySelectorAll(sel).forEach(x=>x.setAttribute('aria-pressed',String(x===on)));
   if(k==='dl') cxDownload(); else if(k==='cp') cxCopy();
+  else if(k==='s0'||k==='s3'||k==='s5'){CX.savN=k==='s0'?0:k==='s3'?3:5; seg('[data-cx^=s]:not([data-cx=sc])',b); cxRender(); cxCapRender(true);}
   else if(k==='n5'||k==='n8'){CX.rows=k==='n5'?5:8; seg('[data-cx^=n]',b); cxRender(); cxCapRender(true);}
   else if(k==='cc') cxCopyCap();
   else if(k==='cr') cxCapRender(true);
   else if(k==='lid'||k==='len'){CX.lang=k==='lid'?'id':'en'; seg('[data-cx=lid],[data-cx=len]',b); cxCapRender(true);}
   else if(k==='cn'){CX.capNotes=!CX.capNotes; b.setAttribute('aria-pressed',String(CX.capNotes)); cxCapRender(true);}
+  else if(k==='cs'){CX.capSave=!CX.capSave; b.setAttribute('aria-pressed',String(CX.capSave)); cxCapRender(true);}
   else if(k==='ct'){CX.capTrend=!CX.capTrend; b.setAttribute('aria-pressed',String(CX.capTrend)); cxCapRender(true);}
 });
 document.addEventListener('input',e=>{if(e.target&&e.target.id==='cxCap') CX.edited=true;});
