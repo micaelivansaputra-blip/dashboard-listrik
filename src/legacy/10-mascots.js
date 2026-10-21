@@ -41,14 +41,7 @@ function mini(c){
   const m={up:'M8 18 Q13 13 18 18',down:'M8 15 Q13 20.5 18 15',flat:'M8 17 H18'}[c];
   return `<svg class="face" viewBox="0 0 26 26" aria-hidden="true"><circle cx="13" cy="13" r="12" fill="currentColor" opacity=".13"/><circle cx="9" cy="10.5" r="1.7" fill="currentColor"/><circle cx="17" cy="10.5" r="1.7" fill="currentColor"/><path d="${m}" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>`;
 }
-function renderMascots(mood,msg){
-  document.getElementById('mascot').innerHTML=volty(mood);
-  document.getElementById('heroM').innerHTML=`<div class="bubble">${msg}</div>${volty(mood)}`;
-}
-let pq=null;
-addEventListener('pointermove',e=>{ if(pq)return; pq=requestAnimationFrame(()=>{pq=null;
-  document.querySelectorAll('svg .pp').forEach(p=>{const r=p.ownerSVGElement.getBoundingClientRect();const cx=r.left+r.width/2, cy=r.top+r.height*.43;
-    let dx=e.clientX-cx, dy=e.clientY-cy; const d=Math.hypot(dx,dy)||1, k=Math.min(1,d/160)*2.6; p.style.transform=`translate(${dx/d*k}px,${dy/d*k}px)`;});});},{passive:true});
+function renderMascots(){}   // no page mascot any more
 let QUIPS=['Hi! I\'m Volty. Tap me again for another tip.'], qi=0, qt=null;
 function say(){
   const q=document.getElementById('quip'); q.textContent=QUIPS[qi++%QUIPS.length]; q.hidden=false;

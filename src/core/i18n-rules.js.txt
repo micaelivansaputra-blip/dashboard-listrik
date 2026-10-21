@@ -15,3 +15,16 @@
   if(l==='id') return `Admits ${id[m[1]]} ${L(m[2])} ${id[m[3]]} listrik ${id[m[4]]} ${L(m[5])} pada ${m[6]} site yang sebanding. Setiap admit kini memakai ${L(m[7])} kWh, ${id[m[8]]} ${L(m[9])}.`;
   return `Los admits ${es[m[1]][0]} ${L(m[2])} ${es[m[3]]} la electricidad ${es[m[4]][1]} ${L(m[5])} en ${m[6]} sitios comparables. Cada admit ahora usa ${L(m[7])} kWh, ${L(m[9])} ${es[m[8]]}.`;
 }],
+[/^Usage is (\S+) (above|below) the (\w+) budget$/,function(m,l){const L=I18N.loc,a=m[2]==='above';return l==='id'?`Pemakaian ${L(m[1])} ${a?'di atas':'di bawah'} budget ${L(m[3])}`:`El consumo está ${L(m[1])} ${a?'sobre':'bajo'} el presupuesto de ${L(m[3])}`;}],
+[/^Usage is on budget for (\w+)$/,{id:'Pemakaian sesuai budget untuk $1',es:'El consumo está dentro del presupuesto de $1'}],
+[/^Actual (\S+) kWh\/day against a budget of (\S+) kWh\/day · (\d+) sites( · .+)?\.$/,{id:'Aktual $1 kWh/hari dibanding budget $2 kWh/hari · $3 site@4.',es:'Real $1 kWh/día frente a un presupuesto de $2 kWh/día · $3 sitios@4.'}],
+[/^(\d+) of (\d+) sites are more than 5% above budget \((\d+) are more than 10%\)\.$/,{id:'$1 dari $2 site lebih dari 5% di atas budget ($3 di antaranya lebih dari 10%).',es:'$1 de $2 sitios están más del 5% sobre el presupuesto ($3 más del 10%).'}],
+[/^(\d+) sites? (?:is|are) more than 5% below budget\.$/,{id:'$1 site lebih dari 5% di bawah budget.',es:'$1 sitio(s) más del 5% bajo el presupuesto.'}],
+[/^Biggest gap: (.+), (\+\S+) kWh\/day \((\S+)\)\.$/,{id:'Selisih terbesar: $1, $2 kWh/hari ($3).',es:'Mayor diferencia: $1, $2 kWh/día ($3).'}],
+[/^At this pace (\w+) ends at about (\S+) kWh against a budget of (\S+) kWh\.$/,{id:'Dengan laju ini $1 berakhir sekitar $2 kWh dibanding budget $3 kWh.',es:'A este ritmo $1 cerrará en unos $2 kWh frente a un presupuesto de $3 kWh.'}],
+[/^Month to date: (\d+) of (\d+) days \(1–(\d+) (\w+)\)\. Budget per day = monthly budget ÷ (\d+) days\.$/,{id:'Sampai saat ini (MTD): $1 dari $2 hari (1–$3 $4). Budget per hari = budget bulanan ÷ $5 hari.',es:'Acumulado del mes: $1 de $2 días (1–$3 $4). Presupuesto diario = presupuesto mensual ÷ $5 días.'}],
+[/^Full month\. Budget per day = monthly budget ÷ (\d+) days\.$/,{id:'Satu bulan penuh. Budget per hari = budget bulanan ÷ $1 hari.',es:'Mes completo. Presupuesto diario = presupuesto mensual ÷ $1 días.'}],
+[/^(\S+) kWh for (\w+)$/,{id:'$1 kWh untuk $2',es:'$1 kWh para $2'}],
+[/^Total kWh per day, (\d+) sites · the dashed line is the budget per day$/,{id:'Total kWh per hari, $1 site · garis putus-putus adalah budget per hari',es:'Total de kWh por día, $1 sitios · la línea punteada es el presupuesto diario'}],
+[/^(R\d) · (\S+) vs (\S+) kWh\/day$/,{id:'$1 · $2 vs $3 kWh/hari',es:'$1 · $2 vs $3 kWh/día'}],
+[/^(\d+) sites? more than 5% below budget · biggest savings first$/,{id:'$1 site lebih dari 5% di bawah budget · hemat terbesar dulu',es:'$1 sitio(s) más del 5% bajo el presupuesto · mayor ahorro primero'}],

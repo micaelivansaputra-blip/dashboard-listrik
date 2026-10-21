@@ -77,7 +77,7 @@ const Pager = (function () {
   }
 
   document.addEventListener('click', e => {
-    const b = e.target.closest('#pgNav [data-pg],#pgSub [data-pg],#sideNav [data-pg]');
+    const b = e.target.closest('#pgNav [data-pg],#pgSub [data-pg],#sideNav [data-pg],#ovLists [data-pg]');
     if (b) show(b.dataset.pg);
   });
   GROUPS.elec.forEach(g => g.items.forEach(id => Router.register(id.slice(2), id)));

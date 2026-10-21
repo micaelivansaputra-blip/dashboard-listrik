@@ -17,7 +17,6 @@ document.getElementById('counts').addEventListener('click',e=>{const b=e.target.
 document.addEventListener('click',e=>{const c=e.target.closest('[data-n]');if(c&&!c.closest('#modal')){openSite(c.dataset.n);return;}if(e.target.closest('[data-close]'))closeSite();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!document.getElementById('modal').hidden)closeSite();
   if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('[data-n][tabindex]')){e.preventDefault();openSite(e.target.dataset.n);}});
-document.getElementById('mascot').addEventListener('click',say);
 document.getElementById('tiles').addEventListener('click',e=>{const b=e.target.closest('th button');if(!b)return;e.stopPropagation();const k=b.dataset.k;
   if(SORTKEY===k)SORT=SORT==='desc'?'asc':'desc';else{SORTKEY=k;SORT=k==='name'?'asc':'desc';}
   renderSites(selected());});

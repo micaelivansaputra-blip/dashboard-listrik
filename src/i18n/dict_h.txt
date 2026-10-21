@@ -1,0 +1,24 @@
+Under budget || Di bawah budget || Bajo el presupuesto
+On budget || Sesuai budget || Dentro del presupuesto
+Actual (month to date) || Aktual (MTD) || Real (acumulado del mes)
+Actual || Aktual || Real
+Gap to budget || Selisih ke budget || Diferencia vs presupuesto
+Sites over budget || Site melebihi budget || Sitios sobre el presupuesto
+above budget || di atas budget || sobre el presupuesto
+below budget || di bawah budget || bajo el presupuesto
+of § sites || dari § site || de § sitios
+§ red · § saving || § merah · § hemat || § rojos · § ahorrando
+Each day vs budget || Setiap hari vs budget || Cada día vs presupuesto
+Within 10% of budget or below || Dalam 10% dari budget atau di bawahnya || Dentro del 10% del presupuesto o menos
+More than 10% above budget || Lebih dari 10% di atas budget || Más del 10% sobre el presupuesto
+Biggest gaps above budget || Selisih terbesar di atas budget || Mayores diferencias sobre el presupuesto
+Saving against budget || Hemat dari budget || Ahorro frente al presupuesto
+Open Site Concern › || Buka Site Concern › || Abrir Site Concern ›
+No site is more than 5% above budget. || Tidak ada site yang lebih dari 5% di atas budget. || Ningún sitio está más del 5% sobre el presupuesto.
+No site is more than 5% below budget. || Tidak ada site yang lebih dari 5% di bawah budget. || Ningún sitio está más del 5% bajo el presupuesto.
+No daily data for this month. || Tidak ada data harian untuk bulan ini. || No hay datos diarios para este mes.
+Saving vs budget || Hemat vs budget || Ahorro vs presupuesto
+Saving sites || Site hemat || Sitios con ahorro
+Include saving sites || Sertakan site hemat || Incluir sitios con ahorro
+Saving sites in the image || Site hemat di gambar || Sitios con ahorro en la imagen
+Off || Mati || No

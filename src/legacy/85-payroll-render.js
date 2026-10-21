@@ -151,6 +151,6 @@ function render(){
   if(APP==='pay'){renderPay();Pager.sync();return;}
   const list=selected(); const P=periods(list);
   document.getElementById('asof').textContent=`Data through ${dm(days[N-1])} 2026 · ${list.length} sites${REGION==='All'?'':' · '+REGION}`;
-  const {zs}=renderHero(P,list); renderKpis(P); renderStrip(zs); renderCharts(P); renderSites(list); renderConcern(list,P); renderProgram(); renderFoot(list); renderMom(); renderExplorer(); renderWeekly(); App.refresh(); Pager.sync();
+  renderOverview(list); renderCharts(P); renderSites(list); renderConcern(list,P); renderProgram(); renderFoot(list); renderMom(); renderExplorer(); renderWeekly(); App.refresh(); Pager.sync();
   
 }

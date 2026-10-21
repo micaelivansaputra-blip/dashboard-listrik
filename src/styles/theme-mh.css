@@ -119,3 +119,43 @@ h2{font-weight:700;letter-spacing:-.02em}
 .sv-h b{font-size:17px;font-weight:700}
 .sv-h small{color:var(--muted);font-size:13px}
 .crow.sv .tr i.sv-i{background:var(--down)}
+
+/* ---------- calmer page: no cursor effects, no mascots, no scroll-in animation ---------- */
+#curGlow,#curRing,.buddy,.mascot,.hero-m,.quip{display:none!important}
+[data-rv]{opacity:1!important;transform:none!important;transition:none!important}
+section .card,section .kpis>*,.pagehead{animation:none!important}
+.logo-mark{flex:none;width:36px;height:36px;border-radius:10px;background:var(--blue);display:grid;place-items:center}
+.logo-mark svg{width:20px;height:20px;fill:#fff}
+.sidebar .brand{align-items:center}
+
+/* ---------- Overview (vs budget) ---------- */
+.ovtools{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin:0 0 14px}
+.ovtools .f{display:flex;flex-direction:row;align-items:center;gap:8px;font-size:13px;font-weight:600;text-transform:none;letter-spacing:0;color:var(--muted)}
+.ovtools select{min-width:170px;height:36px;padding:0 28px 0 12px}
+.ovnote{font-size:13px;color:var(--muted)}
+#ovVerdict{margin-bottom:16px}
+#ovKpis{margin-bottom:16px}
+#ovDaily{margin-bottom:16px}
+.ov-svg{display:block;width:100%;height:auto;margin-top:8px}
+.ov-grid{stroke:var(--grid);stroke-width:1}
+.ov-ax{font-size:11px;fill:var(--muted)}
+.ov-bar{fill:var(--blue)}
+.ov-bar.hi{fill:var(--up)}
+.ov-bud{stroke:var(--ink);stroke-width:1.5;stroke-dasharray:5 4}
+.ov-budl{font-size:12px;font-weight:700;fill:var(--ink);paint-order:stroke;stroke:var(--surface);stroke-width:4px;stroke-linejoin:round}
+#ovVerdict p{max-width:none}
+#ovDaily .sw{margin-top:10px}
+.ovgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:900px){.ovgrid{grid-template-columns:minmax(0,1fr)}}
+.ovl-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
+.ovl-h h3{font-size:17px;font-weight:700}
+.linkbtn{font:inherit;font-size:13px;font-weight:600;color:var(--blue);background:none;border:0;cursor:pointer;padding:4px 0}
+.ovl{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--hair);cursor:pointer}
+.ovl:first-of-type{border-top:0}
+.ovl .nm{min-width:0}.ovl .nm b{display:block;font-size:15px}
+.ovl .nm small{display:block;font-size:12.5px;color:var(--muted)}
+.ovl .v{text-align:right;font-weight:700;font-size:17px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.ovl .v small{display:block;font-size:12px;font-weight:600}
+.ovl .v.up{color:var(--up-ink)}.ovl .v.down{color:var(--down-ink)}
+#ovVerdict.card{min-height:0!important;padding:24px!important}
+.hero{min-height:0}

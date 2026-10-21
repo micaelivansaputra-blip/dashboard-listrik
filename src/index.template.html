@@ -11,7 +11,7 @@
   <header class="bar">
     <div class="bar-in">
       <div class="brand">
-        <button class="mascot" id="mascot" type="button" aria-label="Volty the mascot. Tap for a tip"></button>
+        <span class="logo-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M13 2L4 14h6l-1 8 9-12h-6z"/></svg></span>
         <div><h1 id="appTitle">Electricity Usage Monitoring</h1><div class="sub" id="asof"></div></div><div class="quip" id="quip" role="status" hidden></div>
       </div>
       <select class="langsel" id="langSel" data-notr aria-label="Language"><option value="en">English</option><option value="id">Indonesia</option><option value="es">Español (MX)</option></select><button type="button" class="thbtn" id="themeBtn" aria-label="Switch to dark mode" title="Switch to dark mode"></button><div class="apptabs" id="appTabs" role="group" aria-label="Dashboard"><button type="button" data-app="elec" aria-pressed="true">Electricity</button><button type="button" data-app="pay" aria-pressed="false">Payroll</button></div>
@@ -28,18 +28,11 @@
   <div class="updmsg" id="updMsg" role="status" hidden></div>
   <div id="v-elec">
   <div id="s-ringkasan" style="scroll-margin-top:120px">
-    <div class="hero">
-      <div class="card verdict"><div id="verdict"></div><div class="hero-m" id="heroM"></div></div>
-    </div>
-
-    <div class="sec-head" style="margin-top:34px"><h2>MTD Oct &amp; Daily Usage <small>kWh per day</small></h2></div>
-    <div class="kpis" id="kpis"></div>
-    <div class="legend"><span><i style="background:var(--up)"></i>Up &gt;5%</span><span><i style="background:var(--flat)"></i>Stable (within ±5%)</span><span><i style="background:var(--down)"></i>Down &gt;5%</span></div>
-    <div class="card strip-card">
-      <div class="strip-top"><h3>Each October day</h3><div class="sub" id="stripNote"></div></div>
-      <div class="strip" id="strip"></div>
-      <div class="sw"><span><i style="background:var(--blue)"></i>Weekday</span><span><i style="background:var(--amber)"></i>Weekend</span><span><i class="dash"></i>September average for the same weekday</span></div>
-    </div>
+    <div class="ovtools"><label class="f" for="ovMonth">Month<select id="ovMonth"></select></label><span class="ovnote" id="ovNote"></span></div>
+    <div class="card verdict" id="ovVerdict"></div>
+    <div class="kpis" id="ovKpis"></div>
+    <div class="card" id="ovDaily"></div>
+    <div class="ovgrid" id="ovLists"></div>
   </div>
 
   <section id="s-tren">
