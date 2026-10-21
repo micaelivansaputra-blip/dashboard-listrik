@@ -22,3 +22,14 @@ Saving sites || Site hemat || Sitios con ahorro
 Include saving sites || Sertakan site hemat || Incluir sitios con ahorro
 Saving sites in the image || Site hemat di gambar || Sitios con ahorro en la imagen
 Off || Mati || No
+Notes History || Riwayat Catatan || Historial de notas
+What each CM told us, newest first || Penjelasan dari tiap CM, terbaru di atas || Lo que nos dijo cada CM, lo más reciente primero
+Search site, reason or note || Cari site, alasan atau catatan || Buscar sitio, motivo o nota
+Latest per site || Terbaru per site || Último por sitio
+Full history || Riwayat lengkap || Historial completo
+All statuses || Semua status || Todos los estados
+All reasons || Semua alasan || Todos los motivos
+Copy as table || Salin sebagai tabel || Copiar como tabla
+No note matches these filters. || Tidak ada catatan yang cocok dengan filter ini. || Ninguna nota coincide con estos filtros.
+No notes yet. Open any site in Site Concern or Sites and add what the CM told you. It will show up here. || Belum ada catatan. Buka site mana pun di Site Concern atau Sites lalu tambahkan penjelasan dari CM. Catatan akan muncul di sini. || Aún no hay notas. Abre cualquier sitio en Site Concern o Sitios y agrega lo que te dijo el CM. Aparecerá aquí.
+Nothing to copy. || Tidak ada yang bisa disalin. || Nada que copiar.

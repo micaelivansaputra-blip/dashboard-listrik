@@ -71,6 +71,7 @@ function renderConcern(list,P){
   const sm=document.getElementById('cSum'); if(sm) sm.innerHTML=`<div class="cs"><small>Budget</small><b>${fmt(CMETA.tb)}</b><span>kWh/day, ${CMETA.n} sites</span></div><div class="cs"><small>Actual</small><b>${fmt(CMETA.ta)}</b><span>kWh/day so far</span></div><div class="cs ${cls(CMETA.tp)}"><small>vs budget</small><b>${pct(CMETA.tp)}</b><span>${CMETA.ta>=CMETA.tb?'+':'−'}${fmt(Math.abs(CMETA.ta-CMETA.tb))} kWh/day</span></div><div class="cs"><small>Over budget</small><b>${CMETA.nOver}</b><span>of ${CMETA.n} sites, ${CMETA.nRed} red</span></div>`;
   if(typeof LASTC!=='undefined'){LASTC=rows.map(r=>r.s.n);LASTC.args=__a;fuSummary();}
   if(typeof cxRender==='function') cxRender();
+  if(typeof renderNotes==='function') renderNotes();
 }
 
 function renderProgram(){

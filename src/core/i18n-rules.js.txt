@@ -28,3 +28,6 @@
 [/^Total kWh per day, (\d+) sites · the dashed line is the budget per day$/,{id:'Total kWh per hari, $1 site · garis putus-putus adalah budget per hari',es:'Total de kWh por día, $1 sitios · la línea punteada es el presupuesto diario'}],
 [/^(R\d) · (\S+) vs (\S+) kWh\/day$/,{id:'$1 · $2 vs $3 kWh/hari',es:'$1 · $2 vs $3 kWh/día'}],
 [/^(\d+) sites? more than 5% below budget · biggest savings first$/,{id:'$1 site lebih dari 5% di bawah budget · hemat terbesar dulu',es:'$1 sitio(s) más del 5% bajo el presupuesto · mayor ahorro primero'}],
+[/^(\d+) notes? · (\d+) sites?( \(filtered\))?$/,{id:'$1 catatan · $2 site@3',es:'$1 notas · $2 sitios@3'}],
+[/^(\d+) notes copied\. Paste them into Excel\.$/,{id:'$1 catatan disalin. Tempel ke Excel.',es:'$1 notas copiadas. Pégalas en Excel.'}],
+[/^(\S+%) vs budget now$/,{id:'$1 vs budget saat ini',es:'$1 vs presupuesto ahora'}],
