@@ -2,24 +2,20 @@
    Reads the same notes as the site pop-up (FU). "Latest per site" shows the current note of each site;
    "Full history" lists every saved version. Click an item to open the site and edit its note. */
 const NT={q:'',view:'latest',st:'all',tag:'all'};
-function ntWhen(iso){
-  const d=new Date(iso); if(isNaN(d)) return {day:'',txt:''};
-  const day=d.getDate()+' '+MN[d.getMonth()]+' '+d.getFullYear(), tm=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
-  return {day,txt:day+', '+tm,ts:d.getTime()};
+function ntWhen(d0){
+  const d=new Date(String(d0).length===10?d0+'T12:00:00':d0); if(isNaN(d)) return {day:'',txt:''};
+  const day=d.getDate()+' '+MN[d.getMonth()]+' '+d.getFullYear();
+  return {day,txt:day,ts:d.getTime()};
 }
 function ntEntries(){
   const out=[];
   Object.values(FU).forEach(f=>{
-    if(!f||!f.site||!(f.reason||f.tag)) return;
+    if(!f||!f.site) return;
+    const l=fuNotes(f); if(!l.length) return;
     const site=DATA.sites.find(s=>s.n===f.site)||null;
-    const base=(e,cur)=>({site:f.site,r:site?site.r:'',tag:e.tag||'',cm:e.cm||'',reason:e.reason||'',by:e.by||'',at:e.at||f.at||'',status:cur?(f.status||'open'):'',cur,due:cur?(f.due||''):'',s:site});
-    if(NT.view==='latest') out.push(base(f,true));
-    else{
-      const log=(f.log&&f.log.length)?f.log:[f];
-      log.forEach((e,i)=>out.push(base(e,i===0)));
-    }
+    (NT.view==='latest'?l.slice(0,1):l).forEach((e,i)=>out.push({site:f.site,r:site?site.r:'',tag:e.tag,cm:e.cm,reason:e.reason,by:e.by,at:fuEff(e),saved:e.at,status:i===0?(f.status||'open'):'',cur:i===0,due:i===0?(f.due||''):'',more:NT.view==='latest'?l.length-1:0,s:site}));
   });
-  return out.sort((a,b)=>String(b.at).localeCompare(String(a.at)));
+  return out.sort((a,b)=>String(b.at).localeCompare(String(a.at))||String(b.saved).localeCompare(String(a.saved)));
 }
 function ntFilter(list){
   const q=NT.q.trim().toLowerCase();
@@ -48,7 +44,7 @@ function renderNotes(){
     const w=ntWhen(e.at), hd=w.day!==day?`<div class="nt-day">${fuEsc(w.day)}</div>`:''; day=w.day;
     const stc=e.cur&&e.status?`<span class="fu ${e.status}">${FUST[e.status]||e.status}</span>`:'';
     return `${hd}<div class="nti" role="button" tabindex="0" data-n="${fuEsc(e.site)}">
-      <div class="nti-h"><b>${short(e.site)}</b>${e.r?`<small>${e.r}</small>`:''}${e.tag?`<span class="fu tag">${FUTAG[e.tag]||'Other'}</span>`:''}${stc}${e.cur?ntNow(e.s):''}</div>
+      <div class="nti-h"><b>${short(e.site)}</b>${e.r?`<small>${e.r}</small>`:''}${e.tag?`<span class="fu tag">${FUTAG[e.tag]||'Other'}</span>`:''}${stc}${e.cur?ntNow(e.s):''}${e.more?`<span class="fu more">+${e.more} earlier</span>`:''}</div>
       ${e.reason?`<p class="nti-t" data-notr>${fuEsc(e.reason)}</p>`:''}
       <div class="nti-m" data-notr>${e.cm?'Told by '+fuEsc(e.cm)+' · ':''}${e.by?'written by '+fuEsc(e.by)+' · ':''}${fuEsc(w.txt)}${e.due?' · next follow-up '+fuEsc(e.due):''}</div></div>`;
   }).join('');

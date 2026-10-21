@@ -33,3 +33,22 @@ Copy as table || Salin sebagai tabel || Copiar como tabla
 No note matches these filters. || Tidak ada catatan yang cocok dengan filter ini. || Ninguna nota coincide con estos filtros.
 No notes yet. Open any site in Site Concern or Sites and add what the CM told you. It will show up here. || Belum ada catatan. Buka site mana pun di Site Concern atau Sites lalu tambahkan penjelasan dari CM. Catatan akan muncul di sini. || Aún no hay notas. Abre cualquier sitio en Site Concern o Sitios y agrega lo que te dijo el CM. Aparecerá aquí.
 Nothing to copy. || Tidak ada yang bisa disalin. || Nada que copiar.
+Why is this site up or down? Add a note each time you hear something new. || Kenapa site ini naik atau turun? Tambahkan note setiap ada kabar baru. || ¿Por qué sube o baja este sitio? Agrega una nota cada vez que sepas algo nuevo.
+Add a note || Tambah note || Agregar nota
+Add another note || Tambah note lagi || Agregar otra nota
+Edit note || Ubah note || Editar nota
+Add note || Tambah note || Agregar nota
+Save changes || Simpan perubahan || Guardar cambios
+Cancel || Batal || Cancelar
+Edit || Ubah || Editar
+Delete || Hapus || Eliminar
+Date (optional) || Tanggal (opsional) || Fecha (opcional)
+Leave the date empty to use today. || Kosongkan tanggal untuk memakai hari ini. || Deja la fecha vacía para usar hoy.
+Follow-up status of this site || Status follow-up site ini || Estado de seguimiento de este sitio
+Save status || Simpan status || Guardar estado
+Note added. Saved in this browser. || Note ditambahkan. Tersimpan di browser ini. || Nota agregada. Guardada en este navegador.
+Note added. Your team can see it now. || Note ditambahkan. Tim kamu sudah bisa melihatnya. || Nota agregada. Tu equipo ya puede verla.
+Changes saved. || Perubahan tersimpan. || Cambios guardados.
+Status saved. || Status tersimpan. || Estado guardado.
+Note deleted. || Note dihapus. || Nota eliminada.
+Tap again to delete || Tap lagi untuk hapus || Toca otra vez para eliminar

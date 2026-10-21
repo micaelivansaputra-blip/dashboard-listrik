@@ -11,7 +11,7 @@ function cxDraw(cv,rows,opt,sav){
   const S=2, W=880, X=32, CW=W-X*2;
   const C={ink:'#1D1D1F',mut:'#6E6E73',soft:'#F5F5F7',track:'#E3E3E8',base:'#AFC0D8',red:'#FF3B30',amb:'#FF9F0A',up:'#D70015',upS:'#FFEFED',am:'#B26A00',amS:'#FFF3DD',blue:'#0071E3',blueS:'#E8F2FD',dn:'#1B7F37'};
   const tmp=document.createElement('canvas').getContext('2d'); tmp.font='400 13.5px '+cxFont;
-  const lay=rows.map(r=>{const f=FU[fuId(r.s.n)]; const has=opt.notes&&f&&(f.reason||f.tag); const lines=has&&f.reason?cxWrap(tmp,f.reason,CW-54-24-8).slice(0,3):[]; const nh=has?(f.tag?28:0)+lines.length*19+8:0; return {r,f:has?f:null,lines,h:100+nh};});
+  const lay=rows.map(r=>{const f=fuLatest(r.s.n); const has=opt.notes&&f; const lines=has&&f.reason?cxWrap(tmp,f.reason,CW-54-24-8).slice(0,3):[]; const nh=has?(f.tag?28:0)+lines.length*19+8:0; return {r,f:has?f:null,lines,h:100+nh};});
   const m=CMETA, heroH=200, listTop=heroH+X+64, foot=110;
   const svH=sav.length?60+sav.length*84:0;
   const H=listTop+(lay.length?lay.reduce((t,l)=>t+l.h+12,0):70)+svH+foot;
@@ -97,7 +97,7 @@ function cxCaption(){
     const pc=Math.abs(r.p*100).toFixed(0);
     L.push(`${i+1}. ${short(r.s.n)} (${r.s.r}): +${nf(r.ex)} kWh/${id?'hari':'day'} (+${pc}%)${CX.capTrend?(r.tr==='up'?' ↑':r.tr==='down'?' ↓':''):''}`);
     if(CX.capTrend&&r.spike){L.push('    '+(id?`${dt.replace(/ \d{4}$/,'')}: ${nf(r.last)} kWh (${pf(r.pl)} dari budget), lonjakan`:`${dt.replace(/ \d{4}$/,'')}: ${nf(r.last)} kWh (${pf(r.pl)} vs budget), spike`));}
-    const f=CX.capNotes&&FU[fuId(r.s.n)]; if(f&&(f.reason||f.tag)){const tg=f.tag?((id?TGI[f.tag]:FUTAG[f.tag])||''):''; L.push('    '+(id?'Alasan: ':'Reason: ')+[tg,f.reason].filter(Boolean).join(' – ')+(f.cm?' ('+f.cm+')':''));}
+    const f=CX.capNotes&&fuLatest(r.s.n); if(f){const tg=f.tag?((id?TGI[f.tag]:FUTAG[f.tag])||''):''; L.push('    '+(id?'Alasan: ':'Reason: ')+[tg,f.reason].filter(Boolean).join(' – ')+(f.cm?' ('+f.cm+')':''));}
   });
   if(CX.capTrend&&rows.some(r=>r.tr!=='flat')){L.push(''); L.push(id?'↑ masih naik, ↓ mulai turun (7 hari terakhir)':'↑ still rising, ↓ easing (last 7 days)');}
   L.push('');
