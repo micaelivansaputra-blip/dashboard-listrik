@@ -54,3 +54,5 @@ Note deleted. || Note dihapus. || Nota eliminada.
 Tap again to delete || Tap lagi untuk hapus || Toca otra vez para eliminar
 Tracking sites || Site tracking || Sitios en seguimiento
 Tracking || Tracking || Seguimiento
+Site || Site || Sitio
+All sites. Type to find one || Semua site. Ketik untuk cari satu site || Todos los sitios. Escribe para buscar uno

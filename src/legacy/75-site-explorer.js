@@ -101,6 +101,10 @@ function wireMomExplore(){
     else if(q==='prev'){const v=ks.filter(k=>k[0]==='v'),i=v.indexOf(MOM.A.replace(/^y/,'v')); if(i>0){MOM.A=v[i];MOM.B=v[i-1];}}
     else if(q==='yoy'){const ym=MOM.A.slice(2),y='y:2025-'+ym.slice(5); if(MOM.A[0]==='v'&&ks.includes(y)){MOM.B=y;}else{$('mCopyMsg').textContent='Last year is only available for August, September and October.';setTimeout(()=>$('mCopyMsg').textContent='',4000);}}
     fillMonthSelects();renderMom();});
+  $('mSite').addEventListener('input',e=>{const v=e.target.value.trim().toLowerCase(); let m=null;
+    if(!v) MOM.site=''; else {const all=momAll(); m=all.find(x=>short(x.n).toLowerCase()===v||x.n.toLowerCase()===v); if(!m){const c=all.filter(x=>short(x.n).toLowerCase().includes(v)); if(c.length===1&&v.length>=4) m=c[0];} if(m) MOM.site=m.n; else return;}
+    renderMom();});
+  $('mSite').addEventListener('change',e=>{if(!MOM.site) e.target.value='';});
   $('mq').addEventListener('input',e=>{MOM.q=e.target.value;renderMom();});
   $('mTable').addEventListener('click',e=>{const b=e.target.closest('th button');if(!b)return;e.stopPropagation();const k=b.dataset.k;if(MOM.sk===k)MOM.dir=MOM.dir==='desc'?'asc':'desc';else{MOM.sk=k;MOM.dir=k==='name'?'asc':'desc';}renderMom();});
   $('mMore').addEventListener('click',e=>{if(e.target.closest('[data-more]')){MOM.expand=!MOM.expand;renderMom();}});
