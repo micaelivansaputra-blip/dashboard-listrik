@@ -33,6 +33,7 @@ function tkRows(){
     .sort((a,b)=>(b.i.has-a.i.has)||(parseInt(a.s.n)-parseInt(b.s.n)));
 }
 function renderTrack(){
+  gsFill();
   const sec=document.getElementById('s-track'); if(!sec||!DATA||!days) return;
   const nb=document.querySelector('#nav [data-t="s-track"]'), all=DATA.track||[];
   if(nb) nb.hidden=!all.length; sec.hidden=!all.length&&sec.hidden; if(!all.length) return;
@@ -71,3 +72,16 @@ function openTrack(n){
 document.addEventListener('input',e=>{ if(e.target&&e.target.id==='tkQ'){TK.q=e.target.value; renderTrack();} });
 document.addEventListener('click',e=>{ const r=e.target.closest('[data-tk]'); if(r) openTrack(r.dataset.tk); });
 document.addEventListener('keydown',e=>{ if(e.key==='Enter'){const r=e.target.closest&&e.target.closest('tr[data-tk]'); if(r) openTrack(r.dataset.tk);} });
+/* Find site: opens any site (59 in total) from any page */
+function gsFill(){
+  const dl=document.getElementById('gSiteList'); if(!dl||!DATA) return;
+  const main=DATA.sites.map(s=>({n:s.n,r:s.r,t:''})).concat((DATA.track||[]).map(s=>({n:s.n,r:s.r,t:' · tracking'}))), sg=String(main.length);
+  if(dl.dataset.sig===sg) return; dl.dataset.sig=sg;
+  dl.innerHTML=main.sort((a,b)=>parseInt(a.n)-parseInt(b.n)).map(x=>`<option value="${fuEsc(short(x.n))}">${x.r}${x.t}</option>`).join('');
+}
+document.addEventListener('change',e=>{
+  const t=e.target; if(!t||t.id!=='gSite') return; const v=t.value.trim().toLowerCase(); if(!v) return;
+  const all=DATA.sites.map(s=>s.n).concat((DATA.track||[]).map(s=>s.n));
+  let hit=all.find(n=>short(n).toLowerCase()===v||n.toLowerCase()===v); if(!hit){const c=all.filter(n=>short(n).toLowerCase().includes(v)); if(c.length===1) hit=c[0];}
+  if(hit){t.value=''; t.blur(); openSite(hit);}
+});

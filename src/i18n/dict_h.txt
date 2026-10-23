@@ -56,3 +56,5 @@ Tracking sites || Site tracking || Sitios en seguimiento
 Tracking || Tracking || Seguimiento
 Site || Site || Sitio
 All sites. Type to find one || Semua site. Ketik untuk cari satu site || Todos los sitios. Escribe para buscar uno
+Find site || Cari site || Buscar sitio
+Any site || Semua site || Cualquier sitio

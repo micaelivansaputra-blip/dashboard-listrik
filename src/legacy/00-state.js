@@ -25,6 +25,10 @@ const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).
 const ICON = {up:'<svg width="14" height="14" viewBox="0 0 14 14"><path d="M7 2 12 8H9v4H5V8H2z" fill="currentColor"/></svg>',down:'<svg width="14" height="14" viewBox="0 0 14 14"><path d="M7 12 2 6h3V2h4v4h3z" fill="currentColor"/></svg>',flat:'<svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 5h10v1.8H2zm0 3.2h10V10H2z" fill="currentColor"/></svg>'};
 
 let REGION='All', MODE='mom', QUERY='', charts={};
+/* Tracking sites that have readings, shaped like normal sites so list pages can show them too */
+function trackSites(){ return Object.keys((DATA.hist&&DATA.hist.t)||{}).map(n=>{const t=(DATA.track||[]).find(x=>x.n===n); return t?{n,r:t.r,v:t.v,track:true,partial:false}:null;}).filter(Boolean); }
+/* list pages: add Tracking sites with readings, but leave out the ones flagged as suspect (CT or unit wrong, value far from budget) so they do not distort rankings */
+function withTracked(list){ return list.concat(trackSites().filter(s=>(REGION==='All'||s.r===REGION)&&!(typeof tkWhy==='function'&&tkWhy(s,tkInfo(s)).some(w=>/wrong|far from/.test(w))))); }
 function selected(){ return DATA.sites.filter(s => REGION==='All' || s.r===REGION); }
 function natSeries(list){ return days.map((_,i)=>list.reduce((t,s)=>t+s.v[i],0)); }
 function pySeries(list){ return DATA.pyDays.map((_,i)=>list.reduce((t,s)=>t+s.y[i],0)); }
@@ -44,5 +48,5 @@ function siteAvg(s){
   const okt=av('okt'), sep=av('sep'), agu=av('agu'), py=s.y?mean(s.y):NaN;
   return {okt,sep,agu,py,mom:okt/sep-1,vsAgu:okt/agu-1,yoy:okt/py-1};
 }
-function ma7(a){return a.map((_,i)=>i<6?null:mean(a.slice(i-6,i+1)));}
+function ma7(a){return a.map((_,i)=>{if(i<6) return null; const w=a.slice(i-6,i+1); return w.some(x=>x==null)?null:mean(w);});}
 

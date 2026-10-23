@@ -17,6 +17,7 @@ function fillPS(){
   document.querySelectorAll('#psType button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===PS.type));
 }
 function renderSites(list){
+  list=withTracked(list);
   const box=document.getElementById('tiles');
   if(!hasHist()){box.innerHTML='<div class="empty">Monthly history is not available in this file.</div>';return;}
   if(!document.getElementById('psA').options.length) fillPS();
@@ -38,7 +39,7 @@ function renderSites(list){
   const th=(k,l,cl='')=>`<th class="${cl} ${SORTKEY===k?'sorted':''} ${k==='p'?'actc':''}" aria-sort="${SORTKEY===k?(SORT==='asc'?'ascending':'descending'):'none'}"><button type="button" data-k="${k}">${l}${SORTKEY===k?(SORT==='asc'?' ▲':' ▼'):''}</button></th>`;
   const sgn=v=>(v>=0?'+':'−')+fmt(Math.abs(v));
   const body=shown.map(({s,a,b,d:dd,p})=>{const c=cls(p);return `<tr class="row" data-n="${s.n}" tabindex="0">
-    <td><div class="sn"><span class="sd ${c}"></span><span><b>${short(s.n)}${s.partial?' *':''}${fuHas(s.n)?'<i class="nd" title="Has a note"></i>':''}</b><small>${s.r}</small></span></div></td>
+    <td><div class="sn"><span class="sd ${c}"></span><span><b>${short(s.n)}${s.partial?' *':''}${fuHas(s.n)?'<i class="nd" title="Has a note"></i>':''}</b><small>${s.r}${s.track?' · tracking':''}</small></span></div></td>
     <td><div class="okt"><span>${fmt(a)}</span><i style="width:${Math.max(4,a/mx*72)}px"></i></div></td>
     <td class="hs"><div class="okt"><span>${fmt(b)}</span><i style="width:${Math.max(4,b/mx*72)}px;opacity:.55"></i></div></td>
     <td class="hs"><span class="cell ${c}">${sgn(dd)}</span></td>
