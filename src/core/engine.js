@@ -274,6 +274,16 @@
     const excl = [...excluded].map(([site, reason]) => ({ site, reason }));
     for (const s of SITES) if (!good.includes(s) && !excluded.has(s))
       excl.push({ site: s, reason: statusN[s].length ? [...new Set(statusN[s])].join('; ') : 'no active meter data in the report' });
+    // sites outside the main comparison: tracked on their own with whatever meter data exists
+    const inMain = new Set(sites.map(x => x.n));
+    const track = SITES.filter(x => !inMain.has(x)).map(site => {
+      const mv = {}, L = [...M26.entries()].filter(([k, m]) => m.site === site && !skip(k, m)), seen = {}, live = [];
+      L.forEach(([k, m]) => { const a = []; for (let d = d0; d <= LAST; d++) { const x = m.vals[d - m.start]; a.push(d < m.start || x === undefined || Number.isNaN(x) ? null : r1(x)); }
+        seen[m.typ] = (seen[m.typ] || 0) + 1; const key = seen[m.typ] > 1 ? m.typ + ' ' + seen[m.typ] : m.typ; mv[key] = a; if (m.last >= d0) live.push(key); });
+      const tot = days.map((_, i) => live.length && live.every(t => mv[t][i] != null) ? r1(live.reduce((t, k) => t + mv[k][i], 0)) : null);
+      const why = excl.find(e => e.site === site);
+      return { n: site, r: 'R' + (regionOf[site] || '').replace(/\D/g, ''), reason: why ? why.reason : '', meters: L.filter(([k, m]) => m.last >= d0).map(([k, m]) => ({ typ: m.typ, last: iso(m.last) })), v: tot, m: mv };
+    });
     // weekly efficiency sheet (optional): target, actual, shows and screen closes per site for one Wed-Tue week
     const weekly = (function () {
       const ws = wb.Sheets['By Weekly']; if (!ws || !ws['!ref']) return null;
@@ -301,7 +311,7 @@
       return rows.length ? { from: iso(d0), to: iso(d6), source: 'By Weekly sheet', rows } : null;
     })();
     return {
-      days: days.map(iso), pyDays: pyDays.map(iso), sites, sp, zx, hist, weekly,
+      days: days.map(iso), pyDays: pyDays.map(iso), sites, sp, zx, hist, weekly, track,
       meta: { source: o.fileName, last: iso(LAST), lastSeen: info0.lastSeen, totalSites: SITES.length, included: sites.length,
         excluded: excl.sort((a, b) => parseInt(a.site) - parseInt(b.site)), generatedAt: new Date().toISOString() }
     };

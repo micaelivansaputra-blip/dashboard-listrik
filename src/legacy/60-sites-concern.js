@@ -72,6 +72,7 @@ function renderConcern(list,P){
   if(typeof LASTC!=='undefined'){LASTC=rows.map(r=>r.s.n);LASTC.args=__a;fuSummary();}
   if(typeof cxRender==='function') cxRender();
   if(typeof renderNotes==='function') renderNotes();
+  if(typeof renderTrack==='function') renderTrack();
 }
 
 function renderProgram(){

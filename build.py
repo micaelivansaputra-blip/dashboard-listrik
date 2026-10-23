@@ -14,7 +14,7 @@ APP_FILES = [
     'legacy/80-payroll-state.js', 'legacy/81-payroll-mtd.js', 'legacy/82-payroll-calc.js',
     'legacy/83-payroll-cost.js', 'legacy/84-payroll-how.js', 'legacy/85-payroll-render.js',
     'legacy/90-navigation.js', 'legacy/91-controls-theme-lang.js', 'legacy/92-update-excel.js',
-    'legacy/93-followups.js', 'legacy/95-concern-export.js', 'legacy/96-notes-history.js',
+    'legacy/93-followups.js', 'legacy/95-concern-export.js', 'legacy/96-notes-history.js', 'legacy/97-track.js',
 ]
 MODULE_FILES = []   # VIPER modules, appended by modules/*/manifest below
 for m in sorted((SRC / 'modules').glob('*/manifest.json')):

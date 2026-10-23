@@ -124,6 +124,7 @@ function fuWire(n){
 }
 function fuRefresh(){
   if(typeof renderNotes==='function'){try{renderNotes();}catch(e){}}
+  if(typeof renderTrack==='function'){try{renderTrack();}catch(e){}}
   if(LASTC) renderConcern.apply(null,LASTC.args); fuSummary();
   if(typeof renderSites==='function'&&typeof selected==='function'){try{renderSites(selected());}catch(e){}}
   const m=document.getElementById('modal'), box=document.getElementById('fuBox');
