@@ -52,3 +52,5 @@ Changes saved. || Perubahan tersimpan. || Cambios guardados.
 Status saved. || Status tersimpan. || Estado guardado.
 Note deleted. || Note dihapus. || Nota eliminada.
 Tap again to delete || Tap lagi untuk hapus || Toca otra vez para eliminar
+Tracking sites || Site tracking || Sitios en seguimiento
+Tracking || Tracking || Seguimiento

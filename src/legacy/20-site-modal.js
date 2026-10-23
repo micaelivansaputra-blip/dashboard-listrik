@@ -4,6 +4,8 @@ function getSite(n){
 }
 let lastFocus=null;
 function openSite(n){
+  if(!getSite(n)&&typeof openTrack==='function'&&(DATA.track||[]).some(t=>t.n===n)) return openTrack(n);
+  if(!getSite(n)&&typeof openTrack==='function'&&(DATA.track||[]).some(t=>t.n===n)) return openTrack(n);
   const s=getSite(n); if(!s) return; lastFocus=document.activeElement;
   const full=s.v.length===N, isP=ZSET.includes(n), L=s.v.length;
   const stats=[]; const st=full?(()=>{const a=siteAvg(s);return a;})():null;

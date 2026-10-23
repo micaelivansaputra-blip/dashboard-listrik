@@ -278,12 +278,14 @@
     const inMain = new Set(sites.map(x => x.n));
     const track = SITES.filter(x => !inMain.has(x)).map(site => {
       const mv = {}, L = [...M26.entries()].filter(([k, m]) => m.site === site && !skip(k, m)), seen = {}, live = [];
-      L.forEach(([k, m]) => { const a = []; for (let d = d0; d <= LAST; d++) { const x = m.vals[d - m.start]; a.push(d < m.start || x === undefined || Number.isNaN(x) ? null : r1(x)); }
+      L.forEach(([k, m]) => { const a = []; for (let d = h0; d <= LAST; d++) { const x = m.vals[d - m.start]; a.push(d < m.start || x === undefined || Number.isNaN(x) ? null : r1(x)); }
         seen[m.typ] = (seen[m.typ] || 0) + 1; const key = seen[m.typ] > 1 ? m.typ + ' ' + seen[m.typ] : m.typ; mv[key] = a; if (m.last >= d0) live.push(key); });
-      const tot = days.map((_, i) => live.length && live.every(t => mv[t][i] != null) ? r1(live.reduce((t, k) => t + mv[k][i], 0)) : null);
-      const why = excl.find(e => e.site === site);
-      return { n: site, r: 'R' + (regionOf[site] || '').replace(/\D/g, ''), reason: why ? why.reason : '', meters: L.filter(([k, m]) => m.last >= d0).map(([k, m]) => ({ typ: m.typ, last: iso(m.last) })), v: tot, m: mv };
+      const hn = LAST - h0 + 1, tot = Array.from({ length: hn }, (_, i) => live.length && live.every(t => mv[t][i] != null) ? r1(live.reduce((t, k) => t + mv[k][i], 0)) : null);
+      const cut = d0 - h0, why = excl.find(e => e.site === site);
+      return { n: site, r: 'R' + (regionOf[site] || '').replace(/\D/g, ''), reason: why ? why.reason : '', meters: L.filter(([k, m]) => m.last >= d0).map(([k, m]) => ({ typ: m.typ, last: iso(m.last) })),
+        v: tot.slice(cut), m: Object.fromEntries(Object.entries(mv).map(([k, a]) => [k, a.slice(cut)])), h: tot };
     });
+    hist.t = {}; track.forEach(t => { if (t.h.filter(x => x != null).length >= 5) hist.t[t.n] = t.h; }); track.forEach(t => { delete t.h; });
     // weekly efficiency sheet (optional): target, actual, shows and screen closes per site for one Wed-Tue week
     const weekly = (function () {
       const ws = wb.Sheets['By Weekly']; if (!ws || !ws['!ref']) return null;

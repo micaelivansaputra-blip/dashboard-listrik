@@ -1,11 +1,17 @@
 /* ---------- site explorer ---------- */
 const EX={sel:[],col:{},from:null,to:null,range:'30',view:'daily',scale:'abs',ly:false};
 const XC=['--c1','--c2','--c3','--c4','--c5'];
-const hv=s=>DATA.hist.v[s.n]||[];
+const hv=s=>DATA.hist.v[s.n]||(DATA.hist.t&&DATA.hist.t[s.n])||[];
+/* every site that can be tracked here: the main sites plus the Tracking sites that have readings */
+const exAll=()=>DATA.sites.concat(Object.keys(DATA.hist.t||{}).map(n=>{const t=(DATA.track||[]).find(x=>x.n===n);return t?{n,r:t.r,v:t.v,track:true,p:false}:null;}).filter(Boolean));
 const hIdx=d=>Math.round((dt(d)-dt(DATA.hist.d0))/864e5);
-function exFill(arr){ // fill the few missing days so lines stay continuous
+function exFill(arr,edges){ // fill the few missing days so lines stay continuous (edges=false keeps the gaps before the first and after the last reading)
   const out=arr.slice(); let last=null; for(let i=0;i<out.length;i++){ if(out[i]==null) out[i]=last; else last=out[i]; }
-  let nx=null; for(let i=out.length-1;i>=0;i--){ if(out[i]==null) out[i]=nx; else nx=out[i]; } return out; }
+  let nx=null; for(let i=out.length-1;i>=0;i--){ if(out[i]==null) out[i]=nx; else nx=out[i]; }
+  if(edges===false){ const f=arr.findIndex(x=>x!=null); let l=-1; arr.forEach((x,i)=>{if(x!=null) l=i;}); for(let i=0;i<out.length;i++) if(i<f||i>l) out[i]=null; }
+  return out; }
+const exF=s=>exFill(hv(s),s.track?false:undefined);
+const exMa=(full,i)=>{ if(i<6) return null; const w=full.slice(i-6,i+1); return w.some(x=>x==null)?null:mean(w); };
 function exAdd(n){
   if(EX.sel.includes(n)) return; if(EX.sel.length>=5){document.getElementById('xNote').textContent='You can compare up to 5 sites. Remove one first.';return;}
   const used=Object.entries(EX.col).filter(([k])=>EX.sel.includes(k)).map(([,v])=>v); EX.col[n]=XC.find(c=>!used.includes(c)); EX.sel.push(n);
@@ -19,7 +25,7 @@ function exSetRange(r){
   EX.from=from<first?first:from; EX.to=last;
 }
 function exSeries(s){ // returns {dates,vals} for selected range, honouring view
-  const full=exFill(hv(s)), base=EX.view==='ma7'?full.map((_,i)=>i<6?null:mean(full.slice(i-6,i+1))):full;
+  const full=exF(s), base=EX.view==='ma7'?full.map((_,i)=>exMa(full,i)):full;
   const i0=hIdx(EX.from), i1=hIdx(EX.to), dates=[], vals=[];
   for(let i=Math.max(0,i0);i<=Math.min(full.length-1,i1);i++){ dates.push(addDays(DATA.hist.d0,i)); vals.push(base[i]); }
   return {dates,vals,raw:full};
@@ -27,9 +33,9 @@ function exSeries(s){ // returns {dates,vals} for selected range, honouring view
 function renderExplorer(){
   const sec=document.getElementById('s-explore'), nb=document.querySelector('#nav [data-t="s-explore"]');
   if(!hasHist()){sec.hidden=true; if(nb)nb.hidden=true; return;} sec.hidden=false; if(nb)nb.hidden=false;
-  EX.sel=EX.sel.filter(n=>DATA.sites.some(s=>s.n===n)); if(!EX.sel.length) exDefault();
+  EX.sel=EX.sel.filter(n=>exAll().some(s=>s.n===n)); if(!EX.sel.length) exDefault();
   if(!EX.from) exSetRange(EX.range);
-  const sites=EX.sel.map(n=>DATA.sites.find(s=>s.n===n)), last=days[N-1];
+  const sites=EX.sel.map(n=>exAll().find(s=>s.n===n)), last=days[N-1];
   document.getElementById('xFrom').min=document.getElementById('xTo').min=DATA.hist.d0; document.getElementById('xFrom').max=document.getElementById('xTo').max=last;
   document.getElementById('xFrom').value=EX.from; document.getElementById('xTo').value=EX.to;
   document.querySelectorAll('#xRange button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.r===EX.range));
@@ -58,13 +64,14 @@ function renderExStats(sites,dates){
   const i0=hIdx(EX.from), i1=hIdx(EX.to), len=i1-i0+1, last=days[N-1];
   const {opts,mu}=makeOpts(); const o=opts;
   const rows=sites.map(s=>{
-    const full=exFill(hv(s)), seg=[]; for(let i=Math.max(0,i0);i<=Math.min(full.length-1,i1);i++) seg.push({i,d:addDays(DATA.hist.d0,i),v:full[i]});
+    const full=exF(s), seg=[]; for(let i=Math.max(0,i0);i<=Math.min(full.length-1,i1);i++) if(full[i]!=null) seg.push({i,d:addDays(DATA.hist.d0,i),v:full[i]});
+    if(!seg.length) return null;
     const vs=seg.map(x=>x.v), avg=mean(vs), mn=seg.reduce((a,b)=>b.v<a.v?b:a), mxx=seg.reduce((a,b)=>b.v>a.v?b:a);
     const wd=seg.filter(x=>!isWE(x.d)).map(x=>x.v), we=seg.filter(x=>isWE(x.d)).map(x=>x.v);
-    const pi0=i0-len, prev=pi0>=0?mean(full.slice(pi0,i0)):null;
-    const spikes=[]; for(const x of seg){ if(x.i<14) continue; const w=full.slice(x.i-14,x.i).slice().sort((a,b)=>a-b), med=(w[6]+w[7])/2; if(x.v>1.25*med) spikes.push({d:x.d,v:x.v,p:x.v/med-1}); }
+    const pi0=i0-len, pw=pi0>=0?full.slice(pi0,i0).filter(x=>x!=null):[], prev=pw.length?mean(pw):null;
+    const spikes=[]; for(const x of seg){ if(x.i<14) continue; const w0=full.slice(x.i-14,x.i); if(w0.some(z=>z==null)) continue; const w=w0.slice().sort((a,b)=>a-b), med=(w[6]+w[7])/2; if(x.v>1.25*med) spikes.push({d:x.d,v:x.v,p:x.v/med-1}); }
     const prof=[1,2,3,4,5,6,0].map(g=>{const a=seg.filter(x=>dow(x.d)===g).map(x=>x.v); return a.length?(mean(a)/avg-1)*100:null;});
-    return {s,avg,mn,mxx,wd:wd.length?mean(wd):NaN,we:we.length?mean(we):NaN,prev,spikes,prof};});
+    return {s,avg,mn,mxx,wd:wd.length?mean(wd):NaN,we:we.length?mean(we):NaN,prev,spikes,prof};}).filter(Boolean);
   document.getElementById('xStatSub').textContent=`${dm(EX.from)} – ${dm(EX.to)} · ${len} days`;
   const th=l=>`<th>${l}</th>`;
   document.getElementById('xStats').innerHTML=`<table class="ptable xstats" style="min-width:680px"><thead><tr><th style="text-align:left">Site</th>${th('Average')}${th('vs previous '+len+' days')}${th('Lowest day')}${th('Highest day')}${th('Weekday avg')}${th('Weekend avg')}</tr></thead><tbody>${rows.map(r=>{const c=r.prev?cls(r.avg/r.prev-1):'flat';
@@ -80,8 +87,8 @@ function renderExStats(sites,dates){
 function exResults(q){
   const box=document.getElementById('xres'), inp=document.getElementById('xq'); q=q.trim().toLowerCase();
   if(!q){box.hidden=true; inp.setAttribute('aria-expanded','false'); return;}
-  const L=DATA.sites.filter(s=>s.n.toLowerCase().includes(q)&&!EX.sel.includes(s.n)).slice(0,8);
-  box.innerHTML=L.map(s=>`<button type="button" role="option" data-add="${s.n}">${short(s.n)} <small>${s.r}</small></button>`).join('')||'<div class="sub" style="padding:8px 10px">No matching site.</div>';
+  const L=exAll().filter(s=>s.n.toLowerCase().includes(q)&&!EX.sel.includes(s.n)).slice(0,8);
+  box.innerHTML=L.map(s=>`<button type="button" role="option" data-add="${s.n}">${short(s.n)} <small>${s.r}${s.track?' · tracking':''}</small></button>`).join('')||'<div class="sub" style="padding:8px 10px">No matching site.</div>';
   box.hidden=false; inp.setAttribute('aria-expanded','true');
 }
 function wireMomExplore(){
@@ -108,6 +115,7 @@ function wireMomExplore(){
     if(p==='up'){selected().map(s=>({s,a:siteAvg(s)})).sort((x,y)=>y.a.mom-x.a.mom).slice(0,3).forEach(r=>exAdd(r.s.n));}
     else if(p==='big'){selected().map(s=>({s,a:siteAvg(s)})).sort((x,y)=>y.a.okt-x.a.okt).slice(0,3).forEach(r=>exAdd(r.s.n));}
     else if(p==='zoec'){DATA.sites.filter(s=>s.p).slice(0,5).forEach(s=>exAdd(s.n));}
+    else if(p==='trk'){exAll().filter(s=>s.track).slice(0,5).forEach(s=>exAdd(s.n));}
     renderExplorer();});
   $('xRange').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;exSetRange(b.dataset.r);renderExplorer();});
   const dch=()=>{let f=$('xFrom').value,t=$('xTo').value;if(!f||!t)return;if(f>t)[f,t]=[t,f];EX.from=f;EX.to=t;EX.range='custom';renderExplorer();};
