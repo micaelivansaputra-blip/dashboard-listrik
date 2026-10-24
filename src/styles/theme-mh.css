@@ -229,6 +229,7 @@ td.tk-why .fu{display:inline-block;margin:0 4px 4px 0}
 .qtt small.swg{color:#b26a00;font-weight:700}
 #qtOver{grid-template-columns:repeat(auto-fit,minmax(320px,1fr));align-items:start}
 .mvrow em.warn{color:#b26a00}
-#qtOver .mvrow b{white-space:normal;max-width:46%}
+#qtOver .mvrow b{white-space:normal;max-width:38%}
 .vbm{display:flex;gap:4px;margin-bottom:2px}.vbm i{font-style:normal;font-size:11.5px;font-weight:700;padding:1px 6px;border-radius:999px;background:rgba(120,120,128,.14)}
 .vbm i.up{color:var(--up);background:color-mix(in srgb,var(--up) 14%,transparent)}.vbm i.warn{color:#b26a00;background:rgba(255,159,10,.16)}.vbm i.down{color:var(--down);background:color-mix(in srgb,var(--down) 14%,transparent)}
+#qtMovers .vbm{display:inline-flex}

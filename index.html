@@ -1173,9 +1173,10 @@ td.tk-why .fu{display:inline-block;margin:0 4px 4px 0}
 .qtt small.swg{color:#b26a00;font-weight:700}
 #qtOver{grid-template-columns:repeat(auto-fit,minmax(320px,1fr));align-items:start}
 .mvrow em.warn{color:#b26a00}
-#qtOver .mvrow b{white-space:normal;max-width:46%}
+#qtOver .mvrow b{white-space:normal;max-width:38%}
 .vbm{display:flex;gap:4px;margin-bottom:2px}.vbm i{font-style:normal;font-size:11.5px;font-weight:700;padding:1px 6px;border-radius:999px;background:rgba(120,120,128,.14)}
 .vbm i.up{color:var(--up);background:color-mix(in srgb,var(--up) 14%,transparent)}.vbm i.warn{color:#b26a00;background:rgba(255,159,10,.16)}.vbm i.down{color:var(--down);background:color-mix(in srgb,var(--down) 14%,transparent)}
+#qtMovers .vbm{display:inline-flex}
 
 </style>
 
@@ -1264,15 +1265,15 @@ td.tk-why .fu{display:inline-block;margin:0 4px 4px 0}
       <div class="note" id="qtNote"></div>
     </div>
     <div class="card" style="margin-top:14px">
+      <div class="ch"><div><h3>Over budget first</h3><span class="sub">Ranked by how many of the three months a site is above its budget, then by its Q3 total against budget. Tap a site for its Jul–Sep charts.</span></div></div>
+      <div class="mvgrid" id="qtMovers"></div>
+    </div>
+    <div class="card" style="margin-top:14px">
       <div class="ch"><div><h3>Overall Q3</h3><span class="sub">Who rose the most from the first month to the last, and which sites went up and down in an unusual way.</span></div></div>
       <div class="mvgrid" id="qtOver"></div>
     </div>
     <div class="card" style="margin-top:14px">
-      <div class="ch"><div><h3>Increasing and over budget</h3><span class="sub">Sites that rose from the first month to the last and are above budget in the last month, ranked by how far above budget. Tap a site for its Jul–Sep charts.</span></div></div>
-      <div class="mvgrid" id="qtMovers"></div>
-    </div>
-    <div class="card" style="margin-top:14px">
-      <div class="ch"><div><h3>All sites</h3><span class="sub">kWh usage and cost from the actual invoices, side by side. Tap a site for its Jul–Sep charts and a ready-to-send question. Tap a column header to sort.</span></div><div class="qchips"><button type="button" class="ghost" id="qtCopy">Copy table</button></div></div>
+      <div class="ch"><div><h3>All sites</h3><span class="sub">kWh usage and cost from the actual invoices, side by side. Tap a site for its Jul–Sep charts and a ready-to-send question. Sorted by months over budget first. Tap a column header to sort.</span></div><div class="qchips"><button type="button" class="ghost" id="qtCopy">Copy table</button></div></div>
       <div class="tbl-wrap" id="qtTable"></div><div class="more" id="qtMore"></div><div class="cmsg" id="qtMsg" role="status"></div>
     </div>
   </section>
@@ -4144,7 +4145,7 @@ document.addEventListener('change',e=>{
 /* ---------- Quarter view: monthly usage and cost per site, from the actual electricity invoices ----------
    Source: INVOICE (Actual Invoice Electricity.xlsx, PIVOT sheet). Monthly kWh and cost (incl. PPN) of every site as billed.
    Daily meter readings are not used on this page. */
-const QT={q:'2026-Q3',f:'all',hide:true,sk:'t',dir:'desc',more:false,mode:'kwh'};
+const QT={q:'2026-Q3',f:'all',hide:true,sk:'pri',dir:'desc',more:false,mode:'kwh'};
 const QMON={'2026-Q1':['2026-01','2026-02','2026-03'],'2026-Q2':['2026-04','2026-05','2026-06'],'2026-Q3':['2026-07','2026-08','2026-09']};
 const qtNum=n=>(/^\d+/.exec(n)||[])[0];
 const qtRegion=n=>{const k=qtNum(n); const s=(DATA.sites.concat(DATA.track||[])).find(x=>qtNum(x.n)===k); return s?s.r:'';};
@@ -4195,7 +4196,8 @@ function renderQuarter(){
   const ms=qtMonths(), ML=ms.map(m=>MN[+m.slice(5)-1]);
   const all=qtRows().filter(r=>REGION==='All'||r.s.r===REGION), pool=all.filter(r=>r.ok&&!(QT.hide&&r.bad));
   const med=a=>{const x=a.slice().sort((p,q)=>p-q); return x.length?x[Math.floor(x.length/2)]:0;}, m1=med(pool.map(r=>r.s1)), m2=med(pool.map(r=>r.s2));
-  all.forEach(r=>Object.assign(r,qtPattern(r,m1,m2)));
+  all.forEach(r=>{Object.assign(r,qtPattern(r,m1,m2)); const bb=r.n&&BUDGET[+qtNum(r.n)]; r.mo=r.vbm?r.vbm.filter(x=>x>0).length:null;
+    r.q3b=r.ok&&bb?r.kw.reduce((a,b)=>a+b,0)/qtMonths().reduce((a,m)=>a+bb.m[+m.slice(5)-1],0)-1:null; r.pri=r.mo==null?null:r.mo+Math.max(-.9,Math.min(5,r.q3b))/10;});
   const up=pool.filter(r=>qtDir(r.t)==='up'), dn=pool.filter(r=>qtDir(r.t)==='down'), fl=pool.length-up.length-dn.length;
   const tk=ms.map((_,i)=>pool.reduce((t,r)=>t+r.kw[i],0)), tc=ms.map((_,i)=>pool.reduce((t,r)=>t+r.cs[i],0));
   const dk=pool.length?tk[2]/tk[0]-1:null, dc=pool.length?tc[2]/tc[0]-1:null, r0=tc[0]/tk[0], r2=tc[2]/tk[2], dr=pool.length?r2/r0-1:null;
@@ -4225,20 +4227,21 @@ function renderQuarter(){
     ${r.cs.map(x=>`<td class="hs">${qtIdr(x)}</td>`).join('')}<td>${cell(r.ct,true)}</td><td class="hs">Rp ${fmt(r.rt[2])}<br>${cell(r.rc)}</td><td class="hs">${r.vbm?'<span class="vbm">'+r.vbm.map((x,i)=>`<i class="${x>CT.hi?'up':x>0?'warn':'down'}" title="${ML[i]} ${pct(x)}">${pct(x,0)}</i>`).join('')+'</span><small>'+r.vbm.filter(x=>x>0).length+' of 3 over</small>':'<small class="tk-n">No budget</small>'}</td><td class="hs"><small>${r.why}</small></td><td class="hs"><small class="${r.sw?'swg':''}">${r.pat}</small></td>
     <td class="hs">${r.bud?fmt(r.bud)+'<br>'+cell(r.vb):'<small class="tk-n">No budget</small>'}</td></tr>`).join('');
   const g=(t,n)=>`<th colspan="${n}" class="grp">${t}</th>`;
-  document.getElementById('qtTable').innerHTML=`<table class="ptable qtt" style="min-width:1420px"><thead><tr><th></th>${g('kWh usage (invoice)',5)}${g('Cost (Rp, incl. PPN)',4)}${g('Why',4)}${g('Budget',1)}</tr><tr>${th('name','Site')}${ML.map(m=>`<th class="hs">${m}</th>`).join('')}${th('t',ML[2]+' vs '+ML[0])}<th class="hs">Trend</th>${ML.map(m=>`<th class="hs">${m}</th>`).join('')}${th('ct',ML[2]+' vs '+ML[0])}${th('rc',ML[2]+' cost per kWh','hs')}<th class="hs">vs budget by month</th><th class="hs">Driver</th>${th('sc','Pattern','hs')}${th('vb',ML[2]+' budget (kWh)','hs')}</tr></thead><tbody>${body||`<tr><td colspan="15" class="empty">No matching sites.</td></tr>`}</tbody></table>`;
+  document.getElementById('qtTable').innerHTML=`<table class="ptable qtt" style="min-width:1420px"><thead><tr><th></th>${g('kWh usage (invoice)',5)}${g('Cost (Rp, incl. PPN)',4)}${g('Why',4)}${g('Budget',1)}</tr><tr>${th('name','Site')}${ML.map(m=>`<th class="hs">${m}</th>`).join('')}${th('t',ML[2]+' vs '+ML[0])}<th class="hs">Trend</th>${ML.map(m=>`<th class="hs">${m}</th>`).join('')}${th('ct',ML[2]+' vs '+ML[0])}${th('rc',ML[2]+' cost per kWh','hs')}${th('pri','vs budget by month','hs')}<th class="hs">Driver</th>${th('sc','Pattern','hs')}${th('vb',ML[2]+' budget (kWh)','hs')}</tr></thead><tbody>${body||`<tr><td colspan="15" class="empty">No matching sites.</td></tr>`}</tbody></table>`;
   document.getElementById('qtMore').innerHTML=(!q&&QT.f==='all'&&f.length>lim)?`<button type="button" class="chipbtn" data-more aria-pressed="true">${QT.more?'Show top '+lim:'Show all '+f.length+' sites'}</button>`:'';
   const top=pool.slice().sort((a,b)=>b.t-a.t).slice(0,8), tx=Math.max(.01,...top.map(r=>r.t)), sw=pool.filter(r=>r.sw).sort((a,b)=>b.sc-a.sc).slice(0,8), sx=Math.max(.01,...sw.map(r=>r.sc));
   const stp=r=>`${ML[0]}→${ML[1]} ${pct(r.s1,0)} · ${ML[1]}→${ML[2]} ${pct(r.s2,0)}`;
   document.getElementById('qtOver').innerHTML=`<div><h4 class="brh">Biggest rise over the quarter</h4>${top.map(r=>`<div class="mvrow" data-brief="${fuEsc(r.n)}" tabindex="0"><b>${short(r.s.n)}</b><em class="${r.t>CT.lo?'up':'flat'}">${pct(r.t)} · ${fmt(r.kw[0])} → ${fmt(r.kw[2])} kWh<br><span style="font-weight:500">${stp(r)} · ${r.pat}</span></em><div class="mvbar"><i style="width:${Math.max(3,Math.max(0,r.t)/tx*100)}%;background:var(--up)"></i></div></div>`).join('')}</div>
   <div><h4 class="brh">Unusual ups and downs</h4>${sw.length?sw.map(r=>`<div class="mvrow" data-brief="${fuEsc(r.n)}" tabindex="0"><b>${short(r.s.n)}</b><em class="warn">${r.pat}<br><span style="font-weight:500">${stp(r)} · ${fmt(r.kw[0])} · ${fmt(r.kw[1])} · ${fmt(r.kw[2])} kWh</span></em><div class="mvbar"><i style="width:${Math.max(3,r.sc/sx*100)}%;background:var(--warn,#ff9f0a)"></i></div></div>`).join(''):'<div class="note">No unusual swings.</div>'}<p class="note" style="margin-top:8px">A swing is counted when a site moves up and then down (or the reverse) by more than 10% each time, or when a month change differs from the median of all sites by 15 points or more. Most sites rose in ${ML[1]} and fell in ${ML[2]} (median ${pct(m1,0)} then ${pct(m2,0)}), so that normal pattern is not counted.</p></div>`;
-  const mv=pool.filter(r=>r.t>CT.lo&&r.vb!=null&&r.vb>CT.lo).sort((a,b)=>b.vb-a.vb).slice(0,6), mx=Math.max(.01,...mv.map(r=>r.vb));
-  document.getElementById('qtMovers').innerHTML=mv.length?mv.map(r=>`<div class="mvrow" data-brief="${fuEsc(r.n)}" tabindex="0"><b>${short(r.s.n)}</b><em class="up">${pct(r.vb)} vs budget in ${ML[2]}<br><span style="font-weight:500">${fmt(r.kw[0])} → ${fmt(r.kw[2])} kWh (${pct(r.t)}) · vs budget ${r.vbm.map((x,i)=>ML[i]+' '+pct(x,0)).join(' · ')}</span></em><div class="mvbar"><i style="width:${Math.max(3,r.vb/mx*100)}%;background:var(--up)"></i></div></div>`).join(''):'<div class="note">No site is both increasing and above its budget in this quarter.</div>';
+  const mv=pool.filter(r=>r.pri!=null).sort((a,b)=>b.pri-a.pri).slice(0,8), mx=Math.max(.01,...mv.map(r=>Math.max(0,r.q3b)));
+  const chips=r=>r.vbm.map((x,i)=>`<i class="${x>CT.hi?'up':x>0?'warn':'down'}">${ML[i]} ${pct(x,0)}</i>`).join('');
+  document.getElementById('qtMovers').innerHTML=mv.length?mv.map(r=>`<div class="mvrow" data-brief="${fuEsc(r.n)}" tabindex="0"><b>${short(r.s.n)}</b><em class="${r.mo===3?'up':r.mo?'warn':'down'}">${r.mo} of 3 months over budget · Q3 ${pct(r.q3b)}<br><span class="vbm">${chips(r)}</span></em><div class="mvbar"><i style="width:${Math.max(3,Math.max(0,r.q3b)/mx*100)}%;background:${r.mo===3?'var(--up)':'var(--warn,#ff9f0a)'}"></i></div></div>`).join(''):'<div class="note">No site has a budget to compare with.</div>';
   QT.tsv=['Site\tRegion\t'+ML.map(m=>m+' kWh').join('\t')+'\tkWh '+ML[2]+' vs '+ML[0]+'\t'+ML.map(m=>m+' Rp').join('\t')+'\tCost '+ML[2]+' vs '+ML[0]+'\t'+ML[2]+' Rp per kWh\tDriver\t'+ML[2]+' budget kWh\t'+ML[2]+' kWh vs budget\tData note',...f.map(r=>[r.s.n,r.s.r,...r.kw.map(Math.round),(r.t*100).toFixed(1)+'%',...r.cs.map(Math.round),(r.ct*100).toFixed(1)+'%',Math.round(r.rt[2]),r.why,r.bud?Math.round(r.bud):'',r.vb==null?'':(r.vb*100).toFixed(1)+'%',r.flag].join('\t'))].join('\n');
 }
 document.addEventListener('change',e=>{ if(e.target&&e.target.id==='qtQ'){QT.q=e.target.value; renderQuarter();} });
 document.addEventListener('input',e=>{ if(e.target&&e.target.id==='qtSearch') renderQuarter(); });
 document.addEventListener('click',e=>{
-  const f=e.target.closest('#qtFilt [data-f]'); if(f){QT.f=f.dataset.f; QT.sk=QT.f==='both'||QT.f==='allover'?'vb':QT.f==='swing'?'sc':'t'; QT.dir='desc'; renderQuarter(); return;}
+  const f=e.target.closest('#qtFilt [data-f]'); if(f){QT.f=f.dataset.f; QT.sk=QT.f==='swing'?'sc':QT.f==='both'?'vb':'pri'; QT.dir='desc'; renderQuarter(); return;}
   if(e.target.closest('#qtHide')){QT.hide=!QT.hide; renderQuarter(); return;}
   if(e.target.closest('#qtCopy')){copyText(QT.tsv||'',document.getElementById('qtMsg')); return;}
   const h=e.target.closest('#qtTable th button'); if(h){e.stopPropagation(); const k=h.dataset.k; if(QT.sk===k) QT.dir=QT.dir==='desc'?'asc':'desc'; else {QT.sk=k; QT.dir=k==='name'?'asc':'desc';} renderQuarter(); return;}
