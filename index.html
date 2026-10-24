@@ -1168,6 +1168,8 @@ td.tk-why .fu{display:inline-block;margin:0 4px 4px 0}
 .brd{justify-self:start;font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px;background:rgba(120,120,128,.14)}.brd.up{color:var(--up);background:color-mix(in srgb,var(--up) 14%,transparent)}.brd.down{color:var(--down);background:color-mix(in srgb,var(--down) 14%,transparent)}
 .brtake{margin:12px 2px 4px;line-height:1.5}
 .brdet{margin-top:10px;border-top:1px solid var(--line,#e5e7eb);padding-top:10px}.brdet summary{cursor:pointer;font-weight:700;padding:6px 0}
+.brseg{margin:2px 0 12px}
+.brd.warn{color:#b26a00;background:rgba(255,159,10,.16)}
 
 </style>
 
@@ -4218,7 +4220,7 @@ document.addEventListener('click',e=>{
 /* ---------- Site brief: everything needed to ask a site about its electricity, plus a ready-to-send polite message (Bahasa Indonesia) ----------
    Sources: invoice (INVOICE), kWh budget (BUDGET), P&L admissions and electricity (PNL, New DB Financial Sep 2026), daily meter data for the current month.
    Invoice month X is compared with the admissions of month X-1, the same pairing the finance Remarks sheet uses (an invoice bills the previous month's usage). */
-const BR={n:null};
+const BR={n:null,mode:'kwh'};
 const brIdr=x=>x==null?'—':'Rp '+(x/1e6).toFixed(1).replace('.',',')+' jt';
 const brN=x=>x==null?'—':Math.round(x).toLocaleString('id-ID');
 const brP=x=>x==null?'—':Math.abs(x)<.0005?'0,0%':(x>=0?'+':'−')+Math.abs(x*100).toFixed(1).replace('.',',')+'%';
@@ -4271,10 +4273,7 @@ function brHTML(b){
   const r=b.r, C=b.cols, row=(l,f,c='')=>`<tr class="${c}"><th>${l}</th>${C.map(x=>`<td class="${x.i>=b.q[0].i?'':'pre'}">${f(x)}</td>`).join('')}</tr>`;
   const cell=p=>p==null?'—':`<span class="cell ${p>CT.hi?'up':p>CT.lo?'warn':p<-CT.lo?'down':'flat'}">${brP(p)}</span>`;
   return `<div class="mhead">${mini(r.t>CT.hi?'up':'flat')}<div><h3 id="mTitle">${b.name}</h3><div class="sub">${b.reg||''} · ${b.ML[0]}–${b.ML[2]} 2026 brief · actual invoices, P&amp;L and budget</div></div></div>
-  <div class="brcharts">
-   ${[['kWh usage','cBrK',r.t,brN(b.q[2].kwh)+' kWh'],['Cost (Rp, incl. PPN)','cBrC',r.ct,brIdr(b.q[2].cost)],['Cost per kWh','cBrR',r.rc,'Rp '+brN(b.q[2].rate)]].map(([t,id,d,v])=>`<div class="brc"><div class="brct"><small>${t}</small><b>${v}</b><span class="brd ${d>CT.lo?'up':d<-CT.lo?'down':'flat'}">${brP(d)} ${b.ML[2]} vs ${b.ML[0]}</span></div><div class="chartbox" style="height:220px"><canvas id="${id}" role="img" aria-label="${t}, ${b.ML.join(', ')}"></canvas></div></div>`).join('')}
-  </div>
-  <p class="brtake">${fuEsc(brFind(b)[1]||'')} ${b.q[2].vb!=null?fuEsc('Sep invoice is '+brP(b.q[2].vb)+' vs budget.'):''}</p>
+  <div id="brTop">${brTop(b)}</div>
   <details class="brdet"><summary>Details, full data and message to ask</summary>
   <h4 class="brh">What the data says</h4><ul class="brl">${brFind(b).map(x=>`<li>${fuEsc(x)}</li>`).join('')}</ul>
   <h4 class="brh">Full data</h4><div class="tbl-wrap"><table class="ptable brt"><thead><tr><th>Invoice month</th>${C.map(x=>`<th>${x.m}</th>`).join('')}</tr></thead><tbody>
@@ -4289,16 +4288,25 @@ function brHTML(b){
   <textarea id="brMsg" class="brmsg" rows="14" aria-label="Message">${fuEsc(brMsg(b))}</textarea>
   <div class="brbar"><button type="button" class="ghost" id="brCopyMsg">Copy message</button><button type="button" class="ghost" id="brCopyData">Copy data table</button><button type="button" class="ghost" id="brDaily">Open daily chart</button><span class="cmsg" id="brOk" role="status"></span></div></details>`;
 }
+function brVal(b,c){ return BR.mode==='cost'?{a:c.el,t:c.elB}:{a:c.kwh,t:c.b}; }
+function brFmt(v){ return v==null?'—':BR.mode==='cost'?brIdr(v):brN(v); }
+function brTop(b){
+  const kc=BR.mode==='cost', MF=['January','February','March','April','May','June','July','August','September'];
+  const cards=b.q.map((c,k)=>{const v=brVal(b,c), d=v.t&&v.a?v.a/v.t-1:null, cl=d==null?'flat':d>CT.hi?'up':d>CT.lo?'warn':d<-CT.lo?'down':'flat';
+    return `<div class="brc"><div class="brct"><small>${MF[c.i]} 2026</small><b>${brFmt(v.a)}${kc?'':' kWh'}</b><span class="brd ${cl}">${d==null?'No budget':brP(d)+' vs budget'}</span></div><div class="chartbox" style="height:210px"><canvas id="cBr${k}" role="img" aria-label="${MF[c.i]}: budget vs actual"></canvas></div></div>`;}).join('');
+  const tk=b.q.map(c=>{const v=brVal(b,c); return v.t&&v.a?`${c.m} ${brP(v.a/v.t-1)}`:null;}).filter(Boolean).join(', ');
+  return `<div class="brseg"><div class="seg" id="brMode" role="group" aria-label="Measure"><button type="button" data-bm="kwh" aria-pressed="${!kc}">kWh (invoice)</button><button type="button" data-bm="cost" aria-pressed="${kc}">Cost (P&amp;L, Rp)</button></div></div>
+  <div class="brcharts">${cards}</div>
+  <p class="brtake">${tk?fuEsc('Actual vs budget: '+tk+'.'):'No budget is set for this site.'}${kc?' Cost compares the P&amp;L electricity line with its budget, both by calendar month.':' Actual is the invoice kWh, budget is the monthly kWh budget.'}</p>`;
+}
 function brCharts(b){
-  const q=b.q, L=q.map(c=>c.m), blue=css('--blue')||'#0a84ff', ink=css('--ink'), mu=css('--muted');
-  const lab={id:'brlab',afterDatasetsDraw(ch){const m=ch.getDatasetMeta(0), c=ch.ctx; c.save(); c.font='700 13px -apple-system,BlinkMacSystemFont,Inter,sans-serif'; c.fillStyle=ink; c.textAlign='center'; m.data.forEach((bar,i)=>c.fillText(ch.data.datasets[0].lab[i],bar.x,bar.y-8)); c.restore();}};
-  const one=(id,vals,labs,tt)=>{
-    const o=makeOpts().opts; o.layout={padding:{top:26}}; o.scales.y={display:false,beginAtZero:true,suggestedMax:Math.max(...vals)*1.12}; o.scales.x={grid:{display:false},border:{display:false},ticks:{color:mu,font:{size:13,weight:'600'}}};
-    o.plugins.legend={display:false}; o.plugins.tooltip.callbacks={label:c=>' '+tt(c.parsed.y)};
-    mk(id,{type:'bar',plugins:[lab],data:{labels:L,datasets:[{data:vals,lab:labs,backgroundColor:vals.map((_,i)=>A(blue.length===7?blue:'#0a84ff',.35+i*.325)),borderRadius:10,maxBarThickness:64}]},options:o});};
-  one('cBrK',q.map(c=>c.kwh),q.map(c=>brN(c.kwh)),v=>brN(v)+' kWh');
-  one('cBrC',q.map(c=>c.cost),q.map(c=>brIdr(c.cost).replace('Rp ','')),v=>brIdr(v));
-  one('cBrR',q.map(c=>c.rate),q.map(c=>brN(c.rate)),v=>'Rp '+brN(v)+' per kWh');
+  const ink=css('--ink'), mu=css('--muted'), blue=css('--blue')||'#0a84ff', ln=css('--flat')||'#8e8e93';
+  const lab={id:'brlab',afterDatasetsDraw(ch){const c=ch.ctx; c.save(); c.font='700 12.5px -apple-system,BlinkMacSystemFont,Inter,sans-serif'; c.fillStyle=ink; c.textAlign='center'; ch.getDatasetMeta(0).data.forEach((bar,i)=>{const t=ch.data.datasets[0].lab[i]; if(t) c.fillText(t,bar.x,bar.y-8);}); c.restore();}};
+  const mx=Math.max(...b.q.map(c=>{const v=brVal(b,c); return Math.max(v.a||0,v.t||0);}));
+  b.q.forEach((c,k)=>{const v=brVal(b,c), d=v.t&&v.a?v.a/v.t-1:null, over=d==null?blue:d>CT.hi?css('--up'):d>CT.lo?css('--warn')||'#ff9f0a':d<-CT.lo?css('--down'):blue;
+    const o=makeOpts().opts; o.layout={padding:{top:24}}; o.scales.y={display:false,beginAtZero:true,min:0,max:mx*1.15}; o.scales.x={grid:{display:false},border:{display:false},ticks:{color:mu,font:{size:13,weight:'600'}}};
+    o.plugins.legend={display:false}; o.plugins.tooltip.callbacks={label:x=>' '+x.label+': '+brFmt(x.parsed.y)+(BR.mode==='cost'?'':' kWh')};
+    mk('cBr'+k,{type:'bar',plugins:[lab],data:{labels:['Budget','Actual'],datasets:[{data:[v.t||null,v.a],lab:[v.t?(BR.mode==='cost'?brIdr(v.t).replace('Rp ',''):brN(v.t)):'',BR.mode==='cost'?brIdr(v.a).replace('Rp ',''):brN(v.a)],backgroundColor:[A(ln.length===7?ln:'#8e8e93',.45),over],borderRadius:10,maxBarThickness:70}]},options:o});});
 }
 function openBrief(n){
   const b=brBuild(n); if(!b) return; BR.n=n; BR.b=b; lastFocus=document.activeElement;
@@ -4308,6 +4316,7 @@ function openBrief(n){
 }
 document.addEventListener('keydown',e=>{ if(e.key==='Enter'){const r=e.target.closest&&e.target.closest('tr[data-brief],.mvrow[data-brief]'); if(r){e.preventDefault(); openBrief(r.dataset.brief);}} });
 document.addEventListener('click',e=>{
+  const bm=e.target.closest('#brMode [data-bm]'); if(bm&&BR.b){BR.mode=bm.dataset.bm; document.getElementById('brTop').innerHTML=brTop(BR.b); brCharts(BR.b); return;}
   if(e.target.closest('#brDaily')&&BR.n){const n=(DATA.sites.concat(DATA.track||[])).find(x=>qtNum(x.n)===qtNum(BR.n)); if(n) openSite(n.n); return;}
   const bt=e.target.closest('[data-brief]'); if(bt){e.stopPropagation(); e.preventDefault(); openBrief(bt.dataset.brief); return;}
   if(e.target.closest('#brCopyMsg')) copyText(document.getElementById('brMsg').value,document.getElementById('brOk'));
