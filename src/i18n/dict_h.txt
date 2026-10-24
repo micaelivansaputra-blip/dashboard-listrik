@@ -76,3 +76,6 @@ Copy message || Salin pesan || Copiar mensaje
 Copy data table || Salin tabel data || Copiar tabla de datos
 kWh by month || kWh per bulan || kWh por mes
 Cost by month || Biaya per bulan || Costo por mes
+Open daily chart || Buka chart harian || Abrir gráfico diario
+Details, full data and message to ask || Detail, data lengkap dan pesan untuk bertanya || Detalles, datos completos y mensaje para preguntar
+Cost per kWh || Biaya per kWh || Costo por kWh

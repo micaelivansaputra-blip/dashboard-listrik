@@ -218,3 +218,9 @@ td.tk-why .fu{display:inline-block;margin:0 4px 4px 0}
 .brbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
 .brcharts{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-top:6px}
 .brcharts>div{min-width:0}
+.brcharts{grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.brc{background:var(--soft,rgba(120,120,128,.08));border-radius:18px;padding:14px 14px 6px;min-width:0}
+.brct{display:grid;gap:2px;margin-bottom:4px}.brct small{color:var(--muted);font-weight:600}.brct b{font-size:22px;letter-spacing:-.02em}
+.brd{justify-self:start;font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px;background:rgba(120,120,128,.14)}.brd.up{color:var(--up);background:color-mix(in srgb,var(--up) 14%,transparent)}.brd.down{color:var(--down);background:color-mix(in srgb,var(--down) 14%,transparent)}
+.brtake{margin:12px 2px 4px;line-height:1.5}
+.brdet{margin-top:10px;border-top:1px solid var(--line,#e5e7eb);padding-top:10px}.brdet summary{cursor:pointer;font-weight:700;padding:6px 0}

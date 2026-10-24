@@ -4,7 +4,7 @@
 const BR={n:null};
 const brIdr=x=>x==null?'—':'Rp '+(x/1e6).toFixed(1).replace('.',',')+' jt';
 const brN=x=>x==null?'—':Math.round(x).toLocaleString('id-ID');
-const brP=x=>x==null?'—':(x>=0?'+':'−')+Math.abs(x*100).toFixed(1).replace('.',',')+'%';
+const brP=x=>x==null?'—':Math.abs(x)<.0005?'0,0%':(x>=0?'+':'−')+Math.abs(x*100).toFixed(1).replace('.',',')+'%';
 const brSite=n=>{const k=qtNum(n); return {inv:INVOICE.sites.find(x=>qtNum(x.n)===k), pnl:PNL.sites.find(x=>String(x.n)===k), bud:BUDGET[+k], shows:PNL.shows[k]};};
 function brBuild(n){
   const {inv,pnl,bud,shows}=brSite(n); if(!inv) return null;
@@ -54,14 +54,11 @@ function brHTML(b){
   const r=b.r, C=b.cols, row=(l,f,c='')=>`<tr class="${c}"><th>${l}</th>${C.map(x=>`<td class="${x.i>=b.q[0].i?'':'pre'}">${f(x)}</td>`).join('')}</tr>`;
   const cell=p=>p==null?'—':`<span class="cell ${p>CT.hi?'up':p>CT.lo?'warn':p<-CT.lo?'down':'flat'}">${brP(p)}</span>`;
   return `<div class="mhead">${mini(r.t>CT.hi?'up':'flat')}<div><h3 id="mTitle">${b.name}</h3><div class="sub">${b.reg||''} · ${b.ML[0]}–${b.ML[2]} 2026 brief · actual invoices, P&amp;L and budget</div></div></div>
-  <div class="mstats">
-   <div class="ms"><small>kWh ${b.ML[2]}</small><b>${brN(b.q[2].kwh)}</b></div>
-   <div class="ms"><small>${b.ML[2]} vs ${b.ML[0]}</small><b class="${r.t>CT.lo?'up':r.t<-CT.lo?'down':''}">${brP(r.t)}</b></div>
-   <div class="ms"><small>Cost ${b.ML[2]}</small><b>${brIdr(b.q[2].cost)}</b></div>
-   <div class="ms"><small>Cost ${b.ML[2]} vs ${b.ML[0]}</small><b class="${r.ct>CT.lo?'up':r.ct<-CT.lo?'down':''}">${brP(r.ct)}</b></div>
-   <div class="ms"><small>${b.ML[2]} vs budget</small><b class="${b.q[2].vb>CT.hi?'up':''}">${brP(b.q[2].vb)}</b></div></div>
-  <div class="brcharts"><div><h4 class="brh">kWh by month</h4><div class="chartbox" style="height:230px"><canvas id="cBrK" role="img" aria-label="kWh per invoice month"></canvas></div></div>
-  <div><h4 class="brh">Cost by month</h4><div class="chartbox" style="height:230px"><canvas id="cBrC" role="img" aria-label="Cost per invoice month"></canvas></div></div></div>
+  <div class="brcharts">
+   ${[['kWh usage','cBrK',r.t,brN(b.q[2].kwh)+' kWh'],['Cost (Rp, incl. PPN)','cBrC',r.ct,brIdr(b.q[2].cost)],['Cost per kWh','cBrR',r.rc,'Rp '+brN(b.q[2].rate)]].map(([t,id,d,v])=>`<div class="brc"><div class="brct"><small>${t}</small><b>${v}</b><span class="brd ${d>CT.lo?'up':d<-CT.lo?'down':'flat'}">${brP(d)} ${b.ML[2]} vs ${b.ML[0]}</span></div><div class="chartbox" style="height:220px"><canvas id="${id}" role="img" aria-label="${t}, ${b.ML.join(', ')}"></canvas></div></div>`).join('')}
+  </div>
+  <p class="brtake">${fuEsc(brFind(b)[1]||'')} ${b.q[2].vb!=null?fuEsc('Sep invoice is '+brP(b.q[2].vb)+' vs budget.'):''}</p>
+  <details class="brdet"><summary>Details, full data and message to ask</summary>
   <h4 class="brh">What the data says</h4><ul class="brl">${brFind(b).map(x=>`<li>${fuEsc(x)}</li>`).join('')}</ul>
   <h4 class="brh">Full data</h4><div class="tbl-wrap"><table class="ptable brt"><thead><tr><th>Invoice month</th>${C.map(x=>`<th>${x.m}</th>`).join('')}</tr></thead><tbody>
    ${row('kWh (invoice)',x=>brN(x.kwh),'strong')}${C.every(x=>x.wb>0&&x.lw>0)?row('· off-peak LWBP',x=>brN(x.lw))+row('· peak WBP',x=>brN(x.wb)):''}
@@ -73,17 +70,18 @@ function brHTML(b){
   <p class="note" style="margin-top:8px">Invoice month X bills the usage of month X−1, so each invoice is paired with the admissions of the month before it (the same pairing as the finance Remarks sheet). The billing period on the invoice is not exact calendar months. P&amp;L electricity is booked by calendar month and can differ from the invoice. ${b.shows?`Shows: ${brN(b.shows[0])} in July and ${brN(b.shows[1])} in August.`:''}</p>
   <h4 class="brh">Message to ask (Bahasa Indonesia)</h4>
   <textarea id="brMsg" class="brmsg" rows="14" aria-label="Message">${fuEsc(brMsg(b))}</textarea>
-  <div class="brbar"><button type="button" class="ghost" id="brCopyMsg">Copy message</button><button type="button" class="ghost" id="brCopyData">Copy data table</button><span class="cmsg" id="brOk" role="status"></span></div>`;
+  <div class="brbar"><button type="button" class="ghost" id="brCopyMsg">Copy message</button><button type="button" class="ghost" id="brCopyData">Copy data table</button><button type="button" class="ghost" id="brDaily">Open daily chart</button><span class="cmsg" id="brOk" role="status"></span></div></details>`;
 }
 function brCharts(b){
-  const {opts,mu}=makeOpts(), q=b.q, L=q.map(c=>c.m), fill=q.map((c,i)=>A(css('--blue').length===7?css('--blue'):'#0a84ff',.4+i*.3));
-  const lab={id:'brlab',afterDatasetsDraw(ch){const m=ch.getDatasetMeta(0), c=ch.ctx; c.save(); c.font='700 12px -apple-system,BlinkMacSystemFont,Inter,sans-serif'; c.fillStyle=css('--ink'); c.textAlign='center'; m.data.forEach((bar,i)=>{c.fillText(ch.data.datasets[0].lab[i],bar.x,bar.y-8);}); c.restore();}};
-  const mkO=(fm,tt)=>{const o=makeOpts().opts; o.layout={padding:{top:22}}; o.scales.y.beginAtZero=true; o.scales.y.ticks.callback=fm; o.plugins.legend={display:true,labels:{color:mu,boxWidth:12}}; o.plugins.tooltip.callbacks={label:tt}; return o;};
-  const bud=q.map(c=>c.b), hasB=bud.some(x=>x);
-  mk('cBrK',{type:'bar',plugins:[lab],data:{labels:L,datasets:[{label:'kWh (invoice)',data:q.map(c=>c.kwh),backgroundColor:fill,borderRadius:8,lab:q.map(c=>brN(c.kwh))}].concat(hasB?[{type:'line',label:'Budget kWh',data:bud,borderColor:css('--flat'),borderDash:[5,4],borderWidth:2,pointRadius:4,tension:0}]:[])},options:mkO(v=>brN(v),c=>' '+c.dataset.label+': '+brN(c.parsed.y))});
-  mk('cBrC',{type:'bar',plugins:[lab],data:{labels:L,datasets:[{label:'Cost incl. PPN (Rp jt)',data:q.map(c=>c.cost/1e6),backgroundColor:fill.map(x=>x),borderRadius:8,lab:q.map(c=>brIdr(c.cost).replace('Rp ',''))},{type:'line',label:'Cost per kWh (Rp)',data:q.map(c=>c.rate),yAxisID:'y2',borderColor:css('--down'),borderWidth:2,pointRadius:4,tension:0}]},
-    options:Object.assign(mkO(v=>v+' jt',c=>' '+c.dataset.label+': '+(c.datasetIndex?brN(c.parsed.y):c.parsed.y.toFixed(1).replace('.',',')+' jt')),{})});
-  const ch=charts['cBrC']; ch.options.scales.y2={position:'right',grid:{display:false},border:{display:false},ticks:{color:mu,callback:v=>brN(v)},min:0,max:Math.max(...q.map(c=>c.rate))*1.08}; ch.options.scales.y.suggestedMax=Math.max(...q.map(c=>c.cost/1e6))*1.4; ch.update('none');
+  const q=b.q, L=q.map(c=>c.m), blue=css('--blue')||'#0a84ff', ink=css('--ink'), mu=css('--muted');
+  const lab={id:'brlab',afterDatasetsDraw(ch){const m=ch.getDatasetMeta(0), c=ch.ctx; c.save(); c.font='700 13px -apple-system,BlinkMacSystemFont,Inter,sans-serif'; c.fillStyle=ink; c.textAlign='center'; m.data.forEach((bar,i)=>c.fillText(ch.data.datasets[0].lab[i],bar.x,bar.y-8)); c.restore();}};
+  const one=(id,vals,labs,tt)=>{
+    const o=makeOpts().opts; o.layout={padding:{top:26}}; o.scales.y={display:false,beginAtZero:true,suggestedMax:Math.max(...vals)*1.12}; o.scales.x={grid:{display:false},border:{display:false},ticks:{color:mu,font:{size:13,weight:'600'}}};
+    o.plugins.legend={display:false}; o.plugins.tooltip.callbacks={label:c=>' '+tt(c.parsed.y)};
+    mk(id,{type:'bar',plugins:[lab],data:{labels:L,datasets:[{data:vals,lab:labs,backgroundColor:vals.map((_,i)=>A(blue.length===7?blue:'#0a84ff',.35+i*.325)),borderRadius:10,maxBarThickness:64}]},options:o});};
+  one('cBrK',q.map(c=>c.kwh),q.map(c=>brN(c.kwh)),v=>brN(v)+' kWh');
+  one('cBrC',q.map(c=>c.cost),q.map(c=>brIdr(c.cost).replace('Rp ','')),v=>brIdr(v));
+  one('cBrR',q.map(c=>c.rate),q.map(c=>brN(c.rate)),v=>'Rp '+brN(v)+' per kWh');
 }
 function openBrief(n){
   const b=brBuild(n); if(!b) return; BR.n=n; BR.b=b; lastFocus=document.activeElement;
@@ -91,7 +89,9 @@ function openBrief(n){
   brCharts(b);
   document.querySelector('.mclose').focus();
 }
+document.addEventListener('keydown',e=>{ if(e.key==='Enter'){const r=e.target.closest&&e.target.closest('tr[data-brief],.mvrow[data-brief]'); if(r){e.preventDefault(); openBrief(r.dataset.brief);}} });
 document.addEventListener('click',e=>{
+  if(e.target.closest('#brDaily')&&BR.n){const n=(DATA.sites.concat(DATA.track||[])).find(x=>qtNum(x.n)===qtNum(BR.n)); if(n) openSite(n.n); return;}
   const bt=e.target.closest('[data-brief]'); if(bt){e.stopPropagation(); e.preventDefault(); openBrief(bt.dataset.brief); return;}
   if(e.target.closest('#brCopyMsg')) copyText(document.getElementById('brMsg').value,document.getElementById('brOk'));
   if(e.target.closest('#brCopyData')&&BR.b){const b=BR.b,C=b.cols; copyText(['Metric\t'+C.map(x=>x.m).join('\t'),'kWh\t'+C.map(x=>Math.round(x.kwh)).join('\t'),'LWBP kWh\t'+C.map(x=>Math.round(x.lw)).join('\t'),'WBP kWh\t'+C.map(x=>Math.round(x.wb)).join('\t'),'Budget kWh\t'+C.map(x=>x.b?Math.round(x.b):'').join('\t'),'Cost incl PPN\t'+C.map(x=>Math.round(x.cost)).join('\t'),'Rp per kWh\t'+C.map(x=>x.rate?Math.round(x.rate):'').join('\t'),'Activity month\t'+C.map(x=>x.act||'').join('\t'),'Admissions\t'+C.map(x=>x.adm??'').join('\t'),'kWh per admission\t'+C.map(x=>x.pa?x.pa.toFixed(2):'').join('\t'),'PnL electricity\t'+C.map(x=>x.el?Math.round(x.el):'').join('\t')].join('\n'),document.getElementById('brOk'));}
