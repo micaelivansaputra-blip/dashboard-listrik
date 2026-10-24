@@ -1371,7 +1371,10 @@ body.has-side .sidebar{background-blend-mode:normal}
 /* no dead space below the last card */
 .foot{margin-top:14px!important;padding-top:12px;border-top:1px solid var(--hair);font-size:12px;line-height:1.4;gap:2px}
 body{padding-bottom:20px!important}
-@media(max-width:1100px){body{padding-bottom:96px!important}}
+@media(max-width:700px){body{padding-bottom:96px!important}}
+
+/* content must never wait for a scroll animation: the blank area was cards still hidden by reveal-on-scroll */
+[data-rv],[data-rv]:not(.in){opacity:1!important;transform:none!important;transition:none!important}
 
 </style>
 
