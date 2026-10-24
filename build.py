@@ -23,7 +23,7 @@ for m in sorted((SRC / 'modules').glob('*/manifest.json')):
 APP_FILES += MODULE_FILES + ['legacy/94-boot.js']
 
 def build():
-    css = '\n'.join([rd('styles/legacy.css')] + [p.read_text(encoding='utf8') for p in sorted((SRC / 'styles').glob('mod-*.css'))] + [rd('styles/theme-apple.css'), rd('styles/theme-mh.css')])
+    css = '\n'.join([rd('styles/legacy.css')] + [p.read_text(encoding='utf8') for p in sorted((SRC / 'styles').glob('mod-*.css'))] + [rd('styles/theme-apple.css'), rd('styles/theme-mh.css'), rd('styles/theme-cp.css')])
     app = '\n'.join(rd(f) for f in APP_FILES)
     i18n = rd('core/i18n.js').replace('/*I18NDICT*/', rd('i18n/dict.json')).replace('/*I18NRULES*/', rd('core/i18n-rules.js.txt'))
     html = rd('index.template.html')
