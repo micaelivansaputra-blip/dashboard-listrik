@@ -63,3 +63,8 @@ Hide unusual invoices || Sembunyikan invoice tidak wajar || Ocultar facturas inu
 Increasing || Naik || Aumentando
 Decreasing || Turun || Disminuyendo
 Biggest increases || Kenaikan terbesar || Mayores aumentos
+kWh usage (invoice) || Pemakaian kWh (invoice) || Consumo kWh (factura)
+Cost (Rp, incl. PPN) || Biaya (Rp, termasuk PPN) || Costo (Rp, incl. PPN)
+Why || Penyebab || Motivo
+Driver || Penyebab utama || Factor principal
+Budget || Budget || Presupuesto

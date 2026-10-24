@@ -82,9 +82,6 @@
     <div class="card">
       <div class="ctl">
         <label class="f" for="qtQ">Quarter<select id="qtQ"></select></label>
-        <div class="f wide">Measure
-          <div class="seg" id="qtMode" role="group" aria-label="Measure"><button type="button" data-m="kwh" aria-pressed="true">kWh (invoice)</button><button type="button" data-m="cost" aria-pressed="false">Cost (Rp)</button></div>
-        </div>
         <div class="f wide">Show
           <div class="seg" id="qtFilt" role="group" aria-label="Direction"><button type="button" data-f="all" aria-pressed="true">All</button><button type="button" data-f="up" aria-pressed="false">Increasing</button><button type="button" data-f="flat" aria-pressed="false">Stable</button><button type="button" data-f="down" aria-pressed="false">Decreasing</button></div>
         </div>
@@ -95,11 +92,11 @@
       <div class="note" id="qtNote"></div>
     </div>
     <div class="card" style="margin-top:14px">
-      <div class="ch"><div><h3>Biggest increases</h3><span class="sub">First month of the quarter to the last. Tap a site to open its daily chart.</span></div></div>
+      <div class="ch"><div><h3>Biggest increases</h3><span class="sub">First month of the quarter to the last, with usage and cost. Tap a site to open its chart.</span></div></div>
       <div class="mvgrid" id="qtMovers"></div>
     </div>
     <div class="card" style="margin-top:14px">
-      <div class="ch"><div><h3>All sites</h3><span class="sub">Monthly usage from the actual invoices. Tap a column header to sort.</span></div><div class="qchips"><button type="button" class="ghost" id="qtCopy">Copy table</button></div></div>
+      <div class="ch"><div><h3>All sites</h3><span class="sub">kWh usage and cost from the actual invoices, side by side. Tap a column header to sort.</span></div><div class="qchips"><button type="button" class="ghost" id="qtCopy">Copy table</button></div></div>
       <div class="tbl-wrap" id="qtTable"></div><div class="more" id="qtMore"></div><div class="cmsg" id="qtMsg" role="status"></div>
     </div>
   </section>
