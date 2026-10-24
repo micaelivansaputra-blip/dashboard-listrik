@@ -89,3 +89,5 @@ Pattern || Pola || Patrón
 Over budget every month || Over budget setiap bulan || Excede el presupuesto cada mes
 vs budget by month || vs budget per bulan || vs presupuesto por mes
 Over budget first || Over budget dulu || Primero los que exceden el presupuesto
+Download PNG || Unduh PNG || Descargar PNG
+Download PDF || Unduh PDF || Descargar PDF

@@ -4305,6 +4305,7 @@ function brHTML(b){
   const cell=p=>p==null?'—':`<span class="cell ${p>CT.hi?'up':p>CT.lo?'warn':p<-CT.lo?'down':'flat'}">${brP(p)}</span>`;
   return `<div class="mhead">${mini(r.t>CT.hi?'up':'flat')}<div><h3 id="mTitle">${b.name}</h3><div class="sub">${b.reg||''} · ${b.ML[0]}–${b.ML[2]} 2026 brief · actual invoices, P&amp;L and budget</div></div></div>
   <div id="brTop">${brTop(b)}</div>
+  <div class="brbar"><button type="button" class="ghost" id="brPng">Download PNG</button><button type="button" class="ghost" id="brPdf">Download PDF</button><span class="cmsg" id="brOk" role="status"></span></div>
   <details class="brdet"><summary>Details, full data and message to ask</summary>
   <h4 class="brh">What the data says</h4><ul class="brl">${brFind(b).map(x=>`<li>${fuEsc(x)}</li>`).join('')}</ul>
   <h4 class="brh">Full data</h4><div class="tbl-wrap"><table class="ptable brt"><thead><tr><th>Invoice month</th>${C.map(x=>`<th>${x.m}</th>`).join('')}</tr></thead><tbody>
@@ -4317,7 +4318,7 @@ function brHTML(b){
   <p class="note" style="margin-top:8px">Invoice month X bills the usage of month X−1, so each invoice is paired with the admissions of the month before it (the same pairing as the finance Remarks sheet). The billing period on the invoice is not exact calendar months. P&amp;L electricity is booked by calendar month and can differ from the invoice. ${b.shows?`Shows: ${brN(b.shows[0])} in July and ${brN(b.shows[1])} in August.`:''}</p>
   <h4 class="brh">Message to ask (Bahasa Indonesia)</h4>
   <textarea id="brMsg" class="brmsg" rows="14" aria-label="Message">${fuEsc(brMsg(b))}</textarea>
-  <div class="brbar"><button type="button" class="ghost" id="brCopyMsg">Copy message</button><button type="button" class="ghost" id="brCopyData">Copy data table</button><button type="button" class="ghost" id="brDaily">Open daily chart</button><span class="cmsg" id="brOk" role="status"></span></div></details>`;
+  <div class="brbar"><button type="button" class="ghost" id="brCopyMsg">Copy message</button><button type="button" class="ghost" id="brCopyData">Copy data table</button><button type="button" class="ghost" id="brDaily">Open daily chart</button></div></details>`;
 }
 function brVal(b,c){ return BR.mode==='cost'?{a:c.el,t:c.elB}:{a:c.kwh,t:c.b}; }
 function brFmt(v){ return v==null?'—':BR.mode==='cost'?brIdr(v):brN(v); }
@@ -4343,6 +4344,7 @@ function openBrief(n){
   const b=brBuild(n); if(!b) return; BR.n=n; BR.b=b; lastFocus=document.activeElement;
   document.getElementById('mBody').innerHTML=brHTML(b); document.getElementById('modal').hidden=false; document.body.style.overflow='hidden';
   brCharts(b);
+  const body=document.getElementById('mBody'), n0=body.children.length, det=body.querySelector('.brdet'); fuMount(qtName(n)); [...body.children].slice(n0).forEach(el=>det.before(el));
   document.querySelector('.mclose').focus();
 }
 document.addEventListener('keydown',e=>{ if(e.key==='Enter'){const r=e.target.closest&&e.target.closest('tr[data-brief],.mvrow[data-brief]'); if(r){e.preventDefault(); openBrief(r.dataset.brief);}} });
@@ -4352,6 +4354,64 @@ document.addEventListener('click',e=>{
   const bt=e.target.closest('[data-brief]'); if(bt){e.stopPropagation(); e.preventDefault(); openBrief(bt.dataset.brief); return;}
   if(e.target.closest('#brCopyMsg')) copyText(document.getElementById('brMsg').value,document.getElementById('brOk'));
   if(e.target.closest('#brCopyData')&&BR.b){const b=BR.b,C=b.cols; copyText(['Metric\t'+C.map(x=>x.m).join('\t'),'kWh\t'+C.map(x=>Math.round(x.kwh)).join('\t'),'LWBP kWh\t'+C.map(x=>Math.round(x.lw)).join('\t'),'WBP kWh\t'+C.map(x=>Math.round(x.wb)).join('\t'),'Budget kWh\t'+C.map(x=>x.b?Math.round(x.b):'').join('\t'),'Cost incl PPN\t'+C.map(x=>Math.round(x.cost)).join('\t'),'Rp per kWh\t'+C.map(x=>x.rate?Math.round(x.rate):'').join('\t'),'Activity month\t'+C.map(x=>x.act||'').join('\t'),'Admissions\t'+C.map(x=>x.adm??'').join('\t'),'kWh per admission\t'+C.map(x=>x.pa?x.pa.toFixed(2):'').join('\t'),'PnL electricity\t'+C.map(x=>x.el?Math.round(x.el):'').join('\t')].join('\n'),document.getElementById('brOk'));}
+},true);
+/* ---------- Download the brief as PNG or PDF (kWh and cost, budget vs actual, plus the reasons noted for the site) ---------- */
+const BRX={W:1240,H:1754};
+function brRR(c,x,y,w,h,r){c.beginPath(); if(c.roundRect) c.roundRect(x,y,w,h,r); else c.rect(x,y,w,h);}
+function brWrap(c,t,x,y,w,lh,max){const out=[]; String(t).split('\n').forEach(p=>{let l=''; p.split(' ').forEach(wd=>{const tt=l?l+' '+wd:wd; if(c.measureText(tt).width>w&&l){out.push(l); l=wd;} else l=tt;}); out.push(l);}); out.slice(0,max).forEach((l,i)=>c.fillText(l+(i===max-1&&out.length>max?'…':''),x,y+i*lh)); return Math.min(out.length,max)*lh;}
+function brStatus(a,t){ if(!t||!a) return {c:'#0a84ff',l:'No budget'}; const d=a/t-1; return {d,l:brP(d)+' vs budget',c:d>CT.hi?'#ff3b30':d>CT.lo?'#ff9f0a':d<-CT.lo?'#34c759':'#0a84ff'}; }
+function brReport(b){
+  const cv=document.createElement('canvas'); cv.width=BRX.W; cv.height=BRX.H; const c=cv.getContext('2d'), F='-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Arial,sans-serif', P=70, W=BRX.W-P*2;
+  c.fillStyle='#fff'; c.fillRect(0,0,cv.width,cv.height); c.textBaseline='alphabetic';
+  c.fillStyle='#111'; c.font='800 52px '+F; c.fillText(b.name,P,120);
+  c.fillStyle='#6b7280'; c.font='500 26px '+F; c.fillText(`${b.reg||''} · Electricity ${b.ML[0]}–${b.ML[2]} 2026 · budget vs actual`,P,162);
+  const q=b.q, r=b.r; let y=210;
+  const kp=[['kWh '+b.ML[2],brN(q[2].kwh)],[b.ML[2]+' vs '+b.ML[0],brP(r.t)],['Cost '+b.ML[2]+' (invoice)',brIdr(q[2].cost)],['Cost per kWh','Rp '+brN(q[2].rate)]];
+  kp.forEach((k,i)=>{const w=(W-3*18)/4, x=P+i*(w+18); c.fillStyle='#f2f2f7'; brRR(c,x,y,w,120,22); c.fill(); c.fillStyle='#6b7280'; c.font='600 22px '+F; c.fillText(k[0],x+22,y+40); c.fillStyle='#111'; c.font='800 36px '+F; c.fillText(k[1],x+22,y+88);});
+  y+=170;
+  const sect=(title,sub,get,fmtv,y0)=>{
+    c.fillStyle='#111'; c.font='800 34px '+F; c.fillText(title,P,y0); c.fillStyle='#6b7280'; c.font='500 22px '+F; c.fillText(sub,P,y0+34);
+    const top=y0+70, H=400, base=top+H, gw=(W-2*24)/3, mx=Math.max(...q.map(x=>Math.max(get(x).a||0,get(x).t||0)))*1.12||1, MF=['January','February','March','April','May','June','July','August','September'];
+    q.forEach((m,i)=>{const v=get(m), x0=P+i*(gw+24), st=brStatus(v.a,v.t);
+      c.fillStyle='#f2f2f7'; brRR(c,x0,top,gw,H+90,26); c.fill();
+      c.fillStyle='#111'; c.font='700 26px '+F; c.fillText(MF[m.i],x0+24,top+44);
+      c.font='700 22px '+F; const tw=c.measureText(st.l).width+26; c.fillStyle=st.c+'33'; brRR(c,x0+24,top+62,tw,36,18); c.fill(); c.fillStyle=st.c===('#ff9f0a')?'#b26a00':st.c; c.fillText(st.l,x0+37,top+87);
+      const bw=gw*.28, ch=H-190, bx=[x0+gw*.2,x0+gw*.54];
+      [[v.t,'#c7c7cc','Budget'],[v.a,st.c,'Actual']].forEach(([val,col,lb],k)=>{
+        if(val){const h=Math.max(6,val/mx*ch); c.fillStyle=col; brRR(c,bx[k],top+H+10-h-30,bw,h,14); c.fill(); c.fillStyle='#111'; c.font='700 22px '+F; c.textAlign='center'; c.fillText(fmtv(val),bx[k]+bw/2,top+H+10-h-42); c.textAlign='left';}
+        c.fillStyle='#6b7280'; c.font='600 22px '+F; c.textAlign='center'; c.fillText(lb,bx[k]+bw/2,top+H+50); c.textAlign='left';});});
+    return base+130;};
+  y+=0; y=sect('kWh usage: budget vs actual','Invoice kWh against the monthly kWh budget',m=>({a:m.kwh,t:m.b}),v=>brN(v),y);
+  y+=0; y=sect('Cost: budget vs actual','P&L electricity line against its budget, by calendar month (Rp million)',m=>({a:m.el,t:m.elB}),v=>(v/1e6).toFixed(1).replace('.',','),y);
+  y+=0; c.fillStyle='#111'; c.font='800 34px '+F; c.fillText('Reason noted for this site',P,y); y+=26;
+  const key=qtName(BR.n), notes=fuNotes(FU[fuId(key)]).slice(0,3); c.font='500 24px '+F;
+  if(!notes.length){c.fillStyle='#8e8e93'; c.fillText('No reason noted yet.',P,y+34); y+=60;}
+  else notes.forEach(nt=>{const tg=nt.tag?(FUTAG[nt.tag]||''):''; const hd=[fuEff(nt),tg,nt.by].filter(Boolean).join(' · '); c.fillStyle='#6b7280'; c.font='700 21px '+F; c.fillText(hd,P,y+32); c.fillStyle='#111'; c.font='500 24px '+F; const h=brWrap(c,[nt.reason,nt.cm?'('+nt.cm+')':''].filter(Boolean).join(' '),P,y+66,W,32,3); y+=66+h+14;});
+  c.fillStyle='#8e8e93'; c.font='500 19px '+F; brWrap(c,'Source: actual electricity invoices, New DB Financial Sep 2026 (P&L) and the kWh budget. Invoice month X bills the usage of month X−1. Generated '+new Date().toISOString().slice(0,10)+'.',P,BRX.H-70,W,26,2);
+  return cv;
+}
+function brPdf(jpg,w,h){ /* one A4 page holding the JPEG */
+  const enc=s=>new TextEncoder().encode(s), parts=[], offs=[]; let len=0; const add=d=>{const u=typeof d==='string'?enc(d):d; parts.push(u); len+=u.length;};
+  const obj=(n,body)=>{offs[n]=len; add(n+' 0 obj\n'); add(body); add('\nendobj\n');};
+  add('%PDF-1.4\n'); obj(1,'<< /Type /Catalog /Pages 2 0 R >>'); obj(2,'<< /Type /Pages /Kids [3 0 R] /Count 1 >>');
+  obj(3,'<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>');
+  offs[4]=len; add('4 0 obj\n<< /Type /XObject /Subtype /Image /Width '+w+' /Height '+h+' /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length '+jpg.length+' >>\nstream\n'); add(jpg); add('\nendstream\nendobj\n');
+  const cs='q 595 0 0 842 0 0 cm /Im0 Do Q'; obj(5,'<< /Length '+cs.length+' >>\nstream\n'+cs+'\nendstream');
+  const xr=len; let x='xref\n0 6\n0000000000 65535 f \n'; for(let i=1;i<=5;i++) x+=String(offs[i]).padStart(10,'0')+' 00000 n \n'; add(x+'trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n'+xr+'\n%%EOF');
+  return new Blob(parts,{type:'application/pdf'});
+}
+async function brSave(blob,name,msg){
+  const say=(t,c)=>{const m=document.getElementById('brOk'); if(m){m.textContent=t; m.className='fumsg '+(c||'');}};
+  try{ let dl=null; try{ if(window.claude&&claude.use) dl=await claude.use('downloads'); }catch(e){}
+    if(dl){ await dl.save({filename:name,data:blob}); say('Saved '+name,'ok'); return; }
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),4000); say('Downloaded '+name,'ok');
+  }catch(e){ say(e&&e.code==='declined'?'Download cancelled.':'Could not download here.','err'); }
+}
+document.addEventListener('click',async e=>{
+  const bt=e.target.closest('#brPng,#brPdf'); if(!bt||!BR.b) return; e.stopPropagation();
+  const cv=brReport(BR.b), nm=short(BR.n).toLowerCase().replace(/[^a-z0-9]+/g,'-')+'-q3-2026';
+  if(bt.id==='brPng'){ cv.toBlob(b=>b&&brSave(b,nm+'.png'),'image/png'); return; }
+  cv.toBlob(async b=>{ if(!b) return; const u=new Uint8Array(await b.arrayBuffer()); brSave(brPdf(u,cv.width,cv.height),nm+'.pdf'); },'image/jpeg',.92);
 },true);
 
 /* generated dataset: see tools/ and README. Replace by re-running the data prep, not by hand. */
