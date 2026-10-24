@@ -81,3 +81,8 @@ Details, full data and message to ask || Detail, data lengkap dan pesan untuk be
 Cost per kWh || Biaya per kWh || Costo por kWh
 Up and over budget || Naik dan melebihi budget || Sube y excede el presupuesto
 Increasing and over budget || Naik dan melebihi budget || Sube y excede el presupuesto
+Overall Q3 || Q3 secara keseluruhan || Q3 en general
+Unusual swings || Naik turun tidak wajar || Altibajos inusuales
+Unusual ups and downs || Naik turun tidak wajar || Altibajos inusuales
+Biggest rise over the quarter || Kenaikan terbesar sepanjang kuartal || Mayor aumento del trimestre
+Pattern || Pola || Patrón

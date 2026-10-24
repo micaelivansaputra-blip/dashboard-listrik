@@ -226,3 +226,7 @@ td.tk-why .fu{display:inline-block;margin:0 4px 4px 0}
 .brdet{margin-top:10px;border-top:1px solid var(--line,#e5e7eb);padding-top:10px}.brdet summary{cursor:pointer;font-weight:700;padding:6px 0}
 .brseg{margin:2px 0 12px}
 .brd.warn{color:#b26a00;background:rgba(255,159,10,.16)}
+.qtt small.swg{color:#b26a00;font-weight:700}
+#qtOver{grid-template-columns:repeat(auto-fit,minmax(320px,1fr));align-items:start}
+.mvrow em.warn{color:#b26a00}
+#qtOver .mvrow b{white-space:normal;max-width:46%}

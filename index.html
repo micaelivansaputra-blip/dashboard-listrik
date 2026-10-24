@@ -1170,6 +1170,10 @@ td.tk-why .fu{display:inline-block;margin:0 4px 4px 0}
 .brdet{margin-top:10px;border-top:1px solid var(--line,#e5e7eb);padding-top:10px}.brdet summary{cursor:pointer;font-weight:700;padding:6px 0}
 .brseg{margin:2px 0 12px}
 .brd.warn{color:#b26a00;background:rgba(255,159,10,.16)}
+.qtt small.swg{color:#b26a00;font-weight:700}
+#qtOver{grid-template-columns:repeat(auto-fit,minmax(320px,1fr));align-items:start}
+.mvrow em.warn{color:#b26a00}
+#qtOver .mvrow b{white-space:normal;max-width:46%}
 
 </style>
 
@@ -1249,13 +1253,17 @@ td.tk-why .fu{display:inline-block;margin:0 4px 4px 0}
       <div class="ctl">
         <label class="f" for="qtQ">Quarter<select id="qtQ"></select></label>
         <div class="f wide">Show
-          <div class="seg" id="qtFilt" role="group" aria-label="Direction"><button type="button" data-f="all" aria-pressed="true">All</button><button type="button" data-f="up" aria-pressed="false">Increasing</button><button type="button" data-f="both" aria-pressed="false">Up and over budget</button><button type="button" data-f="flat" aria-pressed="false">Stable</button><button type="button" data-f="down" aria-pressed="false">Decreasing</button></div>
+          <div class="seg" id="qtFilt" role="group" aria-label="Direction"><button type="button" data-f="all" aria-pressed="true">All</button><button type="button" data-f="up" aria-pressed="false">Increasing</button><button type="button" data-f="both" aria-pressed="false">Up and over budget</button><button type="button" data-f="swing" aria-pressed="false">Unusual swings</button><button type="button" data-f="flat" aria-pressed="false">Stable</button><button type="button" data-f="down" aria-pressed="false">Decreasing</button></div>
         </div>
         <label class="f" for="qtSearch">Search site<input id="qtSearch" type="search" placeholder="e.g. Ponorogo"></label>
         <div class="qchips"><button type="button" class="chipbtn" id="qtHide" aria-pressed="true">Hide unusual invoices</button></div>
       </div>
       <div class="mkpis" id="qtKpis"></div>
       <div class="note" id="qtNote"></div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <div class="ch"><div><h3>Overall Q3</h3><span class="sub">Who rose the most from the first month to the last, and which sites went up and down in an unusual way.</span></div></div>
+      <div class="mvgrid" id="qtOver"></div>
     </div>
     <div class="card" style="margin-top:14px">
       <div class="ch"><div><h3>Increasing and over budget</h3><span class="sub">Sites that rose from the first month to the last and are above budget in the last month, ranked by how far above budget. Tap a site for its Jul–Sep charts.</span></div></div>
@@ -4143,6 +4151,18 @@ const qtIdr=x=>x==null?'—':(x/1e6).toFixed(1).replace(/\B(?=(\d{3})+(?!\d))/g,
 const qtDir=t=>t==null?'na':t>CT.lo?'up':t<-CT.lo?'down':'flat';
 function qtMonths(){ return QMON[QT.q]; }
 function qtAvail(){ return Object.keys(QMON).filter(q=>QMON[q].every(m=>INVOICE.months.includes(m))); }
+function qtPattern(r,m1,m2){
+  if(!r.ok) return {pat:'',sc:0,sw:false};
+  const a=r.s1,b=r.s2,sc=Math.max(Math.abs(a-m1),Math.abs(b-m2)), zig=(a>.10&&b<-.10)||(a<-.10&&b>.10);
+  let pat='Stable'; const M=ML3();
+  if(a>.10&&b<-.10) pat='Peak in '+M[1]+', then drop'; else if(a<-.10&&b>.10) pat='Dip in '+M[1]+', then rise';
+  else if(a>.10&&b>.10) pat='Rising both months'; else if(a<-.10&&b<-.10) pat='Falling both months';
+  else if(a>.10&&Math.abs(b)<=.05) pat='Jump in '+M[1]+', then flat'; else if(a<-.10&&Math.abs(b)<=.05) pat='Drop in '+M[1]+', then flat';
+  else if(sc>=.15) pat=(Math.abs(a-m1)>=Math.abs(b-m2)?M[1]:M[2])+' differs from the other sites';
+  else if(r.t>CT.lo) pat='Gradual rise'; else if(r.t<-CT.lo) pat='Gradual fall';
+  return {pat,sc,sw:zig||sc>=.15};
+}
+const ML3=()=>qtMonths().map(m=>MN[+m.slice(5)-1]);
 function qtRows(){
   const ms=qtMonths(), ix=ms.map(m=>INVOICE.months.indexOf(m));
   return INVOICE.sites.map(x=>{
@@ -4172,6 +4192,8 @@ function renderQuarter(){
   const sel=document.getElementById('qtQ'); if(sel.dataset.sig!==av.join()){sel.innerHTML=av.slice().reverse().map(q=>`<option value="${q}">${q.slice(5)} ${q.slice(0,4)}</option>`).join(''); sel.dataset.sig=av.join();} sel.value=QT.q;
   const ms=qtMonths(), ML=ms.map(m=>MN[+m.slice(5)-1]);
   const all=qtRows().filter(r=>REGION==='All'||r.s.r===REGION), pool=all.filter(r=>r.ok&&!(QT.hide&&r.bad));
+  const med=a=>{const x=a.slice().sort((p,q)=>p-q); return x.length?x[Math.floor(x.length/2)]:0;}, m1=med(pool.map(r=>r.s1)), m2=med(pool.map(r=>r.s2));
+  all.forEach(r=>Object.assign(r,qtPattern(r,m1,m2)));
   const up=pool.filter(r=>qtDir(r.t)==='up'), dn=pool.filter(r=>qtDir(r.t)==='down'), fl=pool.length-up.length-dn.length;
   const tk=ms.map((_,i)=>pool.reduce((t,r)=>t+r.kw[i],0)), tc=ms.map((_,i)=>pool.reduce((t,r)=>t+r.cs[i],0));
   const dk=pool.length?tk[2]/tk[0]-1:null, dc=pool.length?tc[2]/tc[0]-1:null, r0=tc[0]/tk[0], r2=tc[2]/tk[2], dr=pool.length?r2/r0-1:null;
@@ -4186,7 +4208,7 @@ function renderQuarter(){
     kp(`Up and over budget`,ob+' sites',`${ML[2]} vs ${ML[0]} above ${Math.round(CT.lo*100)}% and ${ML[2]} above budget by more than ${Math.round(CT.lo*100)}% (of ${nbud} with a budget)`,ob?1:0)+
     kp(`Cost per kWh · ${ML[2]}`,'Rp '+fmt(r2),`${ML[0]} Rp ${fmt(r0)} · ${dr==null?'':pct(dr)}`);
   const q=document.getElementById('qtSearch').value.trim().toLowerCase();
-  let f=all.filter(r=>r.ok&&(!QT.hide||!r.bad)&&(QT.f==='all'||(QT.f==='both'?(qtDir(r.t)==='up'&&r.vb!=null&&r.vb>CT.lo):qtDir(r.t)===QT.f))&&(!q||r.s.n.toLowerCase().includes(q)));
+  let f=all.filter(r=>r.ok&&(!QT.hide||!r.bad)&&(QT.f==='all'||(QT.f==='swing'?r.sw:QT.f==='both'?(qtDir(r.t)==='up'&&r.vb!=null&&r.vb>CT.lo):qtDir(r.t)===QT.f))&&(!q||r.s.n.toLowerCase().includes(q)));
   const d=QT.dir==='desc'?1:-1;
   f.sort((x,y)=>QT.sk==='name'?x.s.n.localeCompare(y.s.n)*(QT.dir==='asc'?1:-1):((y[QT.sk]??-9)-(x[QT.sk]??-9))*d);
   const miss=all.filter(r=>!r.ok).length, hid=QT.hide?all.filter(r=>r.ok&&r.bad).length:0;
@@ -4198,11 +4220,15 @@ function renderQuarter(){
   const lim=15, shown=(QT.more||q||QT.f!=='all')?f:f.slice(0,lim);
   const body=shown.map(r=>`<tr class="row" data-brief="${fuEsc(r.n)}" tabindex="0"><td><div class="sn"><span class="sd ${r.t>CT.lo?'up':r.t<-CT.lo?'down':'flat'}"></span><span><b>${short(r.s.n)}${fuHas(r.s.n)?'<i class="nd" title="Has a note"></i>':''}</b><small>${r.s.r}${r.flag?' · <span data-notr>'+fuEsc(r.flag)+'</span>':''}</small></span></div></td>
     ${r.kw.map(x=>`<td class="hs">${fmt(x)}</td>`).join('')}<td>${cell(r.t,true)}</td><td class="sp hs">${qtSpark(r.kw)}</td>
-    ${r.cs.map(x=>`<td class="hs">${qtIdr(x)}</td>`).join('')}<td>${cell(r.ct,true)}</td><td class="hs">Rp ${fmt(r.rt[2])}<br>${cell(r.rc)}</td><td class="hs"><small>${r.why}</small></td>
+    ${r.cs.map(x=>`<td class="hs">${qtIdr(x)}</td>`).join('')}<td>${cell(r.ct,true)}</td><td class="hs">Rp ${fmt(r.rt[2])}<br>${cell(r.rc)}</td><td class="hs"><small>${r.why}</small></td><td class="hs"><small class="${r.sw?'swg':''}">${r.pat}</small></td>
     <td class="hs">${r.bud?fmt(r.bud)+'<br>'+cell(r.vb):'<small class="tk-n">No budget</small>'}</td></tr>`).join('');
   const g=(t,n)=>`<th colspan="${n}" class="grp">${t}</th>`;
-  document.getElementById('qtTable').innerHTML=`<table class="ptable qtt" style="min-width:1180px"><thead><tr><th></th>${g('kWh usage (invoice)',5)}${g('Cost (Rp, incl. PPN)',4)}${g('Why',2)}${g('Budget',1)}</tr><tr>${th('name','Site')}${ML.map(m=>`<th class="hs">${m}</th>`).join('')}${th('t',ML[2]+' vs '+ML[0])}<th class="hs">Trend</th>${ML.map(m=>`<th class="hs">${m}</th>`).join('')}${th('ct',ML[2]+' vs '+ML[0])}${th('rc',ML[2]+' cost per kWh','hs')}<th class="hs">Driver</th>${th('vb',ML[2]+' budget (kWh)','hs')}</tr></thead><tbody>${body||`<tr><td colspan="13" class="empty">No matching sites.</td></tr>`}</tbody></table>`;
+  document.getElementById('qtTable').innerHTML=`<table class="ptable qtt" style="min-width:1300px"><thead><tr><th></th>${g('kWh usage (invoice)',5)}${g('Cost (Rp, incl. PPN)',4)}${g('Why',3)}${g('Budget',1)}</tr><tr>${th('name','Site')}${ML.map(m=>`<th class="hs">${m}</th>`).join('')}${th('t',ML[2]+' vs '+ML[0])}<th class="hs">Trend</th>${ML.map(m=>`<th class="hs">${m}</th>`).join('')}${th('ct',ML[2]+' vs '+ML[0])}${th('rc',ML[2]+' cost per kWh','hs')}<th class="hs">Driver</th>${th('sc','Pattern','hs')}${th('vb',ML[2]+' budget (kWh)','hs')}</tr></thead><tbody>${body||`<tr><td colspan="14" class="empty">No matching sites.</td></tr>`}</tbody></table>`;
   document.getElementById('qtMore').innerHTML=(!q&&QT.f==='all'&&f.length>lim)?`<button type="button" class="chipbtn" data-more aria-pressed="true">${QT.more?'Show top '+lim:'Show all '+f.length+' sites'}</button>`:'';
+  const top=pool.slice().sort((a,b)=>b.t-a.t).slice(0,8), tx=Math.max(.01,...top.map(r=>r.t)), sw=pool.filter(r=>r.sw).sort((a,b)=>b.sc-a.sc).slice(0,8), sx=Math.max(.01,...sw.map(r=>r.sc));
+  const stp=r=>`${ML[0]}→${ML[1]} ${pct(r.s1,0)} · ${ML[1]}→${ML[2]} ${pct(r.s2,0)}`;
+  document.getElementById('qtOver').innerHTML=`<div><h4 class="brh">Biggest rise over the quarter</h4>${top.map(r=>`<div class="mvrow" data-brief="${fuEsc(r.n)}" tabindex="0"><b>${short(r.s.n)}</b><em class="${r.t>CT.lo?'up':'flat'}">${pct(r.t)} · ${fmt(r.kw[0])} → ${fmt(r.kw[2])} kWh<br><span style="font-weight:500">${stp(r)} · ${r.pat}</span></em><div class="mvbar"><i style="width:${Math.max(3,Math.max(0,r.t)/tx*100)}%;background:var(--up)"></i></div></div>`).join('')}</div>
+  <div><h4 class="brh">Unusual ups and downs</h4>${sw.length?sw.map(r=>`<div class="mvrow" data-brief="${fuEsc(r.n)}" tabindex="0"><b>${short(r.s.n)}</b><em class="warn">${r.pat}<br><span style="font-weight:500">${stp(r)} · ${fmt(r.kw[0])} · ${fmt(r.kw[1])} · ${fmt(r.kw[2])} kWh</span></em><div class="mvbar"><i style="width:${Math.max(3,r.sc/sx*100)}%;background:var(--warn,#ff9f0a)"></i></div></div>`).join(''):'<div class="note">No unusual swings.</div>'}<p class="note" style="margin-top:8px">A swing is counted when a site moves up and then down (or the reverse) by more than 10% each time, or when a month change differs from the median of all sites by 15 points or more. Most sites rose in ${ML[1]} and fell in ${ML[2]} (median ${pct(m1,0)} then ${pct(m2,0)}), so that normal pattern is not counted.</p></div>`;
   const mv=pool.filter(r=>r.t>CT.lo&&r.vb!=null&&r.vb>CT.lo).sort((a,b)=>b.vb-a.vb).slice(0,6), mx=Math.max(.01,...mv.map(r=>r.vb));
   document.getElementById('qtMovers').innerHTML=mv.length?mv.map(r=>`<div class="mvrow" data-brief="${fuEsc(r.n)}" tabindex="0"><b>${short(r.s.n)}</b><em class="up">${pct(r.vb)} vs budget in ${ML[2]}<br><span style="font-weight:500">${fmt(r.kw[0])} → ${fmt(r.kw[2])} kWh (${pct(r.t)}) · vs budget ${r.vbm.map((x,i)=>ML[i]+' '+pct(x,0)).join(' · ')}</span></em><div class="mvbar"><i style="width:${Math.max(3,r.vb/mx*100)}%;background:var(--up)"></i></div></div>`).join(''):'<div class="note">No site is both increasing and above its budget in this quarter.</div>';
   QT.tsv=['Site\tRegion\t'+ML.map(m=>m+' kWh').join('\t')+'\tkWh '+ML[2]+' vs '+ML[0]+'\t'+ML.map(m=>m+' Rp').join('\t')+'\tCost '+ML[2]+' vs '+ML[0]+'\t'+ML[2]+' Rp per kWh\tDriver\t'+ML[2]+' budget kWh\t'+ML[2]+' kWh vs budget\tData note',...f.map(r=>[r.s.n,r.s.r,...r.kw.map(Math.round),(r.t*100).toFixed(1)+'%',...r.cs.map(Math.round),(r.ct*100).toFixed(1)+'%',Math.round(r.rt[2]),r.why,r.bud?Math.round(r.bud):'',r.vb==null?'':(r.vb*100).toFixed(1)+'%',r.flag].join('\t'))].join('\n');
@@ -4210,7 +4236,7 @@ function renderQuarter(){
 document.addEventListener('change',e=>{ if(e.target&&e.target.id==='qtQ'){QT.q=e.target.value; renderQuarter();} });
 document.addEventListener('input',e=>{ if(e.target&&e.target.id==='qtSearch') renderQuarter(); });
 document.addEventListener('click',e=>{
-  const f=e.target.closest('#qtFilt [data-f]'); if(f){QT.f=f.dataset.f; QT.sk=QT.f==='both'?'vb':'t'; QT.dir='desc'; renderQuarter(); return;}
+  const f=e.target.closest('#qtFilt [data-f]'); if(f){QT.f=f.dataset.f; QT.sk=QT.f==='both'?'vb':QT.f==='swing'?'sc':'t'; QT.dir='desc'; renderQuarter(); return;}
   if(e.target.closest('#qtHide')){QT.hide=!QT.hide; renderQuarter(); return;}
   if(e.target.closest('#qtCopy')){copyText(QT.tsv||'',document.getElementById('qtMsg')); return;}
   const h=e.target.closest('#qtTable th button'); if(h){e.stopPropagation(); const k=h.dataset.k; if(QT.sk===k) QT.dir=QT.dir==='desc'?'asc':'desc'; else {QT.sk=k; QT.dir=k==='name'?'asc':'desc';} renderQuarter(); return;}
