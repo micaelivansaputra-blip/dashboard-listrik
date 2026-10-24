@@ -74,6 +74,7 @@ function renderConcern(list,P){
   if(typeof cxRender==='function') cxRender();
   if(typeof renderNotes==='function') renderNotes();
   if(typeof renderTrack==='function') renderTrack();
+  if(typeof renderQuarter==='function') renderQuarter();
 }
 
 function renderProgram(){

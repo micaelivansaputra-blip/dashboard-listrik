@@ -3,7 +3,7 @@ const EX={sel:[],col:{},from:null,to:null,range:'30',view:'daily',scale:'abs',ly
 const XC=['--c1','--c2','--c3','--c4','--c5'];
 const hv=s=>DATA.hist.v[s.n]||(DATA.hist.t&&DATA.hist.t[s.n])||[];
 /* every site that can be tracked here: the main sites plus the Tracking sites that have readings */
-const exAll=()=>DATA.sites.concat(Object.keys(DATA.hist.t||{}).map(n=>{const t=(DATA.track||[]).find(x=>x.n===n);return t?{n,r:t.r,v:t.v,track:true,p:false}:null;}).filter(Boolean));
+const exAll=()=>DATA.sites.concat(Object.keys(DATA.hist.t||{}).map(n=>{const t=(DATA.track||[]).find(x=>x.n===n);return t?Object.assign({},t,{track:true,p:false}):null;}).filter(Boolean));
 const hIdx=d=>Math.round((dt(d)-dt(DATA.hist.d0))/864e5);
 function exFill(arr,edges){ // fill the few missing days so lines stay continuous (edges=false keeps the gaps before the first and after the last reading)
   const out=arr.slice(); let last=null; for(let i=0;i<out.length;i++){ if(out[i]==null) out[i]=last; else last=out[i]; }

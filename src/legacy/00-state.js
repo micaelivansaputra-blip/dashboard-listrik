@@ -26,7 +26,7 @@ const ICON = {up:'<svg width="14" height="14" viewBox="0 0 14 14"><path d="M7 2 
 
 let REGION='All', MODE='mom', QUERY='', charts={};
 /* Tracking sites that have readings, shaped like normal sites so list pages can show them too */
-function trackSites(){ return Object.keys((DATA.hist&&DATA.hist.t)||{}).map(n=>{const t=(DATA.track||[]).find(x=>x.n===n); return t?{n,r:t.r,v:t.v,track:true,partial:false}:null;}).filter(Boolean); }
+function trackSites(){ return Object.keys((DATA.hist&&DATA.hist.t)||{}).map(n=>{const t=(DATA.track||[]).find(x=>x.n===n); return t?Object.assign({},t,{track:true,partial:false}):null;}).filter(Boolean); }
 /* list pages: add Tracking sites with readings, but leave out the ones flagged as suspect (CT or unit wrong, value far from budget) so they do not distort rankings */
 function withTracked(list){ return list.concat(trackSites().filter(s=>(REGION==='All'||s.r===REGION)&&!(typeof tkWhy==='function'&&tkWhy(s,tkInfo(s)).some(w=>/wrong|far from/.test(w))))); }
 function selected(){ return DATA.sites.filter(s => REGION==='All' || s.r===REGION); }

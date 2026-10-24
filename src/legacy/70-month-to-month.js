@@ -28,7 +28,7 @@ function MD(key){
 /* the series of one site for a month key; Tracking sites (no 2025 data) live in hist.t */
 const histArr=(key,s)=>key[0]==='v'?(DATA.hist.v[s.n]||(DATA.hist.t&&DATA.hist.t[s.n])):DATA.hist.y[s.n];
 /* every site this page can show: the main sites plus Tracking sites that have readings */
-const momAll=()=>DATA.sites.concat(Object.keys(DATA.hist.t||{}).map(n=>{const t=(DATA.track||[]).find(x=>x.n===n);return t?{n,r:t.r,v:t.v,track:true}:null;}).filter(Boolean));
+const momAll=()=>DATA.sites.concat(Object.keys(DATA.hist.t||{}).map(n=>{const t=(DATA.track||[]).find(x=>x.n===n);return t?Object.assign({},t,{track:true}):null;}).filter(Boolean));
 const momList=()=>{ if(MOM.site){const x=momAll().find(s=>s.n===MOM.site); if(x) return [x];} return selected(); };
 function siteMonth(s,key,type){
   const ck=s.n+'|'+key+'|'+type; if(MCACHE.has(ck)) return MCACHE.get(ck);

@@ -1147,6 +1147,7 @@ td.tk-why .fu{display:inline-block;margin:0 4px 4px 0}
 .snav [data-pg="s-track"]{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M11 2a9 9 0 105.6 16l4.700 4.700 1.400-1.400-4.700-4.700A9 9 0 0011 2zm0 2a7 7 0 110 14 7 7 0 010-14zm-1 3v6l5 3 1-1.700-4-2.300V7z'/%3E%3C/svg%3E")}
 .gsite input{width:150px}
 @media(max-width:700px){.gsite{display:none}}
+.snav [data-pg="s-quarter"]{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 13h4v7H4zm6-5h4v12h-4zm6-5h4v17h-4z'/%3E%3C/svg%3E")}
 
 </style>
 
@@ -1161,7 +1162,7 @@ td.tk-why .fu{display:inline-block;margin:0 4px 4px 0}
       <div class="filters"><label class="f gsite" for="gSite">Find site<input id="gSite" type="search" list="gSiteList" placeholder="Any site" autocomplete="off"><datalist id="gSiteList"></datalist></label><label class="f" for="region" id="regionLbl">Region<select id="region"></select></label>
         <div class="upd"><button type="button" class="updbtn" id="updBtn">Update data</button><input id="fileIn" type="file" accept=".xlsx,.xlsm" hidden><button type="button" class="refbtn" id="refBtn" aria-label="Refresh data" title="Refresh data"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 11-2.4-5.7"/><path d="M20 4v5h-5"/></svg></button></div></div>
       <nav class="nav nav-src" id="nav" aria-label="Section navigation">
-        <button data-t="s-ringkasan" aria-current="true">MTD Oct</button><button data-t="s-tren">Trend</button><button data-t="s-mom">Month to Month</button><button data-t="s-hari">Weekday vs Weekend</button><button data-t="s-site">Perform Site</button><button data-t="s-week">Weekly Zones</button><button data-t="s-explore">Site Explorer</button><button data-t="s-cek">Site Concern</button><button data-t="s-track">Tracking</button><button data-t="s-notes">Notes History</button><button data-t="s-admits">Admits vs kWh</button><button data-t="s-drivers">Why kWh Rose</button><button data-t="s-program">Project ZOEC</button>
+        <button data-t="s-ringkasan" aria-current="true">MTD Oct</button><button data-t="s-tren">Trend</button><button data-t="s-mom">Month to Month</button><button data-t="s-quarter">Quarter</button><button data-t="s-hari">Weekday vs Weekend</button><button data-t="s-site">Perform Site</button><button data-t="s-week">Weekly Zones</button><button data-t="s-explore">Site Explorer</button><button data-t="s-cek">Site Concern</button><button data-t="s-track">Tracking</button><button data-t="s-notes">Notes History</button><button data-t="s-admits">Admits vs kWh</button><button data-t="s-drivers">Why kWh Rose</button><button data-t="s-program">Project ZOEC</button>
       </nav>
       <nav class="nav nav-src" id="navPay" aria-label="Payroll section navigation" hidden><button data-t="p-mtd" id="navMtd" aria-current="true">MTD Oct</button><button data-t="p-sum">Payroll Summary</button><button data-t="p-mon">Month by Month</button><button data-t="p-wk">Weekly Admits &amp; MHDW</button><button data-t="p-site">Site Productivity</button><button data-t="p-cost">Cost Breakdown</button><button data-t="p-how">How It's Calculated</button></nav>
     </div>
@@ -1217,6 +1218,30 @@ td.tk-why .fu{display:inline-block;margin:0 4px 4px 0}
       <div class="ch"><div><h3>All sites</h3><span class="sub" id="mTblSub"></span></div><div class="qchips"><button type="button" class="ghost" id="mCopy">Copy table</button></div></div>
       <div class="tools"><label class="f" for="mq">Search site<input id="mq" type="search" placeholder="e.g. Manado"></label></div>
       <div class="tbl-wrap" id="mTable"></div><div class="more" id="mMore"></div><div class="cmsg" id="mCopyMsg" role="status"></div>
+    </div>
+  </section>
+
+  <section id="s-quarter">
+    <div class="sec-head"><h2>Quarter <small id="qtSub"></small></h2></div>
+    <div class="card">
+      <div class="ctl">
+        <label class="f" for="qtQ">Quarter<select id="qtQ"></select></label>
+        <div class="f wide">Show
+          <div class="seg" id="qtFilt" role="group" aria-label="Direction"><button type="button" data-f="all" aria-pressed="true">All</button><button type="button" data-f="up" aria-pressed="false">Increasing</button><button type="button" data-f="flat" aria-pressed="false">Stable</button><button type="button" data-f="down" aria-pressed="false">Decreasing</button></div>
+        </div>
+        <label class="f" for="qtSearch">Search site<input id="qtSearch" type="search" placeholder="e.g. Ponorogo"></label>
+        <div class="qchips"><button type="button" class="chipbtn" id="qtHide" aria-pressed="true">Hide suspect meters</button></div>
+      </div>
+      <div class="mkpis" id="qtKpis"></div>
+      <div class="note" id="qtNote"></div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <div class="ch"><div><h3>Biggest increases</h3><span class="sub">First month of the quarter to the last. Tap a site to open its daily chart.</span></div></div>
+      <div class="mvgrid" id="qtMovers"></div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <div class="ch"><div><h3>All sites</h3><span class="sub">Average kWh per day by month. Tap a column header to sort.</span></div><div class="qchips"><button type="button" class="ghost" id="qtCopy">Copy table</button></div></div>
+      <div class="tbl-wrap" id="qtTable"></div><div class="more" id="qtMore"></div><div class="cmsg" id="qtMsg" role="status"></div>
     </div>
   </section>
 
@@ -2083,7 +2108,7 @@ const Pager = (function () {
   const GROUPS = {
     elec: [
       { id: 'overview', label: 'Overview', items: ['s-ringkasan', 's-tren'] },
-      { id: 'compare', label: 'Compare', items: ['s-mom', 's-hari'] },
+      { id: 'compare', label: 'Compare', items: ['s-mom', 's-quarter', 's-hari'] },
       { id: 'sites', label: 'Sites', items: ['s-site', 's-week', 's-explore'] },
       { id: 'concerns', label: 'Concerns', items: ['s-cek', 's-track', 's-notes', 's-admits', 's-drivers'] },
       { id: 'zoec', label: 'Project ZOEC', items: ['s-program'] }
@@ -2415,7 +2440,7 @@ const ICON = {up:'<svg width="14" height="14" viewBox="0 0 14 14"><path d="M7 2 
 
 let REGION='All', MODE='mom', QUERY='', charts={};
 /* Tracking sites that have readings, shaped like normal sites so list pages can show them too */
-function trackSites(){ return Object.keys((DATA.hist&&DATA.hist.t)||{}).map(n=>{const t=(DATA.track||[]).find(x=>x.n===n); return t?{n,r:t.r,v:t.v,track:true,partial:false}:null;}).filter(Boolean); }
+function trackSites(){ return Object.keys((DATA.hist&&DATA.hist.t)||{}).map(n=>{const t=(DATA.track||[]).find(x=>x.n===n); return t?Object.assign({},t,{track:true,partial:false}):null;}).filter(Boolean); }
 /* list pages: add Tracking sites with readings, but leave out the ones flagged as suspect (CT or unit wrong, value far from budget) so they do not distort rankings */
 function withTracked(list){ return list.concat(trackSites().filter(s=>(REGION==='All'||s.r===REGION)&&!(typeof tkWhy==='function'&&tkWhy(s,tkInfo(s)).some(w=>/wrong|far from/.test(w))))); }
 function selected(){ return DATA.sites.filter(s => REGION==='All' || s.r===REGION); }
@@ -2841,6 +2866,7 @@ function renderConcern(list,P){
   if(typeof cxRender==='function') cxRender();
   if(typeof renderNotes==='function') renderNotes();
   if(typeof renderTrack==='function') renderTrack();
+  if(typeof renderQuarter==='function') renderQuarter();
 }
 
 function renderProgram(){
@@ -2911,7 +2937,7 @@ function MD(key){
 /* the series of one site for a month key; Tracking sites (no 2025 data) live in hist.t */
 const histArr=(key,s)=>key[0]==='v'?(DATA.hist.v[s.n]||(DATA.hist.t&&DATA.hist.t[s.n])):DATA.hist.y[s.n];
 /* every site this page can show: the main sites plus Tracking sites that have readings */
-const momAll=()=>DATA.sites.concat(Object.keys(DATA.hist.t||{}).map(n=>{const t=(DATA.track||[]).find(x=>x.n===n);return t?{n,r:t.r,v:t.v,track:true}:null;}).filter(Boolean));
+const momAll=()=>DATA.sites.concat(Object.keys(DATA.hist.t||{}).map(n=>{const t=(DATA.track||[]).find(x=>x.n===n);return t?Object.assign({},t,{track:true}):null;}).filter(Boolean));
 const momList=()=>{ if(MOM.site){const x=momAll().find(s=>s.n===MOM.site); if(x) return [x];} return selected(); };
 function siteMonth(s,key,type){
   const ck=s.n+'|'+key+'|'+type; if(MCACHE.has(ck)) return MCACHE.get(ck);
@@ -3015,7 +3041,7 @@ const EX={sel:[],col:{},from:null,to:null,range:'30',view:'daily',scale:'abs',ly
 const XC=['--c1','--c2','--c3','--c4','--c5'];
 const hv=s=>DATA.hist.v[s.n]||(DATA.hist.t&&DATA.hist.t[s.n])||[];
 /* every site that can be tracked here: the main sites plus the Tracking sites that have readings */
-const exAll=()=>DATA.sites.concat(Object.keys(DATA.hist.t||{}).map(n=>{const t=(DATA.track||[]).find(x=>x.n===n);return t?{n,r:t.r,v:t.v,track:true,p:false}:null;}).filter(Boolean));
+const exAll=()=>DATA.sites.concat(Object.keys(DATA.hist.t||{}).map(n=>{const t=(DATA.track||[]).find(x=>x.n===n);return t?Object.assign({},t,{track:true,p:false}):null;}).filter(Boolean));
 const hIdx=d=>Math.round((dt(d)-dt(DATA.hist.d0))/864e5);
 function exFill(arr,edges){ // fill the few missing days so lines stay continuous (edges=false keeps the gaps before the first and after the last reading)
   const out=arr.slice(); let last=null; for(let i=0;i<out.length;i++){ if(out[i]==null) out[i]=last; else last=out[i]; }
@@ -4079,6 +4105,68 @@ document.addEventListener('change',e=>{
   const all=DATA.sites.map(s=>s.n).concat((DATA.track||[]).map(s=>s.n));
   let hit=all.find(n=>short(n).toLowerCase()===v||n.toLowerCase()===v); if(!hit){const c=all.filter(n=>short(n).toLowerCase().includes(v)); if(c.length===1) hit=c[0];}
   if(hit){t.value=''; t.blur(); openSite(hit);}
+});
+
+/* ---------- Quarter view: how every site moved month by month inside a quarter ---------- */
+const QT={q:'2026-Q3',f:'all',hide:true,sk:'t',dir:'desc',txt:'',more:false};
+const QMON={'2026-Q2':['2026-04','2026-05','2026-06'],'2026-Q3':['2026-07','2026-08','2026-09']};
+function qtMonths(){ return QMON[QT.q]||QMON['2026-Q3']; }
+function qtAvail(){ const ks=monthKeys().filter(m=>m.k[0]==='v').map(m=>m.ym); return Object.keys(QMON).filter(q=>QMON[q].every(m=>ks.includes(m))); }
+function qtSites(){ return momAll().filter(s=>REGION==='All'||s.r===REGION); }
+function qtFlag(s){ if(!s.track||typeof tkWhy!=='function') return ''; return tkWhy(s,tkInfo(s)).filter(w=>/wrong|far from|estimated|not plausible|last updated/.test(w)).join('; '); }
+const qtBad=s=>s.track&&typeof tkWhy==='function'&&tkWhy(s,tkInfo(s)).some(w=>/wrong|far from/.test(w));
+function qtRows(){
+  const ms=qtMonths(), nxt=(()=>{const d=new Date(+ms[2].slice(0,4),+ms[2].slice(5),1); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');})();
+  const hasNext=monthKeys().some(m=>m.k==='v:'+nxt);
+  return qtSites().map(s=>{
+    const v=ms.map(m=>siteMonth(s,'v:'+m,'all')), nx=hasNext?siteMonth(s,'v:'+nxt,'all'):NaN;
+    const ok=v.every(Number.isFinite); let flag=qtFlag(s), bad=qtBad(s);
+    if(ok&&s.track){const md=[...v].sort((a,b)=>a-b)[1]; if(v.some(x=>x<=0||x/md>2.5||x/md<.4)){bad=true; flag=(flag?flag+'; ':'')+'Odd monthly level, check meter';}}
+    return {s,v,ok,s1:ok?v[1]/v[0]-1:null,s2:ok?v[2]/v[1]-1:null,t:ok?v[2]/v[0]-1:null,nx:Number.isFinite(nx)&&Number.isFinite(v[2])?nx/v[2]-1:null,flag,bad};
+  });
+}
+const qtDir=t=>t==null?'na':t>CT.lo?'up':t<-CT.lo?'down':'flat';
+function qtSpark(v){ const mx=Math.max(...v), mn=Math.min(...v)*.9; return `<svg viewBox="0 0 54 26" aria-hidden="true">${v.map((x,i)=>{const h=Math.max(3,(x-mn)/(mx-mn||1)*22); return `<rect x="${i*19}" y="${25-h}" width="14" height="${h}" rx="3" fill="var(--blue)" opacity="${.35+i*.3}"/>`;}).join('')}</svg>`; }
+function renderQuarter(){
+  const sec=document.getElementById('s-quarter'), nb=document.querySelector('#nav [data-t="s-quarter"]'); if(!sec) return;
+  const av=hasHist()?qtAvail():[]; if(!av.length){sec.hidden=true; if(nb) nb.hidden=true; return;} if(nb) nb.hidden=false;
+  if(!av.includes(QT.q)) QT.q=av[av.length-1];
+  const sel=document.getElementById('qtQ'); if(sel.dataset.sig!==av.join()){sel.innerHTML=av.slice().reverse().map(q=>`<option value="${q}">${q.slice(5)} ${q.slice(0,4)}</option>`).join(''); sel.dataset.sig=av.join();} sel.value=QT.q;
+  const ms=qtMonths(), ML=ms.map(m=>MN[+m.slice(5)-1]), nxtL=(()=>{const n=(+ms[2].slice(5))%12; return MN[n];})();
+  const all=qtRows(), pool=all.filter(r=>r.ok&&!(QT.hide&&r.bad));
+  const up=pool.filter(r=>qtDir(r.t)==='up'), dn=pool.filter(r=>qtDir(r.t)==='down'), fl=pool.length-up.length-dn.length;
+  const tot=ms.map((_,i)=>pool.reduce((t,r)=>t+r.v[i],0)), tt=pool.length?tot[2]/tot[0]-1:null;
+  document.getElementById('qtSub').textContent=`${QT.q.slice(5)} ${QT.q.slice(0,4)} · ${ML[0]}–${ML[2]} · ${pool.length} sites with data in all three months`;
+  document.getElementById('qtKpis').innerHTML=
+    ms.map((m,i)=>`<div class="mk${i===2?' hl':''}"><small>${ML[i]} ${m.slice(0,4)}</small><b>${fmt(tot[i])}</b><span>kWh per day, all sites</span></div>`).join('')+
+    `<div class="mk"><small>${ML[2]} vs ${ML[0]}</small><b class="${cls(tt||0)}">${tt==null?'—':pct(tt)}</b><span>${up.length} up · ${fl} stable · ${dn.length} down</span></div>`;
+  const q=QT.q&&document.getElementById('qtSearch').value.trim().toLowerCase();
+  let f=all.filter(r=>r.ok&&(!QT.hide||!r.bad)&&(QT.f==='all'||qtDir(r.t)===QT.f)&&(!q||r.s.n.toLowerCase().includes(q)));
+  const d=QT.dir==='desc'?1:-1, key=r=>QT.sk==='name'?r.s.n:QT.sk==='a'?r.v[2]:r[QT.sk];
+  f.sort((x,y)=>QT.sk==='name'?x.s.n.localeCompare(y.s.n)*(QT.dir==='asc'?1:-1):((key(y)??-9)-(key(x)??-9))*d);
+  const miss=all.length-all.filter(r=>r.ok).length, hid=QT.hide?all.filter(r=>r.ok&&r.bad).length:0;
+  document.getElementById('qtNote').textContent=`Average kWh per day for each month, only sites with at least 70% of days in every month. ${miss?miss+' site'+(miss>1?'s have':' has')+' no usable data in one of the months. ':''}${hid?hid+' tracking site'+(hid>1?'s':'')+' with a suspect meter level (CT or unit may be wrong) hidden. ':''}${ms[0]<'2026-08'?'March to July readings are only lightly cleaned, so '+ML[0]+' can be noisier.':''}`;
+  document.querySelectorAll('#qtFilt button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.f===QT.f)));
+  const hb=document.getElementById('qtHide'); hb.setAttribute('aria-pressed',String(QT.hide));
+  const cell=(p,on)=>p==null?'<span class="cell flat">—</span>':`<span class="cell ${p>CT.hi?'up':p>CT.lo?'warn':p<-CT.lo?'down':'flat'}${on?' on':''}">${pct(p)}</span>`;
+  const th=(k,l,c='')=>`<th class="${c} ${QT.sk===k?'sorted':''}" aria-sort="${QT.sk===k?(QT.dir==='asc'?'ascending':'descending'):'none'}"><button type="button" data-k="${k}">${l}${QT.sk===k?(QT.dir==='asc'?' ▲':' ▼'):''}</button></th>`;
+  const lim=15, shown=(QT.more||q||QT.f!=='all')?f:f.slice(0,lim);
+  const body=shown.map(r=>`<tr class="row" data-n="${fuEsc(r.s.n)}" tabindex="0"><td><div class="sn"><span class="sd ${r.t>CT.lo?'up':r.t<-CT.lo?'down':'flat'}"></span><span><b>${short(r.s.n)}${fuHas(r.s.n)?'<i class="nd" title="Has a note"></i>':''}</b><small>${r.s.r}${r.s.track?' · tracking':''}${r.flag?' · <span data-notr>'+fuEsc(r.flag.split(';')[0])+'</span>':''}</small></span></div></td>
+    ${r.v.map(x=>`<td class="hs">${fmt(x)}</td>`).join('')}<td class="hs">${cell(r.s1)}</td><td class="hs">${cell(r.s2)}</td><td>${cell(r.t,true)}</td><td class="sp hs">${qtSpark(r.v)}</td><td class="hs">${cell(r.nx)}</td></tr>`).join('');
+  document.getElementById('qtTable').innerHTML=`<table class="ptable" style="min-width:760px"><thead><tr>${th('name','Site')}${ms.map((m,i)=>`<th class="hs">${ML[i]}</th>`).join('')}${th('s1',ML[1]+' vs '+ML[0],'hs')}${th('s2',ML[2]+' vs '+ML[1],'hs')}${th('t',ML[2]+' vs '+ML[0])}<th class="hs">Trend</th>${th('nx',nxtL+' MTD vs '+ML[2],'hs')}</tr></thead><tbody>${body||'<tr><td colspan="9" class="empty">No matching sites.</td></tr>'}</tbody></table>`;
+  document.getElementById('qtMore').innerHTML=(!q&&QT.f==='all'&&f.length>lim)?`<button type="button" class="chipbtn" data-more aria-pressed="true">${QT.more?'Show top '+lim:'Show all '+f.length+' sites'}</button>`:'';
+  const mv=pool.filter(r=>r.t>CT.lo).sort((a,b)=>b.t-a.t).slice(0,6), mx=Math.max(.01,...mv.map(r=>r.t));
+  document.getElementById('qtMovers').innerHTML=mv.length?mv.map(r=>`<div class="mvrow" data-n="${fuEsc(r.s.n)}" tabindex="0"><b>${short(r.s.n)}</b><em class="up">${fmt(r.v[0])} → ${fmt(r.v[2])} kWh/day · ${pct(r.t)}</em><div class="mvbar"><i style="width:${Math.max(3,r.t/mx*100)}%;background:var(--up)"></i></div></div>`).join(''):'<div class="note">No site increased by more than 5% in this quarter.</div>';
+  QT.tsv=['Site\tRegion\t'+ML.join(' kWh/day\t')+' kWh/day\t'+ML[1]+' vs '+ML[0]+'\t'+ML[2]+' vs '+ML[1]+'\t'+ML[2]+' vs '+ML[0]+'\tDirection\t'+nxtL+' MTD vs '+ML[2]+'\tData note',...f.map(r=>[r.s.n,r.s.r,...r.v.map(x=>x.toFixed(1)),(r.s1*100).toFixed(1)+'%',(r.s2*100).toFixed(1)+'%',(r.t*100).toFixed(1)+'%',{up:'Increasing',down:'Decreasing',flat:'Stable'}[qtDir(r.t)],r.nx==null?'':(r.nx*100).toFixed(1)+'%',r.flag].join('\t'))].join('\n');
+}
+document.addEventListener('change',e=>{ if(e.target&&e.target.id==='qtQ'){QT.q=e.target.value; renderQuarter();} });
+document.addEventListener('input',e=>{ if(e.target&&e.target.id==='qtSearch') renderQuarter(); });
+document.addEventListener('click',e=>{
+  const f=e.target.closest('#qtFilt [data-f]'); if(f){QT.f=f.dataset.f; renderQuarter(); return;}
+  if(e.target.closest('#qtHide')){QT.hide=!QT.hide; renderQuarter(); return;}
+  if(e.target.closest('#qtCopy')){copyText(QT.tsv||'',document.getElementById('qtMsg')); return;}
+  const h=e.target.closest('#qtTable th button'); if(h){e.stopPropagation(); const k=h.dataset.k; if(QT.sk===k) QT.dir=QT.dir==='desc'?'asc':'desc'; else {QT.sk=k; QT.dir=k==='name'?'asc':'desc';} renderQuarter(); return;}
+  if(e.target.closest('#qtMore [data-more]')){QT.more=!QT.more; renderQuarter();}
 });
 
 /* generated dataset: see tools/ and README. Replace by re-running the data prep, not by hand. */

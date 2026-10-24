@@ -11,7 +11,7 @@ const Pager = (function () {
   const GROUPS = {
     elec: [
       { id: 'overview', label: 'Overview', items: ['s-ringkasan', 's-tren'] },
-      { id: 'compare', label: 'Compare', items: ['s-mom', 's-hari'] },
+      { id: 'compare', label: 'Compare', items: ['s-mom', 's-quarter', 's-hari'] },
       { id: 'sites', label: 'Sites', items: ['s-site', 's-week', 's-explore'] },
       { id: 'concerns', label: 'Concerns', items: ['s-cek', 's-track', 's-notes', 's-admits', 's-drivers'] },
       { id: 'zoec', label: 'Project ZOEC', items: ['s-program'] }
