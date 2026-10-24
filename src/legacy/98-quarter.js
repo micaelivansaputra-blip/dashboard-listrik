@@ -42,7 +42,7 @@ function renderQuarter(){
   const up=pool.filter(r=>qtDir(r.t)==='up'), dn=pool.filter(r=>qtDir(r.t)==='down'), fl=pool.length-up.length-dn.length;
   const tk=ms.map((_,i)=>pool.reduce((t,r)=>t+r.kw[i],0)), tc=ms.map((_,i)=>pool.reduce((t,r)=>t+r.cs[i],0));
   const dk=pool.length?tk[2]/tk[0]-1:null, dc=pool.length?tc[2]/tc[0]-1:null, r0=tc[0]/tk[0], r2=tc[2]/tk[2], dr=pool.length?r2/r0-1:null;
-  const cu=pool.filter(r=>qtDir(r.ct)==='up').length;
+  const cu=pool.filter(r=>qtDir(r.ct)==='up').length, ob=pool.filter(r=>qtDir(r.t)==='up'&&r.vb!=null&&r.vb>CT.lo).length, nbud=pool.filter(r=>r.vb!=null).length;
   document.getElementById('qtSub').textContent=`${QT.q.slice(5)} ${QT.q.slice(0,4)} · ${ML[0]}–${ML[2]} · ${pool.length} sites · actual invoices`;
   const kp=(l,b,sub,c)=>`<div class="mk"><small>${l}</small><b${c!=null?` class="${cls(c)}"`:''}>${b}</b><span>${sub}</span></div>`;
   document.getElementById('qtKpis').innerHTML=
@@ -50,9 +50,10 @@ function renderQuarter(){
     kp(`Usage ${ML[2]} vs ${ML[0]}`,dk==null?'—':pct(dk),`${up.length} up · ${fl} stable · ${dn.length} down`,dk||0)+
     kp(`Cost · ${ML[2]}`,'Rp '+(tc[2]/1e9).toFixed(2)+' M',`${ML[0]} ${(tc[0]/1e9).toFixed(2)} → ${ML[1]} ${(tc[1]/1e9).toFixed(2)} M`)+
     kp(`Cost ${ML[2]} vs ${ML[0]}`,dc==null?'—':pct(dc),`${cu} sites with cost up`,dc||0)+
+    kp(`Up and over budget`,ob+' sites',`${ML[2]} vs ${ML[0]} above ${Math.round(CT.lo*100)}% and ${ML[2]} above budget by more than ${Math.round(CT.lo*100)}% (of ${nbud} with a budget)`,ob?1:0)+
     kp(`Cost per kWh · ${ML[2]}`,'Rp '+fmt(r2),`${ML[0]} Rp ${fmt(r0)} · ${dr==null?'':pct(dr)}`);
   const q=document.getElementById('qtSearch').value.trim().toLowerCase();
-  let f=all.filter(r=>r.ok&&(!QT.hide||!r.bad)&&(QT.f==='all'||qtDir(r.t)===QT.f)&&(!q||r.s.n.toLowerCase().includes(q)));
+  let f=all.filter(r=>r.ok&&(!QT.hide||!r.bad)&&(QT.f==='all'||(QT.f==='both'?(qtDir(r.t)==='up'&&r.vb!=null&&r.vb>CT.lo):qtDir(r.t)===QT.f))&&(!q||r.s.n.toLowerCase().includes(q)));
   const d=QT.dir==='desc'?1:-1;
   f.sort((x,y)=>QT.sk==='name'?x.s.n.localeCompare(y.s.n)*(QT.dir==='asc'?1:-1):((y[QT.sk]??-9)-(x[QT.sk]??-9))*d);
   const miss=all.filter(r=>!r.ok).length, hid=QT.hide?all.filter(r=>r.ok&&r.bad).length:0;
@@ -76,7 +77,7 @@ function renderQuarter(){
 document.addEventListener('change',e=>{ if(e.target&&e.target.id==='qtQ'){QT.q=e.target.value; renderQuarter();} });
 document.addEventListener('input',e=>{ if(e.target&&e.target.id==='qtSearch') renderQuarter(); });
 document.addEventListener('click',e=>{
-  const f=e.target.closest('#qtFilt [data-f]'); if(f){QT.f=f.dataset.f; renderQuarter(); return;}
+  const f=e.target.closest('#qtFilt [data-f]'); if(f){QT.f=f.dataset.f; QT.sk=QT.f==='both'?'vb':'t'; QT.dir='desc'; renderQuarter(); return;}
   if(e.target.closest('#qtHide')){QT.hide=!QT.hide; renderQuarter(); return;}
   if(e.target.closest('#qtCopy')){copyText(QT.tsv||'',document.getElementById('qtMsg')); return;}
   const h=e.target.closest('#qtTable th button'); if(h){e.stopPropagation(); const k=h.dataset.k; if(QT.sk===k) QT.dir=QT.dir==='desc'?'asc':'desc'; else {QT.sk=k; QT.dir=k==='name'?'asc':'desc';} renderQuarter(); return;}

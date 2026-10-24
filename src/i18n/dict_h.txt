@@ -79,3 +79,4 @@ Cost by month || Biaya per bulan || Costo por mes
 Open daily chart || Buka chart harian || Abrir gráfico diario
 Details, full data and message to ask || Detail, data lengkap dan pesan untuk bertanya || Detalles, datos completos y mensaje para preguntar
 Cost per kWh || Biaya per kWh || Costo por kWh
+Up and over budget || Naik dan melebihi budget || Sube y excede el presupuesto
