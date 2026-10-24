@@ -187,3 +187,8 @@ body.has-side .sidebar{background-blend-mode:normal}
 .kpi.hl .u,.kpi.hl .sub,.kpi.hl small,.kpi.hl div:not(.v):not(.l){color:var(--muted)}
 .kpi.hl .chip{color:inherit}
 .kpi.hl .chip,.kpi.hl .chip *{color:var(--up-ink)!important}
+
+/* no dead space below the last card */
+.foot{margin-top:14px!important;padding-top:12px;border-top:1px solid var(--hair);font-size:12px;line-height:1.4;gap:2px}
+body{padding-bottom:20px!important}
+@media(max-width:1100px){body{padding-bottom:96px!important}}
