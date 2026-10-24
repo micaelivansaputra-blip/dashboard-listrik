@@ -195,3 +195,6 @@ body{padding-bottom:20px!important}
 
 /* content must never wait for a scroll animation: the blank area was cards still hidden by reveal-on-scroll */
 [data-rv],[data-rv]:not(.in){opacity:1!important;transform:none!important;transition:none!important}
+
+/* chart card fills the same height as the insight panel */
+@media(min-width:1101px){#ovDaily{align-self:stretch;display:flex;flex-direction:column}#ovDaily>svg,#ovDaily>div:has(svg){flex:1;min-height:0}}

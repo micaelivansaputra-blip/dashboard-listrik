@@ -30,7 +30,7 @@ function ovDaily(rows,ym){
   return out;
 }
 function ovChart(series,bud,mx){
-  const W=860,H=250,L=46,R=8,T=14,B=26, pw=W-L-R, ph=H-T-B, n=series.length||1, gap=Math.max(2,Math.min(8,pw/n*.22)), bw=pw/n-gap;
+  const W=860,H=380,L=46,R=8,T=14,B=26, pw=W-L-R, ph=H-T-B, n=series.length||1, gap=Math.max(2,Math.min(8,pw/n*.22)), bw=pw/n-gap;
   const top=Math.max(mx,bud)*1.12, y=v=>T+ph-v/top*ph, step=(()=>{const raw=top/4,m=Math.pow(10,Math.floor(Math.log10(raw)));return [1,2,2.5,5,10].map(k=>k*m).find(k=>k>=raw)||raw;})();
   let g='';
   for(let v=0;v<=top;v+=step) g+=`<line x1="${L}" x2="${W-R}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}" class="ov-grid"/><text x="${L-8}" y="${(y(v)+4).toFixed(1)}" text-anchor="end" class="ov-ax">${fmt(v)}</text>`;
