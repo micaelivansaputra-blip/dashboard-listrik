@@ -34,7 +34,7 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>render(
   const MOON='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
   const cur=()=>root.dataset.theme||(mq.matches?'dark':'light');
   function paint(){ const d=cur()==='dark'; btn.innerHTML=d?SUN:MOON; const t=d?'Switch to light mode':'Switch to dark mode'; btn.setAttribute('aria-label',t); btn.title=t; }
-  try{ const t=localStorage.getItem('theme'); if(t==='dark'||t==='light') root.dataset.theme=t; }catch(e){}
+  root.dataset.theme='dark'; try{ const t=localStorage.getItem('theme'); if(t==='dark'||t==='light') root.dataset.theme=t; }catch(e){}
   paint();
   btn.addEventListener('click',()=>{ const n=cur()==='dark'?'light':'dark'; Motion.themeSwitch(btn,()=>{ root.dataset.theme=n; try{localStorage.setItem('theme',n);}catch(e){} paint(); render(); }); });
   mq.addEventListener('change',()=>paint());
