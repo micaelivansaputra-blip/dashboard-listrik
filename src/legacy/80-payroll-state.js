@@ -1,5 +1,5 @@
 /* ---------- app tabs + payroll ---------- */
-let APP=(location.hash==='#payroll')?'pay':'elec';
+let APP='elec';
 const PAY={d:null,sc:'16',wk:null,q:'',expand:false,ref:'target',view:'mtd',msort:'prod',mq:'',mexp:false,open:{mtd:null,year:null,cost:null},cm:null,cs:'rpa',cq:'',cx:false};
 const PT=0.03;
 const fmtM=v=>Math.round(v/1e6).toLocaleString(EN);

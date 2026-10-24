@@ -5,9 +5,10 @@
    Only restyles. No data or logic lives here.
    ========================================================================== */
 :root{
-  --cp:#0b3fc4; --cp-deep:#0a2a8f; --cp-soft:#e9efff; --cp-yellow:#ffc928;
-  --blue:#1250d6; --blue-soft:rgba(18,80,214,.1);
-  --bg:#eef2fb; --surface:#fff; --ink:#0f1b3d; --muted:#5d6b8c; --line:rgba(15,27,61,.1); --hair:rgba(15,27,61,.1); --grid:rgba(15,27,61,.07);
+  --cp:#2a5bd7; --cp-deep:#1b3d9c; --cp-soft:#eaf0fd; --cp-yellow:#f7c948;
+  --blue:#2a5bd7; --blue-soft:rgba(42,91,215,.1);
+  --up:#e8675d; --up-ink:#c43a30; --up-soft:#fdeeec; --down:#40b57f; --down-ink:#1f7a4e; --down-soft:#e9f7f0; --amber:#f2ab45; --amber-soft:#fff5e3;
+  --bg:#f3f5fa; --surface:#fff; --ink:#0f1b3d; --muted:#5d6b8c; --line:rgba(15,27,61,.1); --hair:rgba(15,27,61,.1); --grid:rgba(15,27,61,.07);
   --shadow:0 1px 2px rgba(15,27,61,.05),0 6px 18px rgba(15,27,61,.06); --sb-bg:#fff; --r-card:18px;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
@@ -114,7 +115,19 @@ body{background:var(--bg);color:var(--ink)}
 @media(min-width:1101px){
   body.has-side .sidebar::after{content:"NOW SHOWING · ENERGY SAVER";display:block;flex:none;margin-top:auto;height:150px;position:sticky;bottom:0;padding:12px 12px 0;border-radius:16px;
     font-size:10px;font-weight:800;letter-spacing:.1em;color:var(--cp-yellow);text-align:center;
-    background:
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 110' preserveAspectRatio='xMidYMax slice'%3E%3Cpath d='M30 4h140l14 40H16z' fill='%23ffffff' fill-opacity='.14'/%3E%3Crect x='30' y='4' width='140' height='4' rx='2' fill='%23ffc928'/%3E%3Cg fill='%23ffffff' fill-opacity='.55'%3E%3Cg id='r'%3E%3Crect x='22' y='58' width='14' height='11' rx='4'/%3E%3Crect x='42' y='58' width='14' height='11' rx='4'/%3E%3Crect x='62' y='58' width='14' height='11' rx='4'/%3E%3Crect x='82' y='58' width='14' height='11' rx='4'/%3E%3Crect x='104' y='58' width='14' height='11' rx='4'/%3E%3Crect x='124' y='58' width='14' height='11' rx='4'/%3E%3Crect x='144' y='58' width='14' height='11' rx='4'/%3E%3Crect x='164' y='58' width='14' height='11' rx='4'/%3E%3C/g%3E%3Cg transform='translate(0 20)' fill-opacity='.8'%3E%3Cuse href='%23r'/%3E%3C/g%3E%3Cg transform='translate(0 40)' fill-opacity='1'%3E%3Cuse href='%23r'/%3E%3C/g%3E%3C/g%3E%3Ccircle cx='78' cy='64' r='5' fill='%23ffc928'/%3E%3Ccircle cx='122' cy='84' r='5' fill='%23ffc928'/%3E%3C/svg%3E") center bottom/100% auto no-repeat,
-      linear-gradient(170deg,var(--cp-deep),var(--cp))}
+    background-repeat:no-repeat;--cinema:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 110' preserveAspectRatio='xMidYMax slice'%3E%3Cpath d='M30 4h140l14 40H16z' fill='%23ffffff' fill-opacity='.14'/%3E%3Crect x='30' y='4' width='140' height='4' rx='2' fill='%23ffc928'/%3E%3Cg fill='%23ffffff' fill-opacity='.55'%3E%3Cg id='r'%3E%3Crect x='22' y='58' width='14' height='11' rx='4'/%3E%3Crect x='42' y='58' width='14' height='11' rx='4'/%3E%3Crect x='62' y='58' width='14' height='11' rx='4'/%3E%3Crect x='82' y='58' width='14' height='11' rx='4'/%3E%3Crect x='104' y='58' width='14' height='11' rx='4'/%3E%3Crect x='124' y='58' width='14' height='11' rx='4'/%3E%3Crect x='144' y='58' width='14' height='11' rx='4'/%3E%3Crect x='164' y='58' width='14' height='11' rx='4'/%3E%3C/g%3E%3Cg transform='translate(0 20)' fill-opacity='.8'%3E%3Cuse href='%23r'/%3E%3C/g%3E%3Cg transform='translate(0 40)' fill-opacity='1'%3E%3Cuse href='%23r'/%3E%3C/g%3E%3C/g%3E%3Ccircle cx='78' cy='64' r='5' fill='%23ffc928'/%3E%3Ccircle cx='122' cy='84' r='5' fill='%23ffc928'/%3E%3C/svg%3E")}
+}
+
+/* round 3: smaller art, calmer colours, no Payroll tab */
+.apptabs,#appTabs{display:none!important}
+.pagehead{min-height:92px;padding:20px 26px;background:linear-gradient(120deg,var(--cp-deep),var(--cp));box-shadow:0 8px 20px rgba(27,61,156,.16)}
+.pagehead::after{width:112px;height:64px;right:22px;bottom:14px;opacity:.9}
+.pagehead .ph-title{font-size:clamp(22px,2.6vw,28px)}
+.kpi.hl{background:var(--cp)!important}
+.mk.hl{background:var(--cp)!important}
+.snav button[aria-current="true"]{box-shadow:none}
+.logo-mark{box-shadow:none!important;background:var(--cp)!important}
+@media(min-width:1101px){
+  body.has-side .sidebar::after{height:104px;padding:10px 12px 0;font-size:9px;background-size:150px auto,auto;background-position:center bottom,0 0;
+    background-image:var(--cinema),linear-gradient(170deg,var(--cp-deep),var(--cp))}
 }
