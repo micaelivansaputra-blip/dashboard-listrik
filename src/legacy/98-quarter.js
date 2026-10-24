@@ -67,7 +67,7 @@ function renderQuarter(){
     kp(`Up and over budget`,ob+' sites',`${ML[2]} vs ${ML[0]} above ${Math.round(CT.lo*100)}% and ${ML[2]} above budget by more than ${Math.round(CT.lo*100)}% (of ${nbud} with a budget)`,ob?1:0)+
     kp(`Cost per kWh · ${ML[2]}`,'Rp '+fmt(r2),`${ML[0]} Rp ${fmt(r0)} · ${dr==null?'':pct(dr)}`);
   const q=document.getElementById('qtSearch').value.trim().toLowerCase();
-  let f=all.filter(r=>r.ok&&(!QT.hide||!r.bad)&&(QT.f==='all'||(QT.f==='swing'?r.sw:QT.f==='both'?(qtDir(r.t)==='up'&&r.vb!=null&&r.vb>CT.lo):qtDir(r.t)===QT.f))&&(!q||r.s.n.toLowerCase().includes(q)));
+  let f=all.filter(r=>r.ok&&(!QT.hide||!r.bad)&&(QT.f==='all'||(QT.f==='swing'?r.sw:QT.f==='allover'?(r.vbm&&r.vbm.every(x=>x>0)):QT.f==='both'?(qtDir(r.t)==='up'&&r.vb!=null&&r.vb>CT.lo):qtDir(r.t)===QT.f))&&(!q||r.s.n.toLowerCase().includes(q)));
   const d=QT.dir==='desc'?1:-1;
   f.sort((x,y)=>QT.sk==='name'?x.s.n.localeCompare(y.s.n)*(QT.dir==='asc'?1:-1):((y[QT.sk]??-9)-(x[QT.sk]??-9))*d);
   const miss=all.filter(r=>!r.ok).length, hid=QT.hide?all.filter(r=>r.ok&&r.bad).length:0;
@@ -79,10 +79,10 @@ function renderQuarter(){
   const lim=15, shown=(QT.more||q||QT.f!=='all')?f:f.slice(0,lim);
   const body=shown.map(r=>`<tr class="row" data-brief="${fuEsc(r.n)}" tabindex="0"><td><div class="sn"><span class="sd ${r.t>CT.lo?'up':r.t<-CT.lo?'down':'flat'}"></span><span><b>${short(r.s.n)}${fuHas(r.s.n)?'<i class="nd" title="Has a note"></i>':''}</b><small>${r.s.r}${r.flag?' · <span data-notr>'+fuEsc(r.flag)+'</span>':''}</small></span></div></td>
     ${r.kw.map(x=>`<td class="hs">${fmt(x)}</td>`).join('')}<td>${cell(r.t,true)}</td><td class="sp hs">${qtSpark(r.kw)}</td>
-    ${r.cs.map(x=>`<td class="hs">${qtIdr(x)}</td>`).join('')}<td>${cell(r.ct,true)}</td><td class="hs">Rp ${fmt(r.rt[2])}<br>${cell(r.rc)}</td><td class="hs"><small>${r.why}</small></td><td class="hs"><small class="${r.sw?'swg':''}">${r.pat}</small></td>
+    ${r.cs.map(x=>`<td class="hs">${qtIdr(x)}</td>`).join('')}<td>${cell(r.ct,true)}</td><td class="hs">Rp ${fmt(r.rt[2])}<br>${cell(r.rc)}</td><td class="hs">${r.vbm?'<span class="vbm">'+r.vbm.map((x,i)=>`<i class="${x>CT.hi?'up':x>0?'warn':'down'}" title="${ML[i]} ${pct(x)}">${pct(x,0)}</i>`).join('')+'</span><small>'+r.vbm.filter(x=>x>0).length+' of 3 over</small>':'<small class="tk-n">No budget</small>'}</td><td class="hs"><small>${r.why}</small></td><td class="hs"><small class="${r.sw?'swg':''}">${r.pat}</small></td>
     <td class="hs">${r.bud?fmt(r.bud)+'<br>'+cell(r.vb):'<small class="tk-n">No budget</small>'}</td></tr>`).join('');
   const g=(t,n)=>`<th colspan="${n}" class="grp">${t}</th>`;
-  document.getElementById('qtTable').innerHTML=`<table class="ptable qtt" style="min-width:1300px"><thead><tr><th></th>${g('kWh usage (invoice)',5)}${g('Cost (Rp, incl. PPN)',4)}${g('Why',3)}${g('Budget',1)}</tr><tr>${th('name','Site')}${ML.map(m=>`<th class="hs">${m}</th>`).join('')}${th('t',ML[2]+' vs '+ML[0])}<th class="hs">Trend</th>${ML.map(m=>`<th class="hs">${m}</th>`).join('')}${th('ct',ML[2]+' vs '+ML[0])}${th('rc',ML[2]+' cost per kWh','hs')}<th class="hs">Driver</th>${th('sc','Pattern','hs')}${th('vb',ML[2]+' budget (kWh)','hs')}</tr></thead><tbody>${body||`<tr><td colspan="14" class="empty">No matching sites.</td></tr>`}</tbody></table>`;
+  document.getElementById('qtTable').innerHTML=`<table class="ptable qtt" style="min-width:1420px"><thead><tr><th></th>${g('kWh usage (invoice)',5)}${g('Cost (Rp, incl. PPN)',4)}${g('Why',4)}${g('Budget',1)}</tr><tr>${th('name','Site')}${ML.map(m=>`<th class="hs">${m}</th>`).join('')}${th('t',ML[2]+' vs '+ML[0])}<th class="hs">Trend</th>${ML.map(m=>`<th class="hs">${m}</th>`).join('')}${th('ct',ML[2]+' vs '+ML[0])}${th('rc',ML[2]+' cost per kWh','hs')}<th class="hs">vs budget by month</th><th class="hs">Driver</th>${th('sc','Pattern','hs')}${th('vb',ML[2]+' budget (kWh)','hs')}</tr></thead><tbody>${body||`<tr><td colspan="15" class="empty">No matching sites.</td></tr>`}</tbody></table>`;
   document.getElementById('qtMore').innerHTML=(!q&&QT.f==='all'&&f.length>lim)?`<button type="button" class="chipbtn" data-more aria-pressed="true">${QT.more?'Show top '+lim:'Show all '+f.length+' sites'}</button>`:'';
   const top=pool.slice().sort((a,b)=>b.t-a.t).slice(0,8), tx=Math.max(.01,...top.map(r=>r.t)), sw=pool.filter(r=>r.sw).sort((a,b)=>b.sc-a.sc).slice(0,8), sx=Math.max(.01,...sw.map(r=>r.sc));
   const stp=r=>`${ML[0]}→${ML[1]} ${pct(r.s1,0)} · ${ML[1]}→${ML[2]} ${pct(r.s2,0)}`;
@@ -95,7 +95,7 @@ function renderQuarter(){
 document.addEventListener('change',e=>{ if(e.target&&e.target.id==='qtQ'){QT.q=e.target.value; renderQuarter();} });
 document.addEventListener('input',e=>{ if(e.target&&e.target.id==='qtSearch') renderQuarter(); });
 document.addEventListener('click',e=>{
-  const f=e.target.closest('#qtFilt [data-f]'); if(f){QT.f=f.dataset.f; QT.sk=QT.f==='both'?'vb':QT.f==='swing'?'sc':'t'; QT.dir='desc'; renderQuarter(); return;}
+  const f=e.target.closest('#qtFilt [data-f]'); if(f){QT.f=f.dataset.f; QT.sk=QT.f==='both'||QT.f==='allover'?'vb':QT.f==='swing'?'sc':'t'; QT.dir='desc'; renderQuarter(); return;}
   if(e.target.closest('#qtHide')){QT.hide=!QT.hide; renderQuarter(); return;}
   if(e.target.closest('#qtCopy')){copyText(QT.tsv||'',document.getElementById('qtMsg')); return;}
   const h=e.target.closest('#qtTable th button'); if(h){e.stopPropagation(); const k=h.dataset.k; if(QT.sk===k) QT.dir=QT.dir==='desc'?'asc':'desc'; else {QT.sk=k; QT.dir=k==='name'?'asc':'desc';} renderQuarter(); return;}

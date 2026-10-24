@@ -86,3 +86,5 @@ Unusual swings || Naik turun tidak wajar || Altibajos inusuales
 Unusual ups and downs || Naik turun tidak wajar || Altibajos inusuales
 Biggest rise over the quarter || Kenaikan terbesar sepanjang kuartal || Mayor aumento del trimestre
 Pattern || Pola || Patrón
+Over budget every month || Over budget setiap bulan || Excede el presupuesto cada mes
+vs budget by month || vs budget per bulan || vs presupuesto por mes
