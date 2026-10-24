@@ -68,3 +68,11 @@ Cost (Rp, incl. PPN) || Biaya (Rp, termasuk PPN) || Costo (Rp, incl. PPN)
 Why || Penyebab || Motivo
 Driver || Penyebab utama || Factor principal
 Budget || Budget || Presupuesto
+Brief || Ringkasan || Resumen
+What the data says || Yang ditunjukkan data || Qué dicen los datos
+Full data || Data lengkap || Datos completos
+Message to ask (Bahasa Indonesia) || Pesan untuk bertanya (Bahasa Indonesia) || Mensaje para preguntar (en indonesio)
+Copy message || Salin pesan || Copiar mensaje
+Copy data table || Salin tabel data || Copiar tabla de datos
+kWh by month || kWh per bulan || kWh por mes
+Cost by month || Biaya per bulan || Costo por mes

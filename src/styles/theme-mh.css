@@ -210,3 +210,11 @@ td.tk-why .fu{display:inline-block;margin:0 4px 4px 0}
 .qtt td.hs{white-space:nowrap}
 .qtt td small{white-space:normal}
 #qtKpis{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.brbtn{padding:3px 10px;font-size:12px;border-radius:999px;white-space:nowrap}
+.brh{margin:18px 0 6px;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:var(--mute,#6b7280)}
+.brl{margin:0;padding-left:18px;display:grid;gap:6px;line-height:1.45}
+.brt{min-width:640px}.brt th:first-child{text-align:left;white-space:nowrap}.brt td{text-align:right;white-space:nowrap}.brt td.pre{opacity:.6}.brt tr.strong th,.brt tr.strong td{font-weight:700}.brt tr.mute th,.brt tr.mute td{color:var(--mute,#6b7280);font-size:12px}
+.brmsg{width:100%;box-sizing:border-box;font:inherit;line-height:1.5;padding:12px;border:1px solid var(--line,#e5e7eb);border-radius:12px;background:var(--card,#fff);color:inherit;resize:vertical}
+.brbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.brcharts{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-top:6px}
+.brcharts>div{min-width:0}
