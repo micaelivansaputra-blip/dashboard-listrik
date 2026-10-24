@@ -28,7 +28,7 @@ function qtRows(){
       else if(u==='down') why='Usage down, cost steady';
       else if(c==='down') why='Cost down, usage steady';
       else why='Stable'; }
-    return {n:x.n,s:{n:qtName(x.n),r:qtRegion(x.n)},kw,cs,rt,ok,s1:ok?kw[1]/kw[0]-1:null,s2:ok?kw[2]/kw[1]-1:null,t,ct,rc,why,bud,vb:ok&&bud?kw[2]/bud-1:null,flag,bad:!!flag};
+    return {n:x.n,s:{n:qtName(x.n),r:qtRegion(x.n)},kw,cs,rt,ok,s1:ok?kw[1]/kw[0]-1:null,s2:ok?kw[2]/kw[1]-1:null,t,ct,rc,why,bud,vb:ok&&bud?kw[2]/bud-1:null,vbm:ok&&bd?kw.map((k,i)=>k/bd.m[+ms[i].slice(5)-1]-1):null,flag,bad:!!flag};
   });
 }
 function qtSpark(v){ const mx=Math.max(...v), mn=Math.min(...v)*.9; return `<svg viewBox="0 0 54 26" aria-hidden="true">${v.map((x,i)=>{const h=Math.max(3,(x-mn)/(mx-mn||1)*22); return `<rect x="${i*19}" y="${25-h}" width="14" height="${h}" rx="3" fill="var(--blue)" opacity="${.35+i*.3}"/>`;}).join('')}</svg>`; }
@@ -70,8 +70,8 @@ function renderQuarter(){
   const g=(t,n)=>`<th colspan="${n}" class="grp">${t}</th>`;
   document.getElementById('qtTable').innerHTML=`<table class="ptable qtt" style="min-width:1180px"><thead><tr><th></th>${g('kWh usage (invoice)',5)}${g('Cost (Rp, incl. PPN)',4)}${g('Why',2)}${g('Budget',1)}</tr><tr>${th('name','Site')}${ML.map(m=>`<th class="hs">${m}</th>`).join('')}${th('t',ML[2]+' vs '+ML[0])}<th class="hs">Trend</th>${ML.map(m=>`<th class="hs">${m}</th>`).join('')}${th('ct',ML[2]+' vs '+ML[0])}${th('rc',ML[2]+' cost per kWh','hs')}<th class="hs">Driver</th>${th('vb',ML[2]+' budget (kWh)','hs')}</tr></thead><tbody>${body||`<tr><td colspan="13" class="empty">No matching sites.</td></tr>`}</tbody></table>`;
   document.getElementById('qtMore').innerHTML=(!q&&QT.f==='all'&&f.length>lim)?`<button type="button" class="chipbtn" data-more aria-pressed="true">${QT.more?'Show top '+lim:'Show all '+f.length+' sites'}</button>`:'';
-  const mv=pool.filter(r=>r.t>CT.lo).sort((a,b)=>b.t-a.t).slice(0,6), mx=Math.max(.01,...mv.map(r=>r.t));
-  document.getElementById('qtMovers').innerHTML=mv.length?mv.map(r=>`<div class="mvrow" data-brief="${fuEsc(r.n)}" tabindex="0"><b>${short(r.s.n)}</b><em class="up">${fmt(r.kw[0])} → ${fmt(r.kw[2])} kWh · ${pct(r.t)}<br><span style="font-weight:500">${qtIdr(r.cs[0])} → ${qtIdr(r.cs[2])} · cost ${pct(r.ct)}</span></em><div class="mvbar"><i style="width:${Math.max(3,r.t/mx*100)}%;background:var(--up)"></i></div></div>`).join(''):'<div class="note">No site increased by more than 5% in this quarter.</div>';
+  const mv=pool.filter(r=>r.t>CT.lo&&r.vb!=null&&r.vb>CT.lo).sort((a,b)=>b.vb-a.vb).slice(0,6), mx=Math.max(.01,...mv.map(r=>r.vb));
+  document.getElementById('qtMovers').innerHTML=mv.length?mv.map(r=>`<div class="mvrow" data-brief="${fuEsc(r.n)}" tabindex="0"><b>${short(r.s.n)}</b><em class="up">${pct(r.vb)} vs budget in ${ML[2]}<br><span style="font-weight:500">${fmt(r.kw[0])} → ${fmt(r.kw[2])} kWh (${pct(r.t)}) · vs budget ${r.vbm.map((x,i)=>ML[i]+' '+pct(x,0)).join(' · ')}</span></em><div class="mvbar"><i style="width:${Math.max(3,r.vb/mx*100)}%;background:var(--up)"></i></div></div>`).join(''):'<div class="note">No site is both increasing and above its budget in this quarter.</div>';
   QT.tsv=['Site\tRegion\t'+ML.map(m=>m+' kWh').join('\t')+'\tkWh '+ML[2]+' vs '+ML[0]+'\t'+ML.map(m=>m+' Rp').join('\t')+'\tCost '+ML[2]+' vs '+ML[0]+'\t'+ML[2]+' Rp per kWh\tDriver\t'+ML[2]+' budget kWh\t'+ML[2]+' kWh vs budget\tData note',...f.map(r=>[r.s.n,r.s.r,...r.kw.map(Math.round),(r.t*100).toFixed(1)+'%',...r.cs.map(Math.round),(r.ct*100).toFixed(1)+'%',Math.round(r.rt[2]),r.why,r.bud?Math.round(r.bud):'',r.vb==null?'':(r.vb*100).toFixed(1)+'%',r.flag].join('\t'))].join('\n');
 }
 document.addEventListener('change',e=>{ if(e.target&&e.target.id==='qtQ'){QT.q=e.target.value; renderQuarter();} });
