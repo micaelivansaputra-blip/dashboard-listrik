@@ -101,3 +101,20 @@ body{background:var(--bg);color:var(--ink)}
   .kpi{padding:16px 16px 14px 70px;min-height:0}
   .kpi::before{left:14px;top:16px;width:42px;height:42px}
 }
+
+/* brand: reel mark + Cinépolis wordmark (own drawing, swap for the official logo file if you have one) */
+.logo-mark{width:40px!important;height:40px!important;border-radius:12px!important}
+.logo-mark svg{width:26px!important;height:26px!important;fill:#fff!important}
+.logo-mark svg .hole{fill:var(--cp)}
+.cp-word{display:block;font-weight:800;font-style:italic;font-size:21px;letter-spacing:-.02em;line-height:1;color:var(--cp);margin-bottom:3px}
+.brand h1{font-size:12px!important;font-weight:600!important;color:var(--muted)!important;letter-spacing:.01em}
+.sidebar .brand h1{font-size:12px!important;max-width:none}
+
+/* bottom-left: little cinema (screen glow + rows of seats) */
+@media(min-width:1101px){
+  body.has-side .sidebar::after{content:"NOW SHOWING · ENERGY SAVER";display:block;flex:none;margin-top:auto;height:150px;position:sticky;bottom:0;padding:12px 12px 0;border-radius:16px;
+    font-size:10px;font-weight:800;letter-spacing:.1em;color:var(--cp-yellow);text-align:center;
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 110' preserveAspectRatio='xMidYMax slice'%3E%3Cpath d='M30 4h140l14 40H16z' fill='%23ffffff' fill-opacity='.14'/%3E%3Crect x='30' y='4' width='140' height='4' rx='2' fill='%23ffc928'/%3E%3Cg fill='%23ffffff' fill-opacity='.55'%3E%3Cg id='r'%3E%3Crect x='22' y='58' width='14' height='11' rx='4'/%3E%3Crect x='42' y='58' width='14' height='11' rx='4'/%3E%3Crect x='62' y='58' width='14' height='11' rx='4'/%3E%3Crect x='82' y='58' width='14' height='11' rx='4'/%3E%3Crect x='104' y='58' width='14' height='11' rx='4'/%3E%3Crect x='124' y='58' width='14' height='11' rx='4'/%3E%3Crect x='144' y='58' width='14' height='11' rx='4'/%3E%3Crect x='164' y='58' width='14' height='11' rx='4'/%3E%3C/g%3E%3Cg transform='translate(0 20)' fill-opacity='.8'%3E%3Cuse href='%23r'/%3E%3C/g%3E%3Cg transform='translate(0 40)' fill-opacity='1'%3E%3Cuse href='%23r'/%3E%3C/g%3E%3C/g%3E%3Ccircle cx='78' cy='64' r='5' fill='%23ffc928'/%3E%3Ccircle cx='122' cy='84' r='5' fill='%23ffc928'/%3E%3C/svg%3E") center bottom/100% auto no-repeat,
+      linear-gradient(170deg,var(--cp-deep),var(--cp))}
+}
