@@ -18,7 +18,7 @@
       <div class="filters"><label class="f gsite" for="gSite">Find site<input id="gSite" type="search" list="gSiteList" placeholder="Any site" autocomplete="off"><datalist id="gSiteList"></datalist></label><label class="f" for="region" id="regionLbl">Region<select id="region"></select></label>
         <div class="upd"><button type="button" class="updbtn" id="updBtn">Update data</button><input id="fileIn" type="file" accept=".xlsx,.xlsm" hidden><button type="button" class="refbtn" id="refBtn" aria-label="Refresh data" title="Refresh data"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 11-2.4-5.7"/><path d="M20 4v5h-5"/></svg></button></div></div>
       <nav class="nav nav-src" id="nav" aria-label="Section navigation">
-        <button data-t="s-ringkasan" aria-current="true">MTD Oct</button><button data-t="s-tren">Trend</button><button data-t="s-mom">Month to Month</button><button data-t="s-quarter">Quarter</button><button data-t="s-hari">Weekday vs Weekend</button><button data-t="s-site">Perform Site</button><button data-t="s-week">Weekly Zones</button><button data-t="s-explore">Site Explorer</button><button data-t="s-cek">Site Concern</button><button data-t="s-track">Tracking</button><button data-t="s-notes">Notes History</button><button data-t="s-admits">Admits vs kWh</button><button data-t="s-drivers">Why kWh Rose</button><button data-t="s-program">Project ZOEC</button>
+        <button data-t="s-ringkasan" aria-current="true">MTD Oct</button><button data-t="s-tren">Trend</button><button data-t="s-mom">Month to Month</button><button data-t="s-quarter">Quarter</button><button data-t="s-hari">Weekday vs Weekend</button><button data-t="s-site">Perform Site</button><button data-t="s-perf">Site Performance</button><button data-t="s-week">Weekly Zones</button><button data-t="s-explore">Site Explorer</button><button data-t="s-cek">Site Concern</button><button data-t="s-track">Tracking</button><button data-t="s-notes">Notes History</button><button data-t="s-admits">Admits vs kWh</button><button data-t="s-drivers">Why kWh Rose</button><button data-t="s-program">Project ZOEC</button>
       </nav>
       <nav class="nav nav-src" id="navPay" aria-label="Payroll section navigation" hidden><button data-t="p-mtd" id="navMtd" aria-current="true">MTD Oct</button><button data-t="p-sum">Payroll Summary</button><button data-t="p-mon">Month by Month</button><button data-t="p-wk">Weekly Admits &amp; MHDW</button><button data-t="p-site">Site Productivity</button><button data-t="p-cost">Cost Breakdown</button><button data-t="p-how">How It's Calculated</button></nav>
     </div>
@@ -108,6 +108,19 @@
   <section id="s-hari">
     <div class="sec-head"><h2>Avg Weekday vs Weekend</h2></div>
     <div class="card"><div class="ch"><h3>Weekday vs weekend</h3><span class="sub">Average kWh per day</span></div><div class="chartbox"><canvas id="cWd" role="img" aria-label="Average weekday and weekend usage by period"></canvas></div></div>
+  </section>
+
+  <section id="s-perf">
+    <div class="sec-head"><h2>Site Performance <small id="pfSub"></small></h2></div>
+    <div class="card">
+      <div class="ctl">
+        <label class="f" for="pfMonth">Month<select id="pfMonth"></select></label>
+        <label class="f" for="pfSearch">Search site<input id="pfSearch" type="search" placeholder="e.g. Manado"></label>
+      </div>
+      <div class="pfcards" id="pfCards"></div>
+      <div class="note" id="pfNote"></div>
+      <div class="tbl-wrap" id="pfTable"></div>
+    </div>
   </section>
 
   <section id="s-site">

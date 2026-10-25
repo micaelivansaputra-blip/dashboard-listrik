@@ -1379,6 +1379,25 @@ body{padding-bottom:20px!important}
 /* chart card fills the same height as the insight panel */
 @media(min-width:1101px){#ovDaily{align-self:stretch;display:flex;flex-direction:column}#ovDaily>svg,#ovDaily>div:has(svg){flex:1;min-height:0}}
 
+/* Site Performance */
+.pfcards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:6px 0 10px}
+@media(max-width:900px){.pfcards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.pfc{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;gap:2px;padding:14px 16px;border:1px solid var(--hair);border-radius:16px;background:var(--surface)}
+.pfc:hover{border-color:var(--cp)}
+.pfc[aria-pressed="true"]{border-color:var(--cp);background:var(--cp-soft);box-shadow:inset 0 0 0 1px var(--cp)}
+.pfl{font-size:13px;font-weight:600;color:var(--muted)}
+.pfv{font-size:32px;font-weight:700;letter-spacing:-.02em;line-height:1.1}
+.pfc.up .pfv{color:var(--up-ink)}.pfc.down .pfv{color:var(--down-ink)}
+.pfn{font-size:12.5px;color:var(--muted);line-height:1.3}
+.pft td.hs,.pft th.hs{text-align:right;white-space:nowrap}
+.pft b.up{color:var(--up-ink)}.pft b.down{color:var(--down-ink)}
+.pfb{display:flex;flex-direction:column;align-items:flex-end;gap:3px;min-width:92px}
+.pfb span{font-weight:600}.pfb span.over{color:var(--up-ink)}.pfb span.save{color:var(--down-ink)}
+.pfb i{display:block;height:5px;border-radius:3px;background:var(--flat)}.pfb i.over{background:var(--up)}.pfb i.save{background:var(--down)}
+.pfp{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12.5px;font-weight:600;white-space:nowrap}
+.pfp.over{background:var(--up-soft);color:var(--up-ink)}.pfp.save{background:var(--down-soft);color:var(--down-ink)}.pfp.on{background:var(--cp-soft);color:var(--cp)}
+.pft tr.row{cursor:pointer}
+
 </style>
 
 <div class="wrap">
@@ -1392,7 +1411,7 @@ body{padding-bottom:20px!important}
       <div class="filters"><label class="f gsite" for="gSite">Find site<input id="gSite" type="search" list="gSiteList" placeholder="Any site" autocomplete="off"><datalist id="gSiteList"></datalist></label><label class="f" for="region" id="regionLbl">Region<select id="region"></select></label>
         <div class="upd"><button type="button" class="updbtn" id="updBtn">Update data</button><input id="fileIn" type="file" accept=".xlsx,.xlsm" hidden><button type="button" class="refbtn" id="refBtn" aria-label="Refresh data" title="Refresh data"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 11-2.4-5.7"/><path d="M20 4v5h-5"/></svg></button></div></div>
       <nav class="nav nav-src" id="nav" aria-label="Section navigation">
-        <button data-t="s-ringkasan" aria-current="true">MTD Oct</button><button data-t="s-tren">Trend</button><button data-t="s-mom">Month to Month</button><button data-t="s-quarter">Quarter</button><button data-t="s-hari">Weekday vs Weekend</button><button data-t="s-site">Perform Site</button><button data-t="s-week">Weekly Zones</button><button data-t="s-explore">Site Explorer</button><button data-t="s-cek">Site Concern</button><button data-t="s-track">Tracking</button><button data-t="s-notes">Notes History</button><button data-t="s-admits">Admits vs kWh</button><button data-t="s-drivers">Why kWh Rose</button><button data-t="s-program">Project ZOEC</button>
+        <button data-t="s-ringkasan" aria-current="true">MTD Oct</button><button data-t="s-tren">Trend</button><button data-t="s-mom">Month to Month</button><button data-t="s-quarter">Quarter</button><button data-t="s-hari">Weekday vs Weekend</button><button data-t="s-site">Perform Site</button><button data-t="s-perf">Site Performance</button><button data-t="s-week">Weekly Zones</button><button data-t="s-explore">Site Explorer</button><button data-t="s-cek">Site Concern</button><button data-t="s-track">Tracking</button><button data-t="s-notes">Notes History</button><button data-t="s-admits">Admits vs kWh</button><button data-t="s-drivers">Why kWh Rose</button><button data-t="s-program">Project ZOEC</button>
       </nav>
       <nav class="nav nav-src" id="navPay" aria-label="Payroll section navigation" hidden><button data-t="p-mtd" id="navMtd" aria-current="true">MTD Oct</button><button data-t="p-sum">Payroll Summary</button><button data-t="p-mon">Month by Month</button><button data-t="p-wk">Weekly Admits &amp; MHDW</button><button data-t="p-site">Site Productivity</button><button data-t="p-cost">Cost Breakdown</button><button data-t="p-how">How It's Calculated</button></nav>
     </div>
@@ -1482,6 +1501,19 @@ body{padding-bottom:20px!important}
   <section id="s-hari">
     <div class="sec-head"><h2>Avg Weekday vs Weekend</h2></div>
     <div class="card"><div class="ch"><h3>Weekday vs weekend</h3><span class="sub">Average kWh per day</span></div><div class="chartbox"><canvas id="cWd" role="img" aria-label="Average weekday and weekend usage by period"></canvas></div></div>
+  </section>
+
+  <section id="s-perf">
+    <div class="sec-head"><h2>Site Performance <small id="pfSub"></small></h2></div>
+    <div class="card">
+      <div class="ctl">
+        <label class="f" for="pfMonth">Month<select id="pfMonth"></select></label>
+        <label class="f" for="pfSearch">Search site<input id="pfSearch" type="search" placeholder="e.g. Manado"></label>
+      </div>
+      <div class="pfcards" id="pfCards"></div>
+      <div class="note" id="pfNote"></div>
+      <div class="tbl-wrap" id="pfTable"></div>
+    </div>
   </section>
 
   <section id="s-site">
@@ -2343,7 +2375,7 @@ const Pager = (function () {
     elec: [
       { id: 'overview', label: 'Overview', items: ['s-ringkasan', 's-tren'] },
       { id: 'compare', label: 'Compare', items: ['s-mom', 's-quarter', 's-hari'] },
-      { id: 'sites', label: 'Sites', items: ['s-week', 's-explore'] },
+      { id: 'sites', label: 'Sites', items: ['s-perf', 's-week', 's-explore'] },
       { id: 'concerns', label: 'Concerns', items: ['s-cek', 's-notes', 's-admits'] },
       { id: 'zoec', label: 'Project ZOEC', items: ['s-program'] }
     ],
@@ -3836,7 +3868,7 @@ function render(){
   if(APP==='pay'){renderPay();Pager.sync();return;}
   const list=selected(); const P=periods(list);
   document.getElementById('asof').textContent=`Data through ${dm(days[N-1])} 2026 · ${list.length} sites${REGION==='All'?'':' · '+REGION}`;
-  renderOverview(list); renderCharts(P); renderSites(list); renderConcern(list,P); renderProgram(); renderFoot(list); renderMom(); renderExplorer(); renderWeekly(); App.refresh(); Pager.sync();
+  renderOverview(list); renderCharts(P); renderSites(list); renderPerf(list); renderConcern(list,P); renderProgram(); renderFoot(list); renderMom(); renderExplorer(); renderWeekly(); App.refresh(); Pager.sync();
   
 }
 /* navigation is handled by core/pager.js; the section buttons in #nav and #navPay stay in the DOM as the list of pages that exist */
@@ -4448,6 +4480,51 @@ document.addEventListener('click',e=>{
   const h=e.target.closest('#qtTable th button'); if(h){e.stopPropagation(); const k=h.dataset.k; if(QT.sk===k) QT.dir=QT.dir==='desc'?'asc':'desc'; else {QT.sk=k; QT.dir=k==='name'?'asc':'desc';} renderQuarter(); return;}
   if(e.target.closest('#qtMore [data-more]')){QT.more=!QT.more; renderQuarter();}
 });
+
+/* ---------- Site Performance: every site against its budget for one month (default = month to date) ----------
+   Three cards double as filters: Over budget, Saving, On budget. Reuses ovSite() from the overview, so the numbers
+   match the MTD page exactly. Tap a row for the site's daily chart. */
+const PF={f:'all',sk:'ex',dir:'desc',q:''};
+function pfPrev(ym){const y=+ym.slice(0,4),m=+ym.slice(5);return m>1?y+'-'+String(m-1).padStart(2,'0'):null;}
+function renderPerf(list){
+  const $=id=>document.getElementById(id); if(!$('pfTable')) return;
+  const last=ovLast(), months=ovMonthList(), ym=(OVM&&months.includes(OVM))?OVM:last, mi=+ym.slice(5)-1, isLast=ym===last;
+  const sel=$('pfMonth'), sig=months.join(',')+'|'+ym;
+  if(sel.dataset.sig!==sig){sel.innerHTML=months.slice().reverse().map(m=>`<option value="${m}">${MONFULL[+m.slice(5)-1]} ${m.slice(0,4)}${m===last?' (MTD)':''}</option>`).join(''); sel.dataset.sig=sig;}
+  sel.value=ym;
+  const nb=document.querySelector('#nav [data-t="s-perf"]'); if(nb&&nb.textContent!=='Site Performance') nb.textContent='Site Performance';
+  const py=pfPrev(ym), pm=py?MN[+py.slice(5)-1]:'';
+  const all=list.map(s=>{const r=ovSite(s,ym); if(!r) return null; r.pv=py?siteMonth(s,'v:'+py,'all'):NaN; r.t=Number.isFinite(r.pv)&&r.pv>0?r.act/r.pv-1:null; r.st=r.p>CT.lo?'over':r.p<-CT.lo?'save':'on'; return r;}).filter(Boolean);
+  const cnt=k=>all.filter(r=>r.st===k), sum=a=>a.reduce((t,r)=>t+r.ex,0);
+  const ov=cnt('over'), sv=cnt('save'), on=cnt('on');
+  const dim=all[0]?all[0].dim:30, nd=isLast?days.filter(d=>d.slice(0,7)===ym).length:dim;
+  $('pfSub').textContent=all.length?`${MONFULL[mi]} ${ym.slice(0,4)}${isLast&&nd<dim?' · month to date, 1–'+nd:''} · ${all.length} sites`:'';
+  const card=(k,t,a,cls,note)=>`<button type="button" class="pfc ${cls}" data-pf="${k}" aria-pressed="${PF.f===k}"><span class="pfl">${t}</span><span class="pfv">${a.length}</span><span class="pfn">${note}</span></button>`;
+  $('pfCards').innerHTML=
+    card('all','All sites',all,'',`${fmt(all.reduce((t,r)=>t+r.act,0))} kWh/day vs budget ${fmt(all.reduce((t,r)=>t+r.bud,0))}`)+
+    card('over','Over budget',ov,'up',`more than 5% above · ${ov.length?'+'+fmt(sum(ov)):'0'} kWh/day`)+
+    card('save','Saving',sv,'down',`more than 5% below · ${sv.length?'−'+fmt(Math.abs(sum(sv))):'0'} kWh/day`)+
+    card('on','On budget',on,'flat','within 5% either way');
+  const q=$('pfSearch').value.trim().toLowerCase();
+  let f=all.filter(r=>(PF.f==='all'||r.st===PF.f)&&(!q||r.s.n.toLowerCase().includes(q)));
+  const d=PF.dir==='desc'?1:-1;
+  f.sort((x,y)=>PF.sk==='name'?x.s.n.localeCompare(y.s.n)*(PF.dir==='asc'?1:-1):((y[PF.sk]??-1e9)-(x[PF.sk]??-1e9))*d);
+  const mx=Math.max(.2,...f.map(r=>Math.abs(r.p)));
+  const pill=r=>`<span class="pfp ${r.st}">${r.st==='over'?'Over budget':r.st==='save'?'Saving':'On budget'}</span>`;
+  const th=(k,l,c='')=>`<th class="${c} ${PF.sk===k?'sorted':''}" aria-sort="${PF.sk===k?(PF.dir==='asc'?'ascending':'descending'):'none'}"><button type="button" data-k="${k}">${l}${PF.sk===k?(PF.dir==='asc'?' ▲':' ▼'):''}</button></th>`;
+  const body=f.map(r=>`<tr class="row" data-n="${fuEsc(r.s.n)}" tabindex="0"><td><div class="sn"><span class="sd ${r.st==='over'?'up':r.st==='save'?'down':'flat'}"></span><span><b>${short(r.s.n)}${fuHas(r.s.n)?'<i class="nd" title="Has a note"></i>':''}</b><small>${r.s.r}${r.s.partial?' · partial meter':''}</small></span></div></td>
+    <td class="hs">${fmt(r.act)}</td><td class="hs">${fmt(r.bud)}</td><td class="hs"><b class="${r.st==='over'?'up':r.st==='save'?'down':''}">${r.ex>=0?'+':'−'}${fmt(Math.abs(r.ex))}</b></td>
+    <td class="hs"><div class="pfb"><span class="${r.st}">${pct(r.p)}</span><i class="${r.st}" style="width:${Math.max(3,Math.abs(r.p)/mx*100)}%"></i></div></td>
+    <td class="hs">${r.t==null?'<small class="tk-n">—</small>':`<span class="cell ${r.t>CT.lo?'up':r.t<-CT.lo?'down':'flat'}">${pct(r.t)}</span>`}</td><td>${pill(r)}</td></tr>`).join('');
+  $('pfTable').innerHTML=`<table class="ptable pft"><thead><tr>${th('name','Site')}${th('act','Actual kWh/day','hs')}${th('bud','Budget','hs')}${th('ex','Gap kWh/day','hs')}${th('p','vs budget','hs')}${th('t',pm?'vs '+pm:'vs last month','hs')}<th>Status</th></tr></thead><tbody>${body||'<tr><td colspan="7" class="empty">No matching sites.</td></tr>'}</tbody></table>`;
+  $('pfNote').textContent=`Budget per day = monthly budget ÷ ${dim} days. Over or under budget means more than 5% away from budget. Tap a row for the daily chart.`;
+}
+document.addEventListener('click',e=>{
+  const c=e.target.closest('[data-pf]'); if(c){PF.f=c.dataset.pf; PF.sk='ex'; PF.dir=PF.f==='save'?'asc':'desc'; renderPerf(selected()); return;}
+  const h=e.target.closest('#pfTable th button'); if(h){e.stopPropagation(); const k=h.dataset.k; if(PF.sk===k) PF.dir=PF.dir==='desc'?'asc':'desc'; else {PF.sk=k; PF.dir=k==='name'?'asc':'desc';} renderPerf(selected());}
+});
+document.addEventListener('input',e=>{ if(e.target&&e.target.id==='pfSearch') renderPerf(selected()); });
+document.addEventListener('change',e=>{ if(e.target&&e.target.id==='pfMonth'){OVM=e.target.value; render();} });
 
 /* ---------- Site brief: everything needed to ask a site about its electricity, plus a ready-to-send polite message (Bahasa Indonesia) ----------
    Sources: invoice (INVOICE), kWh budget (BUDGET), P&L admissions and electricity (PNL, New DB Financial Sep 2026), daily meter data for the current month.
