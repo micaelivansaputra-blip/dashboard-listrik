@@ -14,7 +14,7 @@ APP_FILES = [
     'legacy/80-payroll-state.js', 'legacy/81-payroll-mtd.js', 'legacy/82-payroll-calc.js',
     'legacy/83-payroll-cost.js', 'legacy/84-payroll-how.js', 'legacy/85-payroll-render.js',
     'legacy/90-navigation.js', 'legacy/91-controls-theme-lang.js', 'legacy/92-update-excel.js',
-    'legacy/93-followups.js', 'legacy/95-concern-export.js', 'legacy/96-notes-history.js', 'legacy/97-track.js', 'legacy/98-quarter.js', 'legacy/98-perf.js', 'legacy/99-brief.js',
+    'legacy/93-followups.js', 'legacy/95-concern-export.js', 'legacy/96-notes-history.js', 'legacy/97-track.js', 'legacy/98-quarter.js', 'legacy/98-perf.js', 'legacy/98-evaloct.js', 'legacy/99-brief.js',
 ]
 MODULE_FILES = []   # VIPER modules, appended by modules/*/manifest below
 for m in sorted((SRC / 'modules').glob('*/manifest.json')):
@@ -29,7 +29,7 @@ def build():
     html = rd('index.template.html')
     html = html.replace('/*STYLES*/', '<style>\n' + css + '\n</style>')
     html = html.replace('/*I18NCORE*/', i18n).replace('/*ENGINE*/', rd('core/engine.js')).replace('/*PAYENGINE*/', rd('legacy/payroll-engine.js'))
-    html = html.replace('/*APP*/', app).replace('/*DATA*/', rd('data/electricity.json')).replace('/*BUDGET*/', rd('data/budget.json')).replace('/*INVOICE*/', rd('data/invoice.json')).replace('/*PNL*/', rd('data/pnl.json'))
+    html = html.replace('/*APP*/', app).replace('/*DATA*/', rd('data/electricity.json')).replace('/*BUDGET*/', rd('data/budget.json')).replace('/*INVOICE*/', rd('data/invoice.json')).replace('/*PNL*/', rd('data/pnl.json')).replace('/*EVAL*/', rd('data/evaloct.json'))
     return html
 
 if __name__ == '__main__':
