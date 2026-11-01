@@ -22,7 +22,7 @@ for x in fc:
     if r['ly']:
         r['vly'] = r['fc'] - r['ly']; r['bly'] = r['bud'] - r['ly']
     rows.append(r)
-json.dump(dict(asof='2026-10-28', rows=rows), open('src/data/evaloct.json', 'w'), separators=(',', ':'))
+json.dump(dict(asof='2026-10-31', rows=rows), open('src/data/evaloct.json', 'w'), separators=(',', ':'))
 tot = lambda key, rs: sum(r[key] for r in rs)
 print('all', len(rows), tot('bud', rows), tot('fc', rows), tot('gap', rows))
 dec = [r for r in rows if 'carried' in r]

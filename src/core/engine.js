@@ -80,9 +80,10 @@
       lastOverride: null, minCoverage: 0.8
     }, o || {});
     const SH26 = { WBP: ['Mar-Des26 WBP'], LWBP: ['Mar-Des26 LWBP'] };
-    const SH25 = { WBP: ['Jul25 WBP', 'Aug25 WBP', 'Sep25 WBP', 'Okt25 WBP'], LWBP: ['Jul25 LWBP', 'Aug25 LWBP', 'Sep25 LWBP', 'Okt25 LWBP'] };
+    const SH25 = { WBP: ['Jul25 WBP', 'Aug25 WBP', 'Sep25 WBP', 'Okt25 WBP', 'Nov25 WBP'], LWBP: ['Jul25 LWBP', 'Aug25 LWBP', 'Sep25 LWBP', 'Okt25 LWBP', 'Nov25 LWBP'] };
     const NEED = ['RAW SUMMARY', ...Object.values(SH26).flat(), ...Object.values(SH25).flat(), 'By Weekly'];
     const wb = XLSX.read(buf, { type: o.readType, sheets: NEED, cellFormula: false, cellStyles: false, cellHTML: false });
+    for (const k of ['WBP', 'LWBP']) SH25[k] = SH25[k].filter(n => !n.startsWith('Nov') || wb.Sheets[n]);   // Nov 2025 is only needed for the last days of October
     const need = n => { if (!wb.Sheets[n]) throw new Error('Sheet "' + n + '" was not found in the file.'); return wb.Sheets[n]; };
     const cell = (ws, r, c) => ws[XLSX.utils.encode_cell({ r: r - 1, c: c - 1 })];
     const tofloat = c => {
