@@ -187,3 +187,41 @@ function fuCopyAll(){
   try{const U=await claude.use('user'); if(U&&U.can&&U.can('data.write')===false) FUCAN=false;}catch(e){}
   DB.collection('followups').onSnapshot(s=>{FULOCAL=false;FU={};s.docs.forEach(d=>{FU[d.id]=d.data();});fuRefresh();},()=>{});
 }catch(e){}})();
+
+/* ---- Move notes between browsers. The GitHub link keeps notes in that browser only; the Claude link shares them with the team. ---- */
+function fuLocalRaw(){try{return JSON.parse(localStorage.getItem('followups.v1')||'{}')||{};}catch(e){return {};}}
+function fuShareBar(){
+  const el=document.getElementById('ntShare'); if(!el) return;
+  const nLoc=Object.keys(fuLocalRaw()).length, s=n=>n+' site'+(n===1?'':'s');
+  if(FULOCAL){
+    el.innerHTML=`<div class="ntwarn"><b>These notes are saved only in this browser.</b> People you share this link with cannot see them. Open the dashboard from Claude to share notes with your team.${nLoc?` <button type="button" class="fubtn ghost" id="ntExport">Copy notes of ${s(nLoc)} to move them</button>`:''} <span class="fumsg" id="ntShMsg" role="status"></span></div>`;
+  }else if(FUCAN){
+    el.innerHTML=`<details class="ntwarn ok"><summary>Move notes into the shared dashboard</summary><p class="note">Notes written on another link or browser are not shared yet. Paste what you copied there and import it${nLoc?`, or import the notes of ${s(nLoc)} saved in this browser`:''}. Existing notes are kept; only new ones are added.</p><textarea id="ntImp" rows="3" placeholder="Paste copied notes here"></textarea><div class="fuact"><button type="button" class="fubtn" id="ntImport">Import pasted notes</button>${nLoc?'<button type="button" class="fubtn ghost" id="ntImportLocal">Import notes saved in this browser</button>':''}<span class="fumsg" id="ntShMsg" role="status"></span></div></details>`;
+  }else el.innerHTML='';
+}
+async function fuImport(src){
+  const m=document.getElementById('ntShMsg'), say=(t,c)=>{if(m){m.textContent=t;m.className='fumsg '+(c||'');}};
+  let data; try{data=typeof src==='string'?JSON.parse(src):src;}catch(e){say('Could not read that text. Copy the notes again and paste all of it.','err');return;}
+  if(!data||typeof data!=='object'||!DB){say('Nothing to import.','err');return;}
+  let sites=0,added=0;
+  try{
+    for(const [id,doc] of Object.entries(data)){
+      if(!doc||!doc.site) continue;
+      const cur=FU[id], have=fuNotes(cur), ids=new Set(have.map(x=>x.id)), more=fuNotes(doc).filter(x=>!ids.has(x.id));
+      if(!more.length) continue;
+      const all=have.concat(more).slice(0,200), top=all.slice().sort((a,b)=>fuEff(b).localeCompare(fuEff(a))||String(b.at).localeCompare(String(a.at)))[0], base=cur||doc;
+      await DB.doc('followups/'+id).set({site:doc.site,status:base.status||'open',due:base.due||'',tag:top.tag,cm:top.cm,reason:top.reason,by:top.by,at:top.at,notes:all});
+      sites++; added+=more.length;
+    }
+    say(added?`Imported ${added} note${added===1?'':'s'} for ${sites} site${sites===1?'':'s'}. Your team can see them now.`:'No new notes to import.',added?'ok':'');
+  }catch(e){say('Not saved. '+fuErr(e),'err');}
+}
+document.addEventListener('click',async e=>{
+  const x=e.target.closest('#ntExport'), i=e.target.closest('#ntImport'), l=e.target.closest('#ntImportLocal');
+  if(x){
+    const t=JSON.stringify(FU), m=document.getElementById('ntShMsg');
+    try{await navigator.clipboard.writeText(t); if(m){m.textContent='Copied. Open the dashboard from Claude, go to Notes History and import it there.';m.className='fumsg ok';}}
+    catch(err){const a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();let ok=false;try{ok=document.execCommand('copy');}catch(z){}a.remove();if(m){m.textContent=ok?'Copied. Open the dashboard from Claude, go to Notes History and import it there.':'Could not copy. Try again.';m.className='fumsg '+(ok?'ok':'err');}}
+  }else if(i){const v=(document.getElementById('ntImp')||{}).value||''; if(!v.trim()){const m=document.getElementById('ntShMsg'); if(m){m.textContent='Paste the copied notes first.';m.className='fumsg err';} return;} fuImport(v);}
+  else if(l) fuImport(fuLocalRaw());
+});

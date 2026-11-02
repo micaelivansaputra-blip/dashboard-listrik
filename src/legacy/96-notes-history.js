@@ -33,7 +33,7 @@ function ntOpts(){
   tg.innerHTML='<option value="all">All reasons</option>'+Object.keys(FUTAG).map(k=>`<option value="${k}">${FUTAG[k]}</option>`).join('');
 }
 function renderNotes(){
-  const box=document.getElementById('ntList'); if(!box) return; ntOpts();
+  const box=document.getElementById('ntList'); if(!box) return; ntOpts(); fuShareBar();
   const all=ntEntries(), list=ntFilter(all), sites=new Set(list.map(e=>e.site)).size;
   document.getElementById('ntSum').textContent=all.length?`${list.length} note${list.length===1?'':'s'} · ${sites} site${sites===1?'':'s'}${list.length!==all.length?' (filtered)':''}`:'';
   document.querySelectorAll('#ntView button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.nt===NT.view)));

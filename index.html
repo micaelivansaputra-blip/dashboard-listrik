@@ -1427,6 +1427,12 @@ span.fupic{position:relative;cursor:default}
 .evq{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;font-size:11px;font-weight:600;background:var(--amber-soft);color:#8a5a00}
 .evq.lo{background:var(--up-soft);color:var(--up-ink)}
 
+/* Notes sharing bar */
+.ntwarn{margin:0 0 12px;padding:12px 14px;border-radius:14px;background:var(--amber-soft);color:var(--ink);font-size:13.5px;line-height:1.5;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}
+.ntwarn.ok{display:block;background:var(--cp-soft)}.ntwarn summary{cursor:pointer;font-weight:600}
+.ntwarn textarea{width:100%;box-sizing:border-box;margin:6px 0;border:1px solid var(--hair);border-radius:10px;padding:8px;background:var(--surface);color:var(--ink);font:inherit}
+.ntwarn .fuact{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+
 </style>
 
 <div class="wrap">
@@ -1682,6 +1688,7 @@ span.fupic{position:relative;cursor:default}
   <section id="s-notes">
     <div class="sec-head"><h2>Notes History <small>What each CM told us, newest first</small></h2></div>
     <div class="card" id="ntCard">
+      <div id="ntShare"></div>
       <div class="ntbar">
         <input type="search" id="ntQ" placeholder="Search site, reason or note" aria-label="Search notes">
         <div class="seg" id="ntView" role="group" aria-label="View"><button type="button" data-nt="latest" aria-pressed="true">Latest per site</button><button type="button" data-nt="all" aria-pressed="false">Full history</button></div>
@@ -4168,6 +4175,44 @@ function fuCopyAll(){
   DB.collection('followups').onSnapshot(s=>{FULOCAL=false;FU={};s.docs.forEach(d=>{FU[d.id]=d.data();});fuRefresh();},()=>{});
 }catch(e){}})();
 
+/* ---- Move notes between browsers. The GitHub link keeps notes in that browser only; the Claude link shares them with the team. ---- */
+function fuLocalRaw(){try{return JSON.parse(localStorage.getItem('followups.v1')||'{}')||{};}catch(e){return {};}}
+function fuShareBar(){
+  const el=document.getElementById('ntShare'); if(!el) return;
+  const nLoc=Object.keys(fuLocalRaw()).length, s=n=>n+' site'+(n===1?'':'s');
+  if(FULOCAL){
+    el.innerHTML=`<div class="ntwarn"><b>These notes are saved only in this browser.</b> People you share this link with cannot see them. Open the dashboard from Claude to share notes with your team.${nLoc?` <button type="button" class="fubtn ghost" id="ntExport">Copy notes of ${s(nLoc)} to move them</button>`:''} <span class="fumsg" id="ntShMsg" role="status"></span></div>`;
+  }else if(FUCAN){
+    el.innerHTML=`<details class="ntwarn ok"><summary>Move notes into the shared dashboard</summary><p class="note">Notes written on another link or browser are not shared yet. Paste what you copied there and import it${nLoc?`, or import the notes of ${s(nLoc)} saved in this browser`:''}. Existing notes are kept; only new ones are added.</p><textarea id="ntImp" rows="3" placeholder="Paste copied notes here"></textarea><div class="fuact"><button type="button" class="fubtn" id="ntImport">Import pasted notes</button>${nLoc?'<button type="button" class="fubtn ghost" id="ntImportLocal">Import notes saved in this browser</button>':''}<span class="fumsg" id="ntShMsg" role="status"></span></div></details>`;
+  }else el.innerHTML='';
+}
+async function fuImport(src){
+  const m=document.getElementById('ntShMsg'), say=(t,c)=>{if(m){m.textContent=t;m.className='fumsg '+(c||'');}};
+  let data; try{data=typeof src==='string'?JSON.parse(src):src;}catch(e){say('Could not read that text. Copy the notes again and paste all of it.','err');return;}
+  if(!data||typeof data!=='object'||!DB){say('Nothing to import.','err');return;}
+  let sites=0,added=0;
+  try{
+    for(const [id,doc] of Object.entries(data)){
+      if(!doc||!doc.site) continue;
+      const cur=FU[id], have=fuNotes(cur), ids=new Set(have.map(x=>x.id)), more=fuNotes(doc).filter(x=>!ids.has(x.id));
+      if(!more.length) continue;
+      const all=have.concat(more).slice(0,200), top=all.slice().sort((a,b)=>fuEff(b).localeCompare(fuEff(a))||String(b.at).localeCompare(String(a.at)))[0], base=cur||doc;
+      await DB.doc('followups/'+id).set({site:doc.site,status:base.status||'open',due:base.due||'',tag:top.tag,cm:top.cm,reason:top.reason,by:top.by,at:top.at,notes:all});
+      sites++; added+=more.length;
+    }
+    say(added?`Imported ${added} note${added===1?'':'s'} for ${sites} site${sites===1?'':'s'}. Your team can see them now.`:'No new notes to import.',added?'ok':'');
+  }catch(e){say('Not saved. '+fuErr(e),'err');}
+}
+document.addEventListener('click',async e=>{
+  const x=e.target.closest('#ntExport'), i=e.target.closest('#ntImport'), l=e.target.closest('#ntImportLocal');
+  if(x){
+    const t=JSON.stringify(FU), m=document.getElementById('ntShMsg');
+    try{await navigator.clipboard.writeText(t); if(m){m.textContent='Copied. Open the dashboard from Claude, go to Notes History and import it there.';m.className='fumsg ok';}}
+    catch(err){const a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();let ok=false;try{ok=document.execCommand('copy');}catch(z){}a.remove();if(m){m.textContent=ok?'Copied. Open the dashboard from Claude, go to Notes History and import it there.':'Could not copy. Try again.';m.className='fumsg '+(ok?'ok':'err');}}
+  }else if(i){const v=(document.getElementById('ntImp')||{}).value||''; if(!v.trim()){const m=document.getElementById('ntShMsg'); if(m){m.textContent='Paste the copied notes first.';m.className='fumsg err';} return;} fuImport(v);}
+  else if(l) fuImport(fuLocalRaw());
+});
+
 /* ---------- Site Concern: email-ready image (PNG) ----------
    Drawn on a canvas so the picture is crisp and always light, whatever theme the page is in.
    Download saves a PNG; Copy puts the image on the clipboard, ready to paste into an email body. */
@@ -4355,7 +4400,7 @@ function ntOpts(){
   tg.innerHTML='<option value="all">All reasons</option>'+Object.keys(FUTAG).map(k=>`<option value="${k}">${FUTAG[k]}</option>`).join('');
 }
 function renderNotes(){
-  const box=document.getElementById('ntList'); if(!box) return; ntOpts();
+  const box=document.getElementById('ntList'); if(!box) return; ntOpts(); fuShareBar();
   const all=ntEntries(), list=ntFilter(all), sites=new Set(list.map(e=>e.site)).size;
   document.getElementById('ntSum').textContent=all.length?`${list.length} note${list.length===1?'':'s'} · ${sites} site${sites===1?'':'s'}${list.length!==all.length?' (filtered)':''}`:'';
   document.querySelectorAll('#ntView button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.nt===NT.view)));
