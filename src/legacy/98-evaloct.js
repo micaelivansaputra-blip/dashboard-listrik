@@ -1,6 +1,6 @@
 /* ---------- Evaluation Oct: why October is over budget and which sites rose the most ----------
-   Data: src/data/evaloct.json (built by tools/make_evaloct.py from the full-month forecast + invoices).
-   gap = forecast - budget = (Sep usage - Sep budget) [carried over] + (Oct forecast - Sep usage) [usage change] + (Sep budget - Oct budget) [budget cut]. */
+   Data: src/data/evaloct.json (built by tools/make_evaloct.py from the actual invoices).
+   gap = October invoice - budget = (Sep usage - Sep budget) [carried over] + (Oct invoice - Sep invoice) [usage change] + (Sep budget - Oct budget) [budget cut]. */
 const EVALOCT = /*EVAL*/;
 const EV={view:'gap'};
 function evTag(r){
@@ -18,26 +18,26 @@ function renderEvalOct(){
   const allOv=R.filter(r=>r.gp>.05), nOver=allOv.length, nSave=R.filter(r=>r.gp<-.05).length;
   const sepGap=S(dec,'carried'), useCh=S(dec,'usage'), cut=S(dec,'cut'), gapDec=S(dec,'gap');
   const budLY=S(lyR,'bud'), lyTot=S(lyR,'ly'), fcLY=S(lyR,'fc');
-  $('evSub').textContent='Full month · actual meter data to 31 Oct, gaps filled with a forecast';
+  $('evSub').textContent='Actual electricity invoice · October billing period (about 28 Sep to 27 Oct)';
   const card=(t,v,n,c)=>`<div class="pfc ${c}"><span class="pfl">${t}</span><span class="pfv">${v}</span><span class="pfn">${n}</span></div>`;
   $('evCards').innerHTML=
     card('Budget',fmt(S(R,'bud')),'kWh · all 59 sites','')+
-    card('October usage',fmt(S(R,'fc')),'kWh · actual to 31 Oct, gaps forecast','')+
+    card('October invoice',fmt(S(R,'fc')),'kWh · actual invoice','')+
     card('Gap vs budget',sg(gapAll),`${pct(gapAll/S(R,'bud'))} · over budget`,'up')+
     card('Sites over / saving',`${nOver} / ${nSave}`,'more than 5% above / below budget','');
   const why=[
     ['1','Budget was set lower than last October',`For the ${lyR.length} sites that existed in 2025, the October budget is ${fmt(budLY)} kWh versus ${fmt(lyTot)} kWh actually used in Oct 2025 — ${fmt(lyTot-budLY)} kWh (${pct(budLY/lyTot-1)}) below. Compared with September, budgets were cut by ${fmt(cut)} kWh.`],
-    ['2','Usage did not come down enough from September',`These ${dec.length} sites were already ${sg(sepGap)} kWh over budget in September. October usage is ${sg(useCh)} kWh versus the September invoice, so only part of that overshoot disappears while the budget gets tighter.`],
-    ['3','The over-budget sites carry almost all of the gap',`${ov.length} sites are more than 5% above budget with a combined ${sg(S(ov,'gap'))} kWh. ${fmt(S(ov,'carried'))} kWh of it was already there in September, ${fmt(S(ov,'cut'))} kWh comes from the lower budget, and usage added only ${sg(S(ov,'usage'))} kWh.`],
+    ['2','Usage did not come down enough from September',`These ${dec.length} sites were already ${sg(sepGap)} kWh over budget in September. The October invoice is ${sg(useCh)} kWh versus September, so only part of that overshoot disappears, and the budget got ${fmt(cut)} kWh tighter at the same time.`],
+    ['3','The over-budget sites carry almost all of the gap',`${ov.length} sites are more than 5% above budget with a combined ${sg(S(ov,'gap'))} kWh. ${fmt(S(ov,'carried'))} kWh of it was already there in September, ${fmt(S(ov,'cut'))} kWh comes from the lower budget, and the change in usage was ${sg(S(ov,'usage'))} kWh.`],
     ['4','A few sites decide the result',`The top 10 sites add up to ${sg(S(top10,'gap'))} kWh, ${Math.round(S(top10,'gap')/S(allOv,'gap')*100)}% of the ${sg(S(allOv,'gap'))} kWh gap of all ${allOv.length} over-budget sites. Senayan Park alone is ${sg(R.find(r=>r.k===69).gap)} kWh.`],
-    ['5','Versus last October usage is only slightly higher',`October usage is ${fmt(fcLY)} kWh against ${fmt(lyTot)} kWh in Oct 2025 (${pct(fcLY/lyTot-1)}, ${sg(fcLY-lyTot)} kWh). Most of the over-budget position comes from the budget level, not from a jump in consumption.`],
-    ['6','Read some numbers with care',`${R.filter(r=>r.conf!=='High').length} sites are estimated from raw meters or invoices instead of clean daily data. Kendari and K-Square have budgets far above their invoices, so those two look like budget issues, not savings.`]
+    ['5','Usage is also above last October',`October invoices are ${fmt(fcLY)} kWh against ${fmt(lyTot)} kWh in Oct 2025 (${pct(fcLY/lyTot-1)}, ${sg(fcLY-lyTot)} kWh), and the budget was set ${pct(1-budLY/lyTot)} below that usage. The gap is the sum of both.`],
+    ['6','Read some numbers with care',`October billing runs about 28 Sep to 27 Oct, so it is about one day shorter than the calendar month. Cibubur shows the same 52,900 kWh for Aug, Sep and Oct, which looks like an estimate. Kendari and K-Square have budgets far above their invoices, so those two look like budget issues, not savings.`]
   ];
   $('evWhy').innerHTML=why.map(w=>`<div class="evw"><i>${w[0]}</i><div><b>${w[1]}</b><p>${w[2]}</p></div></div>`).join('');
-  const steps=[['September gap (invoice vs budget)',sepGap,'up'],['Usage change vs September',useCh,useCh<0?'down':'up'],['Budget lowered for October',cut,'up'],['October gap (forecast vs budget)',gapDec,'tot']];
+  const steps=[['September gap (invoice vs budget)',sepGap,'up'],['Usage change vs September',useCh,useCh<0?'down':'up'],['Budget lowered for October',cut,'up'],['October gap (invoice vs budget)',gapDec,'tot']];
   const mx=Math.max(...steps.map(s=>Math.abs(s[1])));
   $('evBridge').innerHTML=steps.map(s=>`<div class="evb"><span>${s[0]}</span><div class="evbar"><i class="${s[2]}" style="width:${Math.max(2,Math.abs(s[1])/mx*100)}%"></i></div><b class="${s[2]==='tot'?'':s[1]<0?'down':'up'}">${sg(s[1])}</b></div>`).join('')+
-    `<div class="note">September uses actual invoice kWh (billing period roughly 25th to 24th), October is the calendar month, so the bridge is a guide to direction and size, not an exact reconciliation.</div>`;
+    `<div class="note">Both months use actual invoice kWh, so the bridge compares like with like. The three sites without a September budget are left out.</div>`;
   const v=EV.view, q=$('evSearch').value.trim().toLowerCase();
   const key={gap:'gap',sep:'usage',ly:'vly'}[v];
   let f=R.filter(r=>(!q||r.n.toLowerCase().includes(q))&&(v==='all'||r[key]!=null));
@@ -47,8 +47,8 @@ function renderEvalOct(){
   const body=f.map(r=>{const t=evTag(r);return `<tr><td><div class="sn"><span class="sd ${t[0]==='up'?'up':t[0]==='save'?'down':'flat'}"></span><span><b>${short(r.n)}</b><small>${r.r}${r.ly==null?' · new site':''} ${evDq(r)}</small></span></div></td>
     <td class="hs">${fmt(r.bud)}</td><td class="hs">${fmt(r.fc)}</td><td class="hs"><b class="${r.gap>0?'up':'down'}">${sg(r.gap)}</b></td><td class="hs">${r.gp==null?'—':pct(r.gp)}</td>
     <td class="hs">${cell(r.usage)}</td><td class="hs">${cell(r.vly)}</td><td><span class="pfp ${t[0]}">${t[1]}</span></td></tr>`;}).join('');
-  $('evTable').innerHTML=`<table class="ptable pft"><thead><tr><th>Site</th><th class="hs">Budget</th><th class="hs">Oct usage</th><th class="hs">Gap kWh</th><th class="hs">vs budget</th><th class="hs">vs Sep invoice</th><th class="hs">vs Oct 2025</th><th>Main driver</th></tr></thead><tbody>${body||'<tr><td colspan="8" class="empty">No matching site.</td></tr>'}</tbody></table>`;
-  $('evNote').textContent={gap:'Top 20 sites by gap to the October budget.',sep:'Top 20 sites by October kWh minus the September invoice kWh.',ly:'Top 20 sites by October kWh minus Oct 2025 invoice kWh (sites with a 2025 invoice only).',all:'All 59 sites.'}[v]+' All figures are kWh for the full month. Main driver = the largest part of the gap: overshoot already in September, higher usage, or a lowered budget.';
+  $('evTable').innerHTML=`<table class="ptable pft"><thead><tr><th>Site</th><th class="hs">Budget</th><th class="hs">Oct invoice</th><th class="hs">Gap kWh</th><th class="hs">vs budget</th><th class="hs">vs Sep invoice</th><th class="hs">vs Oct 2025</th><th>Main driver</th></tr></thead><tbody>${body||'<tr><td colspan="8" class="empty">No matching site.</td></tr>'}</tbody></table>`;
+  $('evNote').textContent={gap:'Top 20 sites by gap to the October budget.',sep:'Top 20 sites by October invoice kWh minus the September invoice kWh.',ly:'Top 20 sites by October kWh minus Oct 2025 invoice kWh (sites with a 2025 invoice only).',all:'All 59 sites.'}[v]+' All figures are kWh for the full month. Main driver = the largest part of the gap: overshoot already in September, higher usage, or a lowered budget.';
 }
 document.addEventListener('change',e=>{ if(e.target&&e.target.id==='evView'){EV.view=e.target.value; renderEvalOct();} });
 document.addEventListener('input',e=>{ if(e.target&&e.target.id==='evSearch') renderEvalOct(); });
