@@ -77,12 +77,23 @@ let LAST=N-1;for(;LAST>0;LAST--){if(S.filter(s=>s.v[LAST]!=null).length>=S.lengt
 const ASOF=D[LAST];
 const grp=d=>{const w=d.getDay();return w==0||w==6?'we':w==4||w==5?'th':'ot'};
 const GN={we:'Sat–Sun',th:'Thu–Fri (new premiere)',ot:'Mon–Wed'};
-// weekly profile, last 8 weeks (director's method): 3 categories Sat–Sun, Thu–Fri, Mon–Wed
+// weekly pattern (director's method, 3 categories Sat–Sun, Thu–Fri, Mon–Wed) from all months with data.
+// Each day is divided by its own month's average so level shifts (savings program) do not distort the pattern.
+// A cinema's own pattern is used in proportion to how consistent it is; the rest comes from the network pattern.
 const prof={};
-for(const s of S){const a=[0,0,0,0,0,0,0],c=[0,0,0,0,0,0,0];
- for(let i=Math.max(0,LAST-55);i<=LAST;i++){const v=s.v[i];if(v!=null&&v>0){a[D[i].getDay()]+=v;c[D[i].getDay()]++}}
- const av=a.map((x,i)=>c[i]>=3?x/c[i]:0),tot=av.reduce((x,y)=>x+y,0),ok=av.every(x=>x>0);
- const w=ok?(av[0]+av[6])/tot:2/7,t=ok?(av[4]+av[5])/tot:2/7;prof[s.k]={w,t,o:1-w-t,ok};}
+function dowSamples(s){const A=[[],[],[],[],[],[],[]];
+ for(let m=0;m<12;m++){const ix=monthDays(2026,m).filter(i=>i<=LAST&&s.v[i]!=null&&s.v[i]>0);if(ix.length<15)continue;
+  const mean=ix.reduce((x,i)=>x+s.v[i],0)/ix.length;for(const i of ix)A[D[i].getDay()].push(s.v[i]/mean)}return A}
+const avgA=a=>a.reduce((x,y)=>x+y,0)/a.length,varA=a=>{const m=avgA(a);return a.reduce((x,y)=>x+(y-m)*(y-m),0)/a.length};
+const medA=a=>{const b=[...a].sort((x,y)=>x-y),n=b.length;return n%2?b[(n-1)/2]:(b[n/2-1]+b[n/2])/2};
+const OWN={};
+for(const s of S){const A=dowSamples(s);if(A.every(x=>x.length>=6)){const mean=A.map(avgA);OWN[s.k]={mean,noise:avgA(A.map(x=>varA(x)/x.length)),n:Math.min(...A.map(x=>x.length))}}}
+const NET=(()=>{const r=[0,1,2,3,4,5,6].map(d=>medA(Object.values(OWN).map(o=>o.mean[d]))),m=avgA(r);return r.map(x=>x/m)})();
+const grpShare=idx=>{const t=idx.reduce((x,y)=>x+y,0);return{w:(idx[0]+idx[6])/t,t:(idx[4]+idx[5])/t,o:(idx[1]+idx[2]+idx[3])/t}};
+const NETSH=grpShare(NET);
+for(const s of S){const o=OWN[s.k];let cf=0,idx=NET;
+ if(o){const signal=Math.max(varA(o.mean)-o.noise,0);cf=signal+o.noise>0?signal/(signal+o.noise):0;idx=NET.map((x,d)=>cf*o.mean[d]+(1-cf)*x)}
+ prof[s.k]=Object.assign(grpShare(idx),{ok:!!o,cf,own:o?grpShare(o.mean):null})}
 const share=(s,d)=>{const p=prof[s.k],g=grp(d);return g=='we'?p.w/2:g=='th'?p.t/2:p.o/3};
 const budget=(s,m)=>s.b?s.b[m]:null;
 function monthDays(y,m){const r=[];for(let i=0;i<N;i++)if(D[i].getFullYear()==y&&D[i].getMonth()==m)r.push(i);return r}
@@ -96,7 +107,7 @@ function mtd(s,y,m,upTo){const o={a:0,t:0,n:0,miss:0,g:{we:[0,0],th:[0,0],ot:[0,
  o.gap=o.a-o.t;o.pct=o.t?o.gap/o.t:0;return o}
 function dayRow(s,i){const v=s.v[i],t=tgt(s,i);return{v,t,gap:v==null||t==null?null:v-t,pct:v==null||!t?null:(v-t)/t}}
 function drv(o){let b=null,bv=0;for(const k of['we','th','ot']){const g=o.g[k][0]-o.g[k][1];if(g>bv){bv=g;b=k}}return b}
-const dq=(s,o)=>{const f=[];if(o.miss>=3)f.push(o.miss+' days missing');if(!prof[s.k].ok)f.push('weekly pattern unclear');if(s.bp)f.push('Oct budget used');return f}
+const dq=(s,o)=>{const f=[];if(o.miss>=3)f.push(o.miss+' days missing');if(!prof[s.k].ok)f.push('too little data, network pattern used');if(s.bp)f.push('Oct budget used');return f}
 const st={m:null,y:2026,reg:'all',f:'all',sort:'gap',q:'',dd:LAST,drf:'all',dsort:'pct'};
 // ----- header
 $('#asof').textContent='Data to '+fdd(ASOF)+' · source: Google Sheet RAW SUMMARY'+(RAW.generated?' · refreshed '+RAW.generated:'');
@@ -146,7 +157,7 @@ function openSite(k){const s=S.find(x=>x.k==k),o=mtd(s,2026,st.m,upTo()),p=prof[
  <div class="kpis" style="margin-top:14px"><div class="kpi"><div class="l">MTD actual</div><div class="v">${nf(o.a)}</div></div><div class="kpi"><div class="l">MTD target</div><div class="v">${nf(o.t)}</div></div><div class="kpi"><div class="l">Gap</div><div class="v ${o.gap>0?'up':'dn'}">${pc(o.pct)}</div></div></div>
  ${chart(s)}<div class="note">Bars = actual kWh per day (red = above that day's target). Line = daily target.</div>
  <h3 style="margin-top:16px">Where the gap comes from (MTD)</h3><div class="tw"><table><thead><tr><th>Day type</th><th>Actual</th><th>Target</th><th>Gap</th></tr></thead><tbody>${gr}</tbody></table></div>
- <div class="note">Weekly pattern used: Sat–Sun ${Math.round(p.w*100)}% · Thu–Fri ${Math.round(p.t*100)}% · Mon–Wed ${Math.round(p.o*100)}% (last 8 weeks).</div>${f.length?`<div class="note"><span class="tag t-w">Check</span> ${f.join(' · ')}</div>`:''}`;
+ <div class="note">Weekly pattern used: Sat–Sun ${Math.round(p.w*100)}% · Thu–Fri ${Math.round(p.t*100)}% · Mon–Wed ${Math.round(p.o*100)}% (blend of the cinema's own and the network pattern, ${Math.round(p.cf*100)}% own).</div>${f.length?`<div class="note"><span class="tag t-w">Check</span> ${f.join(' · ')}</div>`:''}`;
  $('#md').classList.add('on');$('#cl').onclick=()=>$('#md').classList.remove('on')}
 $('#md').onclick=e=>{if(e.target.id=='md')$('#md').classList.remove('on')};
 // ----- daily
@@ -228,7 +239,7 @@ function renderMe(){const R=S.filter(inReg).sort((a,b)=>a.n<b.n?-1:1);
  <p style="margin:0 0 10px">Dividing the month by 30 treats every day the same. Cinemas do not use power evenly: weekends and the new-film premiere (Thursday) are busier. So each day gets a share of the budget that follows the cinema's own weekly pattern.</p>
  <ol style="margin:0 0 12px;padding-left:20px;line-height:1.7"><li><b>Monthly budget</b> from the FY2026 kWh budget file, e.g. 500 kWh.</li>
  <li><b>Average week</b> = monthly budget ÷ 4 weeks, e.g. 500 ÷ 4 = 125 kWh.</li>
- <li><b>Weekly shares</b>: from the last 8 weeks of actual usage, work out how much of a normal week falls in each of 3 categories: <b>Sat–Sun</b> (weekend), <b>Thu–Fri</b> (Thursday is the new film premiere) and <b>Mon–Wed</b>. The three shares add up to 100%.</li>
+ <li><b>Weekly shares</b>: from all months of actual usage (each day divided by its own month's average, so savings or level changes do not bend the pattern), work out how much of a normal week falls in each of 3 categories: <b>Sat–Sun</b> (weekend), <b>Thu–Fri</b> (Thursday is the new film premiere) and <b>Mon–Wed</b>. The three shares add up to 100%. A cinema's own pattern is used only as far as it is consistent; otherwise the average pattern of all cinemas is used.</li>
  <li><b>Daily target</b> = category share of the week ÷ number of days in that category. The calendar is then scaled so the whole month adds up exactly to the budget.</li>
  <li><b>MTD target</b> = sum of the daily targets for the days that already have data. <b>Gap</b> = actual − target; above 0 means over budget.</li></ol>
  <div class="tw"><table><thead><tr><th>Category (director's example)</th><th>Share</th><th>kWh per week</th><th>Days</th><th>Target per day</th></tr></thead><tbody>
@@ -236,8 +247,8 @@ function renderMe(){const R=S.filter(inReg).sort((a,b)=>a.n<b.n?-1:1);
  <tr><td>Thu–Fri</td><td>35%</td><td>${ex[1].toFixed(1)}</td><td>2</td><td>${ex[4].toFixed(1)}</td></tr>
  <tr><td>Mon–Wed</td><td>20%</td><td>${ex[2].toFixed(1)}</td><td>3</td><td>${ex[5].toFixed(1)}</td></tr>
  <tr><td><b>Total</b></td><td><b>100%</b></td><td><b>125.0</b></td><td>7</td><td></td></tr></tbody></table></div>
- <div class="note">Compared with ÷ 30 (= 16.7 kWh every day), a Saturday target is 28.1 kWh and a Tuesday target 8.3 kWh. This is why a quiet Tuesday and a busy Saturday are no longer judged against the same number. Actual shares differ per cinema (table below); when a cinema has less than 3 readings for a weekday the even split (2/7, 2/7, 3/7) is used.</div></div>
- <div class="card" style="margin-top:12px"><h3>Weekly shares per cinema (last 8 weeks)</h3><div class="tw"><table><thead><tr><th>Site</th><th>Sat–Sun</th><th>Thu–Fri</th><th>Mon–Wed</th><th>Notes</th></tr></thead><tbody>${R.map(s=>{const p=prof[s.k],o=mtd(s,2026,st.m,upTo());return`<tr data-k="${s.k}"><td class="nm">${s.n}<span class="reg">${s.r}</span></td><td>${Math.round(p.w*100)}%</td><td>${Math.round(p.t*100)}%</td><td>${Math.round(p.o*100)}%</td><td style="white-space:normal;text-align:left;color:var(--mut)">${dq(s,o).join(' · ')}</td></tr>`}).join('')}</tbody></table></div></div>`;
+ <div class="note">Compared with ÷ 30 (= 16.7 kWh every day), a Saturday target is 28.1 kWh and a Tuesday target 8.3 kWh. This is why a quiet Tuesday and a busy Saturday are no longer judged against the same number. Actual shares differ per cinema (table below); the network pattern is Sat–Sun ${Math.round(NETSH.w*100)}%, Thu–Fri ${Math.round(NETSH.t*100)}%, Mon–Wed ${Math.round(NETSH.o*100)}%. Day-of-week effects in electricity are small, so most targets stay close to budget ÷ days.</div></div>
+ <div class="card" style="margin-top:12px"><h3>Weekly shares per cinema</h3><div class="tw"><table><thead><tr><th>Site</th><th>Sat–Sun</th><th>Thu–Fri</th><th>Mon–Wed</th><th>Own pattern used</th><th>Notes</th></tr></thead><tbody>${R.map(s=>{const p=prof[s.k],o=mtd(s,2026,st.m,upTo());return`<tr data-k="${s.k}"><td class="nm">${s.n}<span class="reg">${s.r}</span></td><td>${Math.round(p.w*100)}%</td><td>${Math.round(p.t*100)}%</td><td>${Math.round(p.o*100)}%</td><td>${Math.round(p.cf*100)}%</td><td style="white-space:normal;text-align:left;color:var(--mut)">${dq(s,o).join(' · ')}</td></tr>`}).join('')}</tbody></table></div></div>`;
  $$('#p-me tbody tr[data-k]').forEach(t=>t.onclick=()=>openSite(+t.dataset.k))}
 // ----- shows vs kWh
 const SM=SH.months,MLBL=m=>MN[+m.slice(5)-1],dim=m=>new Date(2026,+m.slice(5),0).getDate();

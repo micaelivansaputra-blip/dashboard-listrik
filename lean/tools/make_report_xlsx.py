@@ -34,7 +34,7 @@ for i,s in enumerate(S):
         if x>bv:bv=x;drv=k
     notes=[]
     if s['bp']:notes.append('Oct budget used as proxy')
-    if not s['ok']:notes.append('weekly pattern unclear (even split used)')
+    if not s['ok']:notes.append('too little data, network pattern used')
     if dd['a'] is None:notes.append('no daily reading')
     if s['mtd']['n']==0:notes.append('no MTD data')
     row=[reg(s),s['k'],s['n'].upper(),'Y' if s['z'] else '',round(s['budget']),
@@ -177,12 +177,12 @@ wm=wb.create_sheet('Method')
 lines=['How the budget is divided (3 categories)','',
 '1. Monthly budget: FY2026 kWh budget per cinema (example 500 kWh).',
 '2. Average week = monthly budget / 4 weeks (500 / 4 = 125 kWh).',
-'3. From actual usage of the last 8 weeks, work out the share of a normal week for each category: Sat-Sun, Thu-Fri (Thursday = new film premiere), Mon-Wed. Shares add up to 100%.',
+'3. From actual usage of all months with data (each day divided by its month's average), work out the share of a normal week for each category: Sat-Sun, Thu-Fri (Thursday = new film premiere), Mon-Wed. A cinema's own pattern is used only as far as it is consistent; otherwise the average pattern of all cinemas is used. Shares add up to 100%.',
 '4. Daily target = category share / number of days in the category. The calendar of the month is then scaled so the full month equals the budget.',
 '5. MTD target = sum of daily targets for the days that have data. Gap = actual - target; above 0 = over budget.','',
 'Example (director): 125 kWh/week, Sat-Sun 45% = 56.3 kWh (28.1 per day), Thu-Fri 35% = 43.8 kWh (21.9 per day), Mon-Wed 20% = 25 kWh (8.3 per day). Dividing by 30 would give 16.7 kWh every day.','',
 'Data notes','- A reading of 0 kWh is treated as not filled in. A daily value above 6x the cinema median is treated as a meter/typing error.',
-'- Sites 70, 71, 72 use the October budget as a proxy. Cinemas with fewer than 3 readings per weekday use an even split.',
+'- Sites 70, 71, 72 use the October budget as a proxy. Cinemas with too little data per weekday use the network pattern.',
 '- ACTION status follows the threshold in Summary!C4.']
 for i,t in enumerate(lines,1):
     c=wm.cell(i,1,t);c.alignment=Alignment(wrap_text=True,vertical='top')
