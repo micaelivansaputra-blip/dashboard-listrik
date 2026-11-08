@@ -177,7 +177,7 @@ wm=wb.create_sheet('Method')
 lines=['How the budget is divided (3 categories)','',
 '1. Monthly budget: FY2026 kWh budget per cinema (example 500 kWh).',
 '2. Average week = monthly budget / 4 weeks (500 / 4 = 125 kWh).',
-'3. From actual usage of all months with data (each day divided by its month's average), work out the share of a normal week for each category: Sat-Sun, Thu-Fri (Thursday = new film premiere), Mon-Wed. A cinema's own pattern is used only as far as it is consistent; otherwise the average pattern of all cinemas is used. Shares add up to 100%.',
+"3. From actual usage of all months with data (each day divided by its own month average), work out the share of a normal week for each category: Sat-Sun, Thu-Fri (Thursday = new film premiere), Mon-Wed. A cinema own pattern is used only as far as it is consistent; otherwise the average pattern of all cinemas is used. Shares add up to 100%.",
 '4. Daily target = category share / number of days in the category. The calendar of the month is then scaled so the full month equals the budget.',
 '5. MTD target = sum of daily targets for the days that have data. Gap = actual - target; above 0 = over budget.','',
 'Example (director): 125 kWh/week, Sat-Sun 45% = 56.3 kWh (28.1 per day), Thu-Fri 35% = 43.8 kWh (21.9 per day), Mon-Wed 20% = 25 kWh (8.3 per day). Dividing by 30 would give 16.7 kWh every day.','',
