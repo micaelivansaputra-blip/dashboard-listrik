@@ -177,45 +177,50 @@ const heat=p=>p==null?'#fff':p<=-.2?'#63be7b':p<=-.1?'#a5d46a':p<0?'#cfe58a':p<=
 const cellS='padding:7px 10px;border:1px solid #d9d9de;font-size:13px;text-align:right;white-space:nowrap';
 const hS='background:#1f3864;color:#fff;font-weight:700;font-size:12px;padding:7px 10px;border:1px solid #fff;text-align:center';
 const pcI=p=>p==null?'–':Math.round(p*100)+'%';
+st.thr=.1;
 function agg(L,k){const t=L.reduce((x,r)=>x+(r[k].t||0),0),a=L.reduce((x,r)=>x+(r[k].a||0),0);return{t,a,p:t?(a-t)/t:null}}
-function buildMail(){const i=st.dd,dt=D[i],m=dt.getMonth(),rg=st.reg=='all'?'All regions':st.reg;
- const R=S.filter(inReg).filter(s=>s.b).map(s=>{const o=mtd(s,2026,m,i),dd=dayRow(s,i);return{s,d:{t:dd.v==null?null:dd.t,a:dd.v,p:dd.pct},o:{t:o.t,a:o.a,p:o.n?o.pct:null,n:o.n}}});
- const have=R.filter(r=>r.o.n>0),miss=R.filter(r=>r.d.a==null);
- const mo=have.filter(r=>r.o.a>r.o.t).sort((a,b)=>b.o.p-a.o.p),dov=R.filter(r=>r.d.a!=null&&r.d.a>r.d.t).sort((a,b)=>b.d.p-a.d.p);
+function repData(i){const dt=D[i],m=dt.getMonth();
+ return S.filter(inReg).filter(s=>s.b).map(s=>{const o=mtd(s,2026,m,i),dd=dayRow(s,i);let n7=0,c7=0;for(let j=i-6;j<=i;j++){const r=j>=0?dayRow(s,j):{gap:null};if(r.gap!=null){c7++;if(r.gap>0)n7++}}
+  return{s,d:{t:dd.v==null?null:dd.t,a:dd.v,p:dd.pct},o:{t:o.t,a:o.a,p:o.n?o.pct:null,n:o.n,g:o.g},n7,c7}})}
+function buildMail(){const i=st.dd,dt=D[i],m=dt.getMonth(),rg=st.reg=='all'?'All regions':st.reg,thr=st.thr;
+ const R=repData(i),have=R.filter(r=>r.o.n>0),miss=R.filter(r=>r.d.a==null);
+ const mo=have.filter(r=>r.o.p>thr).sort((a,b)=>b.o.p-a.o.p),dov=R.filter(r=>r.d.a!=null&&r.d.p>thr).sort((a,b)=>b.d.p-a.d.p);
  const msv=have.filter(r=>r.o.a<=r.o.t),dsv=R.filter(r=>r.d.a!=null&&r.d.a<=r.d.t);
- const cell=(v,x)=>`<td style="${cellS}">${v}</td>`,pcell=p=>`<td style="${cellS};background:${heat(p)};text-align:center">${pcI(p)}</td>`;
- const rowOf=r=>cell(r.d.t==null?'–':nf(r.d.t))+cell(r.d.a==null?'–':nf(r.d.a))+pcell(r.d.p)+cell(nf(r.o.t))+cell(nf(r.o.a))+pcell(r.o.p);
- const head=(first)=>`<tr><th colspan="${first}" style="${hS};background:#fff"></th><th colspan="3" style="${hS}">DAILY (${fd(dt)})</th><th colspan="3" style="${hS}">MTD (1–${dt.getDate()} ${MN[m]})</th></tr><tr>${first==1?`<th style="${hS}">REGION</th>`:`<th style="${hS}">REGION</th><th style="${hS}">CINEMA</th>`}${['Target','Actual','%','Target','Actual','%'].map(x=>`<th style="${hS}">${x}</th>`).join('')}</tr>`;
- const regs2=[...new Set(have.concat(R).map(r=>r.s.r))].sort();
- const regRows=regs2.map(g=>{const L=R.filter(r=>r.s.r==g),M=L.filter(r=>r.o.n>0),d=agg(L.filter(r=>r.d.a!=null),'d'),o=agg(M,'o');return`<tr><td style="${cellS};text-align:center">REGION ${g.replace('R','')}</td>${cell(nf(d.t))}${cell(nf(d.a))}${pcell(d.p)}${cell(nf(o.t))}${cell(nf(o.a))}${pcell(o.p)}</tr>`}).join('');
- const TD=agg(R.filter(r=>r.d.a!=null),'d'),TM=agg(have,'o'),tS=`${cellS};background:#1f3864;color:#fff;font-weight:700`;
- const tot=`<tr><td style="${tS};text-align:center">TOTAL</td><td style="${tS}">${nf(TD.t)}</td><td style="${tS}">${nf(TD.a)}</td><td style="${tS};text-align:center">${pcI(TD.p)}</td><td style="${tS}">${nf(TM.t)}</td><td style="${tS}">${nf(TM.a)}</td><td style="${tS};text-align:center">${pcI(TM.p)}</td></tr>`;
- const sites=[...R].sort((a,b)=>a.s.r<b.s.r?-1:a.s.r>b.s.r?1:a.s.k-b.s.k).map(r=>`<tr><td style="${cellS};text-align:left">REGION ${r.s.r.replace('R','')}</td><td style="${cellS};text-align:left;white-space:normal">${r.s.k}-${r.s.n.toUpperCase()}</td>${rowOf(r)}</tr>`).join('');
+ const cell=v=>`<td style="${cellS}">${v}</td>`,pcell=p=>`<td style="${cellS};background:${heat(p)};text-align:center">${pcI(p)}</td>`,txt=v=>`<td style="${cellS};text-align:left;white-space:normal">${v}</td>`;
+ const th=(x,first)=>`<th style="${hS}">${x}</th>`;
  const tbl=h=>`<table style="border-collapse:collapse;font-family:Calibri,Arial,sans-serif;margin:6px 0 14px">${h}</table>`;
- const list=(L,k)=>L.length?L.map(r=>`<b>${r.s.n}</b> (${pcI(r[k].p)})`).join(', '):'none';
- const dr=grp(dt),drn={we:'Sat–Sun',th:'Thu–Fri',ot:'Mon–Wed'}[dr];
- const html=`<div style="font-family:Calibri,Arial,sans-serif;color:#1d1d1f;max-width:900px;font-size:14px"><p style="margin:0 0 4px">Dear All,</p><p style="margin:0 0 12px">Please find Daily Monitoring of Electricity for ${fd(dt)}${st.reg=='all'?'':' ('+rg+')'}.</p>
- ${tbl(head(1)+regRows+tot)}${tbl(head(2)+sites)}
- <p style="margin:0 0 4px"><b>Summary</b></p><ul style="margin:0 0 10px;padding-left:20px;line-height:1.6">
- <li><b>Over budget MTD:</b> ${mo.length} of ${have.length} cinemas. ${list(mo,'o')}.</li>
- <li><b>Over budget on daily usage (${fdd(dt)}, ${drn} category):</b> ${dov.length} of ${R.length-miss.length} cinemas. ${list(dov,'d')}.</li>
- <li><b>Saving, thank you:</b> ${msv.length} cinemas MTD and ${dsv.length} cinemas on the day. Please keep it up.</li></ul>
- <p style="margin:0 0 4px"><b>Note:</b></p><ul style="margin:0;padding-left:20px;line-height:1.6">
- ${miss.length?`<li>The daily result does not yet include ${miss.map(r=>'<b>'+r.s.n+'</b>').join(', ')}, because the cinema has not completed the data. Please complete it as soon as possible.</li>`:''}
- <li>Target = FY2026 monthly kWh budget, spread over the week by each cinema's own pattern: Sat–Sun, Thu–Fri (new film premiere) and Mon–Wed. MTD target = sum of daily targets for the days with data.</li>
- <li>Please follow up with the CM of every cinema marked orange or red and share the reason.</li></ul></div>`;
- const cap=`Hi kak, reminder listrik ya. Per ${fd(dt)}: ${mo.length} cinema over budget secara MTD, dan ${dov.length} cinema over di daily usage ${fdd(dt)}.${miss.length?` Data ${miss.length} cinema belum lengkap.`:''} Detail di email ya, mohon dibantu follow up ke CM masing-masing untuk reason kenaikannya 🙏${msv.length?` Yang sudah saving (${msv.length} cinema MTD), terima kasih, mohon dipertahankan!`:''}`;
+ const regs2=[...new Set(R.map(r=>r.s.r))].sort();
+ const regRows=regs2.map(g=>{const L=R.filter(r=>r.s.r==g),d=agg(L.filter(r=>r.d.a!=null),'d'),o=agg(L.filter(r=>r.o.n>0),'o');return`<tr>${txt('REGION '+g.replace('R',''))}${cell(nf(d.t))}${cell(nf(d.a))}${pcell(d.p)}${cell(nf(o.t))}${cell(nf(o.a))}${pcell(o.p)}</tr>`}).join('');
+ const TD=agg(R.filter(r=>r.d.a!=null),'d'),TM=agg(have,'o'),tS=`${cellS};background:#1f3864;color:#fff;font-weight:700`;
+ const regT=tbl(`<tr><th style="${hS};background:#fff"></th><th colspan="3" style="${hS}">DAILY (${fd(dt)})</th><th colspan="3" style="${hS}">MTD (1–${dt.getDate()} ${MN[m]})</th></tr><tr>${['REGION','Target','Actual','%','Target','Actual','%'].map(x=>th(x)).join('')}</tr>${regRows}<tr><td style="${tS};text-align:center">TOTAL</td><td style="${tS}">${nf(TD.t)}</td><td style="${tS}">${nf(TD.a)}</td><td style="${tS};text-align:center">${pcI(TD.p)}</td><td style="${tS}">${nf(TM.t)}</td><td style="${tS}">${nf(TM.a)}</td><td style="${tS};text-align:center">${pcI(TM.p)}</td></tr>`);
+ const dr={we:'Sat–Sun',th:'Thu–Fri',ot:'Mon–Wed'},dn=dr[grp(dt)],rn=r=>'R'+r.s.r.replace('R','');
+ const tA=mo.length?tbl(`<tr>${['Region','Cinema','MTD target','MTD actual','Gap kWh','%','Main driver'].map(x=>th(x)).join('')}</tr>`+mo.map(r=>`<tr>${txt(rn(r))}${txt('<b>'+r.s.n+'</b>')}${cell(nf(r.o.t))}${cell(nf(r.o.a))}${cell(sg(r.o.a-r.o.t))}${pcell(r.o.p)}${txt(dr[drv(r.o)]||'–')}</tr>`).join('')):'<p>No cinema is above the threshold.</p>';
+ const tB=dov.length?tbl(`<tr>${['Region','Cinema','Daily target','Actual','Gap kWh','%','Days over (last 7)'].map(x=>th(x)).join('')}</tr>`+dov.map(r=>`<tr>${txt(rn(r))}${txt('<b>'+r.s.n+'</b>')}${cell(nf(r.d.t))}${cell(nf(r.d.a))}${cell(sg(r.d.a-r.d.t))}${pcell(r.d.p)}${cell(r.n7+' / '+r.c7)}</tr>`).join('')):'<p>No cinema is above the threshold.</p>';
+ const T=Math.round(thr*100);
+ const html=`<div style="font-family:Calibri,Arial,sans-serif;color:#1d1d1f;max-width:860px;font-size:14px"><p style="margin:0 0 4px">Dear All,</p><p style="margin:0 0 12px">Please find the Daily Monitoring of Electricity for ${fd(dt)}${st.reg=='all'?'':' ('+rg+')'}. Total usage MTD is <b>${nf(TM.a)} kWh</b> vs target <b>${nf(TM.t)} kWh</b> (<b>${pcI(TM.p)}</b>). Below are the cinemas that are more than ${T}% above target and need follow up; the full detail of all cinemas is in the attached Excel.</p>
+ ${regT}
+ <p style="margin:0 0 2px"><b>A. Over budget MTD (more than ${T}% above target): ${mo.length} of ${have.length} cinemas</b></p>${tA}
+ <p style="margin:0 0 2px"><b>B. Over budget on daily usage, ${fdd(dt)} (${dn} category, more than ${T}% above target): ${dov.length} of ${R.length-miss.length} cinemas</b></p>${tB}
+ ${miss.length?`<p style="margin:0 0 4px"><b>Data not yet complete for ${fd(dt)}:</b> ${miss.map(r=>r.s.n).join(', ')}. Please complete it as soon as possible.</p>`:''}
+ <p style="margin:8px 0 4px">Cinemas on or below target: <b>${msv.length}</b> MTD and <b>${dsv.length}</b> on the day. Thank you, please keep it up.</p>
+ <p style="margin:12px 0 4px"><b>Note:</b></p><ul style="margin:0;padding-left:20px;line-height:1.6"><li>Target = FY2026 monthly kWh budget spread over the week by each cinema's own pattern (Sat–Sun, Thu–Fri premiere, Mon–Wed). MTD target = sum of daily targets for days with data.</li><li>Please share the reason for the increase (event, equipment, operating hours, other) with your RM by end of day.</li></ul></div>`;
+ const cap=`Hi kak, reminder listrik ya. Per ${fd(dt)}: ${mo.length} cinema over >${T}% secara MTD, dan ${dov.length} cinema over >${T}% di daily usage ${fdd(dt)}.${miss.length?` Data ${miss.length} cinema belum lengkap.`:''} Detail lengkap ada di Excel lampiran, mohon dibantu follow up ke CM masing-masing untuk reason kenaikannya 🙏`;
  return{html,cap,sub:`Daily Monitoring of Electricity ${fd(dt)}${st.reg=='all'?'':' – '+rg}`}}
+// data for the Excel attachment (read by the report tool)
+window.exportReport=function(i){const dt=D[i],m=dt.getMonth(),R=repData(i),days=monthDays(2026,m).filter(x=>x<=i);
+ return{date:RAW.dates[i],month:m,generated:RAW.generated||'',days:days.map(x=>RAW.dates[x]),sites:R.map(r=>{const s=r.s,p=prof[s.k];
+  return{k:s.k,n:s.n,r:s.r,z:s.z,bp:s.bp,budget:s.b[m],daily:r.d,mtd:{t:r.o.t,a:r.o.a,n:r.o.n,g:r.o.g},n7:r.n7,c7:r.c7,w:p.w,t:p.t,o:p.o,ok:p.ok,
+   da:days.map(x=>s.v[x]),dt:days.map(x=>tgt(s,x)),shows:(SH.v[s.k]||[]),kwh:SM.map((_,j)=>mkwh(s,j))}})}};
 function renderRm(){const m=buildMail();
- $('#p-rm').innerHTML=`<div class="card"><div class="row"><span class="sub">Region and date follow the selectors above and in Daily.</span><input type="date" id="rd" value="${RAW.dates[st.dd]}" min="${RAW.dates[0]}" max="${RAW.dates[LAST]}"></div>
+ $('#p-rm').innerHTML=`<div class="card"><div class="row"><span class="sub">Region and date follow the selectors above and in Daily.</span><input type="date" id="rd" value="${RAW.dates[st.dd]}" min="${RAW.dates[0]}" max="${RAW.dates[LAST]}"><select id="rt" aria-label="Threshold">${[0,.05,.1,.2].map(x=>`<option value="${x}" ${x==st.thr?'selected':''}>Remind if above ${x*100}%</option>`).join('')}</select></div>
  <h3>Subject</h3><textarea id="rs" style="min-height:44px">${m.sub}</textarea><div class="row" style="margin-top:8px"><button class="btn sec" id="cs">Copy subject</button></div>
- <h3 style="margin-top:14px">Email body (both versions)</h3><div class="mail" id="ml">${m.html}</div><div class="row" style="margin-top:10px"><button class="btn" id="ce">Copy email</button><span class="note" id="cm"></span></div>
+ <h3 style="margin-top:14px">Email body</h3><div class="mail" id="ml">${m.html}</div><div class="row" style="margin-top:10px"><button class="btn" id="ce">Copy email</button><span class="note" id="cm"></span></div>
  <h3 style="margin-top:18px">Short caption (Indonesian)</h3><textarea id="rc">${m.cap}</textarea><div class="row" style="margin-top:8px"><button class="btn sec" id="cc">Copy caption</button></div></div>`;
  const say=t=>{$('#cm').textContent=t;setTimeout(()=>$('#cm').textContent='',2500)};
  const cp=async(txt,el)=>{try{await navigator.clipboard.writeText(txt);say('Copied')}catch(e){el.select();document.execCommand('copy');say('Copied')}};
  $('#cs').onclick=()=>cp($('#rs').value,$('#rs'));$('#cc').onclick=()=>cp($('#rc').value,$('#rc'));
  $('#ce').onclick=async()=>{const h=$('#ml').innerHTML;try{await navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([h],{type:'text/html'}),'text/plain':new Blob([$('#ml').innerText],{type:'text/plain'})})]);say('Email copied, paste into the email body')}catch(e){const r=document.createRange();r.selectNodeContents($('#ml'));const s=getSelection();s.removeAllRanges();s.addRange(r);document.execCommand('copy');say('Email copied, paste into the email body')}};
- $('#rd').onchange=e=>{const j=RAW.dates.indexOf(e.target.value);if(j>=0){st.dd=j;renderRm()}}}
+ $('#rt').onchange=e=>{st.thr=+e.target.value;renderRm()};$('#rd').onchange=e=>{const j=RAW.dates.indexOf(e.target.value);if(j>=0){st.dd=j;renderRm()}}}
 // ----- method
 function renderMe(){const R=S.filter(inReg).sort((a,b)=>a.n<b.n?-1:1);
  const ex=(()=>{const w=.45,t=.35,o=.20,wk=500/4;return[wk*w,wk*t,wk*o,wk*w/2,wk*t/2,wk*o/3]})();
