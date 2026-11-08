@@ -68,3 +68,6 @@ history) disappears from the bar on its own, because the pager reads the `hidden
 (meter-level invoice kWh per site for both Septembers, plus the Sep total of the daily file as a cross-check).
 Regenerate it together with the admits data each month. The billing-day assumption (30 or 31 days for the current
 month) is a switch on the page, because the current invoice carries no period dates yet.
+
+## Lean dashboard (current home page)
+`index.html` is built from `lean/` (`python3 lean/build.py index.html`). Data: `lean/tools/make_data.py <RAW SUMMARY values.json>` -> `lean/data/data.json`. The previous full dashboard is kept at `full/index.html`.

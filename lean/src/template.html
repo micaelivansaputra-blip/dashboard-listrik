@@ -1,0 +1,213 @@
+<meta charset="utf-8">
+<title>Electricity Monitoring</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+:root{--bg:#f5f5f7;--surface:#fff;--s2:#f5f5f7;--ink:#1d1d1f;--mut:#6e6e73;--line:rgba(60,60,67,.12);--blue:#007aff;--blue-s:rgba(0,122,255,.1);--red:#d92d20;--red-s:rgba(217,45,32,.1);--grn:#16833a;--grn-s:rgba(22,131,58,.1);--amb:#b45309;--amb-s:rgba(180,83,9,.1);--sh:0 0 0 .5px rgba(0,0,0,.04),0 1px 3px rgba(0,0,0,.05);--r:16px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#000;--surface:#1c1c1e;--s2:#2c2c2e;--ink:#f5f5f7;--mut:#98989d;--line:rgba(84,84,88,.5);--blue:#0a84ff;--blue-s:rgba(10,132,255,.18);--red:#ff6b61;--red-s:rgba(255,107,97,.14);--grn:#4cd37b;--grn-s:rgba(76,211,123,.14);--amb:#f5a524;--amb-s:rgba(245,165,36,.14);--sh:none;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#000;--surface:#1c1c1e;--s2:#2c2c2e;--ink:#f5f5f7;--mut:#98989d;--line:rgba(84,84,88,.5);--blue:#0a84ff;--blue-s:rgba(10,132,255,.18);--red:#ff6b61;--red-s:rgba(255,107,97,.14);--grn:#4cd37b;--grn-s:rgba(76,211,123,.14);--amb:#f5a524;--amb-s:rgba(245,165,36,.14);--sh:none;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:14px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding-bottom:48px}
+header{padding:22px 0 8px;display:flex;flex-wrap:wrap;gap:12px 16px;align-items:flex-end;justify-content:space-between}
+h1{margin:0;font-size:clamp(26px,4vw,32px);letter-spacing:-.03em;line-height:1.1}
+.sub{color:var(--mut);margin-top:4px}
+.ctl{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+select,input,button{font:inherit;color:inherit}
+select,input[type=search],input[type=date]{background:var(--surface);border:0;box-shadow:inset 0 0 0 1px var(--line);border-radius:10px;padding:7px 10px;min-height:34px}
+.tabs{display:flex;gap:4px;background:var(--s2);padding:3px;border-radius:12px;width:max-content;max-width:100%;overflow-x:auto;margin:10px 0 16px;box-shadow:inset 0 0 0 1px var(--line)}
+.tabs button{border:0;background:none;padding:7px 14px;border-radius:9px;cursor:pointer;color:var(--mut);font-weight:600;white-space:nowrap}
+.tabs button[aria-selected=true]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.card{background:var(--surface);border-radius:var(--r);box-shadow:var(--sh);padding:16px;min-width:0}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:16px}
+.kpi .l{color:var(--mut);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.kpi .v{font-size:28px;font-weight:700;letter-spacing:-.02em;margin-top:4px;font-variant-numeric:tabular-nums}
+.kpi .n{color:var(--mut);font-size:12px;margin-top:2px}
+.kpi.hl{background:linear-gradient(160deg,#1a8cff,#0a63d8);color:#fff}.kpi.hl .l,.kpi.hl .n{color:rgba(255,255,255,.8)}
+.up{color:var(--red)}.dn{color:var(--grn)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.chip{border:0;background:var(--s2);color:var(--mut);padding:6px 12px;border-radius:999px;cursor:pointer;font-weight:600;box-shadow:inset 0 0 0 1px var(--line)}
+.chip[aria-pressed=true]{background:var(--blue);color:#fff;box-shadow:none}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--mut);text-align:right;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap;cursor:pointer;user-select:none}
+th:first-child,td:first-child{text-align:left}
+td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+tbody tr{cursor:pointer}tbody tr:hover{background:var(--s2)}
+td.nm{white-space:normal;min-width:170px;font-weight:600}
+.reg{color:var(--mut);font-weight:500;font-size:12px;margin-left:6px}
+.tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700}
+.t-o{background:var(--red-s);color:var(--red)}.t-s{background:var(--grn-s);color:var(--grn)}.t-w{background:var(--amb-s);color:var(--amb)}.t-n{background:var(--s2);color:var(--mut)}
+.bar{display:inline-block;height:6px;border-radius:3px;vertical-align:middle;margin-right:6px}
+.dots{display:inline-flex;gap:3px}.dots i{width:9px;height:9px;border-radius:3px;background:var(--line)}.dots i.o{background:var(--red)}.dots i.g{background:var(--grn)}
+.note{color:var(--mut);font-size:12px;margin-top:10px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:flex-end;justify-content:center;z-index:20}
+.modal.on{display:flex}.sheet{background:var(--surface);width:min(760px,100%);max-height:88vh;overflow:auto;border-radius:20px 20px 0 0;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px))}
+@media(min-width:760px){.modal{align-items:center}.sheet{border-radius:20px}}
+.sheet h2{margin:0 0 2px;font-size:20px;letter-spacing:-.02em}
+.x{float:right;border:0;background:var(--s2);border-radius:50%;width:30px;height:30px;cursor:pointer}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.mail{background:#fff;color:#1d1d1f;border-radius:12px;padding:20px;box-shadow:inset 0 0 0 1px rgba(60,60,67,.14);overflow-x:auto}
+.btn{border:0;background:var(--blue);color:#fff;padding:8px 16px;border-radius:999px;font-weight:600;cursor:pointer}.btn.sec{background:var(--s2);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
+textarea{width:100%;min-height:110px;border:0;border-radius:12px;background:var(--s2);color:var(--ink);padding:12px;font:inherit;box-shadow:inset 0 0 0 1px var(--line)}
+h3{margin:0 0 8px;font-size:15px}
+.empty{color:var(--mut);padding:24px;text-align:center}
+svg text{fill:var(--mut);font-size:10px}
+</style>
+<div class="wrap">
+<header>
+ <div><h1>Electricity Monitoring</h1><div class="sub" id="asof"></div></div>
+ <div class="ctl"><select id="mon" aria-label="Month"></select><select id="reg" aria-label="Region"></select><button class="chip" id="th" aria-label="Toggle theme">Theme</button></div>
+</header>
+<nav class="tabs" role="tablist"><button role="tab" data-p="ov" aria-selected="true">Overview</button><button role="tab" data-p="dy" aria-selected="false">Daily</button><button role="tab" data-p="rm" aria-selected="false">Reminder</button><button role="tab" data-p="me" aria-selected="false">Method</button></nav>
+<main>
+<section id="p-ov"></section><section id="p-dy" hidden></section><section id="p-rm" hidden></section><section id="p-me" hidden></section>
+</main>
+</div>
+<div class="modal" id="md"><div class="sheet" id="mdb"></div></div>
+<script>
+const RAW=/*DATA*/;
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const nf=n=>Math.round(n).toLocaleString('en-US'),sg=n=>(n>0?'+':n<0?'−':'')+Math.abs(Math.round(n)).toLocaleString('en-US'),pc=n=>(n>0?'+':n<0?'−':'')+Math.abs(n*100).toFixed(1)+'%';
+const MN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],DW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const D=RAW.dates.map(s=>new Date(s+'T00:00:00')),S=RAW.sites,N=D.length;
+const fd=d=>d.getDate()+' '+MN[d.getMonth()],fdd=d=>DW[d.getDay()]+' '+fd(d);
+// last day that most sites reported
+let LAST=N-1;for(;LAST>0;LAST--){if(S.filter(s=>s.v[LAST]!=null).length>=S.length*.7)break}
+const ASOF=D[LAST];
+const grp=d=>{const w=d.getDay();return w==0||w==6?'we':w==4?'th':'ot'};
+const GN={we:'Sat–Sun',th:'Thu (premiere)',ot:'Mon–Wed + Fri'};
+// weekly profile from the last 8 weeks (director's method): Sat–Sun share, Thursday share, rest split equally
+const prof={};
+for(const s of S){const a=[0,0,0,0,0,0,0],c=[0,0,0,0,0,0,0];
+ for(let i=Math.max(0,LAST-55);i<=LAST;i++){const v=s.v[i];if(v!=null&&v>0){a[D[i].getDay()]+=v;c[D[i].getDay()]++}}
+ const av=a.map((x,i)=>c[i]>=3?x/c[i]:0),tot=av.reduce((x,y)=>x+y,0),ok=av.every(x=>x>0);
+ const w=ok?(av[0]+av[6])/tot:2/7,t=ok?av[4]/tot:1/7;prof[s.k]={w,t,o:1-w-t,ok};}
+const share=(s,d)=>{const p=prof[s.k],g=grp(d);return g=='we'?p.w/2:g=='th'?p.t:p.o/4};
+const budget=(s,m)=>s.b?s.b[m]:null;
+function monthDays(y,m){const r=[];for(let i=0;i<N;i++)if(D[i].getFullYear()==y&&D[i].getMonth()==m)r.push(i);return r}
+// full-month calendar (incl. future days) for the normaliser
+function calDays(y,m){const n=new Date(y,m+1,0).getDate(),r=[];for(let i=1;i<=n;i++)r.push(new Date(y,m,i));return r}
+const normC={};
+function norm(s,y,m){const key=s.k+'|'+y+'|'+m;if(normC[key])return normC[key];return normC[key]=calDays(y,m).reduce((x,d)=>x+share(s,d),0)}
+function tgt(s,i){const d=D[i],b=budget(s,d.getMonth());return b==null?null:b*share(s,d)/norm(s,d.getFullYear(),d.getMonth())}
+function mtd(s,y,m,upTo){const o={a:0,t:0,n:0,miss:0,g:{we:[0,0],th:[0,0],ot:[0,0]},has:s.b!=null};
+ for(const i of monthDays(y,m)){if(i>upTo)break;const v=s.v[i];if(v==null){o.miss++;continue}const t=tgt(s,i);o.a+=v;o.n++;if(t!=null){o.t+=t;const g=o.g[grp(D[i])];g[0]+=v;g[1]+=t}}
+ o.gap=o.a-o.t;o.pct=o.t?o.gap/o.t:0;return o}
+function dayRow(s,i){const v=s.v[i],t=tgt(s,i);return{v,t,gap:v==null||t==null?null:v-t,pct:v==null||!t?null:(v-t)/t}}
+function drv(o){let b=null,bv=0;for(const k of['we','th','ot']){const g=o.g[k][0]-o.g[k][1];if(g>bv){bv=g;b=k}}return b}
+const dq=(s,o)=>{const f=[];if(o.miss>=3)f.push(o.miss+' days missing');if(!prof[s.k].ok)f.push('weekly pattern unclear');if(s.bp)f.push('Oct budget used');return f}
+const st={m:null,y:2026,reg:'all',f:'all',sort:'gap',q:'',dd:LAST,drf:'all',dsort:'pct'};
+// ----- header
+$('#asof').textContent='Data to '+fdd(ASOF)+' · source: Google Sheet RAW SUMMARY'+(RAW.generated?' · refreshed '+RAW.generated:'');
+const months=[...new Set(D.map(d=>d.getMonth()))];
+$('#mon').innerHTML=months.map(m=>`<option value="${m}">${['January','February','March','April','May','June','July','August','September','October','November','December'][m]} 2026</option>`).join('');
+st.m=ASOF.getMonth();$('#mon').value=st.m;
+const regs=[...new Set(S.map(s=>s.r))].sort();
+$('#reg').innerHTML='<option value="all">All regions</option>'+regs.map(r=>`<option>${r}</option>`).join('');
+const inReg=s=>st.reg=='all'||s.r==st.reg;
+const upTo=()=>st.m==ASOF.getMonth()?LAST:monthDays(2026,st.m).slice(-1)[0];
+// ----- overview
+function rows(){return S.filter(inReg).map(s=>({s,o:mtd(s,2026,st.m,upTo()),d:dayRow(s,LAST)})).filter(r=>r.o.has&&r.o.n>0)}
+function tag(g){return g==null?'<span class="tag t-n">n/a</span>':g>.1?'<span class="tag t-o">Over</span>':g>0?'<span class="tag t-w">Slightly over</span>':'<span class="tag t-s">Saving</span>'}
+function renderOv(){
+ const R=rows(),A=R.reduce((x,r)=>x+r.o.a,0),T=R.reduce((x,r)=>x+r.o.t,0),over=R.filter(r=>r.o.gap>0).length,sav=R.length-over;
+ const B=R.reduce((x,r)=>x+budget(r.s,st.m),0);
+ let h=`<div class="kpis"><div class="card kpi hl"><div class="l">MTD gap vs target</div><div class="v">${sg(A-T)}</div><div class="n">${pc(T?(A-T)/T:0)} · kWh</div></div>
+ <div class="card kpi"><div class="l">MTD actual</div><div class="v">${nf(A)}</div><div class="n">kWh, ${R.length} sites</div></div>
+ <div class="card kpi"><div class="l">MTD target</div><div class="v">${nf(T)}</div><div class="n">${B?Math.round(T/B*100)+'% of month budget '+nf(B):''}</div></div>
+ <div class="card kpi"><div class="l">Over / Saving</div><div class="v"><span class="up">${over}</span> / <span class="dn">${sav}</span></div><div class="n">sites vs MTD target</div></div></div>`;
+ h+=`<div class="card"><div class="row"><input type="search" id="q" placeholder="Search site" value="${st.q}">`+['all:All','over:Over','sav:Saving','zoec:ZOEC'].map(x=>{const[k,l]=x.split(':');return`<button class="chip" data-f="${k}" aria-pressed="${st.f==k}">${l}</button>`}).join('')+`</div><div class="tw"><table><thead><tr><th data-s="name">Site</th><th data-s="a">MTD actual</th><th data-s="t">MTD target</th><th data-s="gap">Gap kWh ▾</th><th data-s="pct">Gap %</th><th>Last day</th><th>Status</th></tr></thead><tbody>`;
+ let L=R.filter(r=>(st.f=='over'?r.o.gap>0:st.f=='sav'?r.o.gap<=0:st.f=='zoec'?r.s.z:true)&&(!st.q||r.s.n.toLowerCase().includes(st.q.toLowerCase())));
+ const key={name:r=>r.s.n,a:r=>-r.o.a,t:r=>-r.o.t,gap:r=>-r.o.gap,pct:r=>-r.o.pct}[st.sort];
+ L.sort((x,y)=>{const a=key(x),b=key(y);return a<b?-1:a>b?1:0});
+ const mx=Math.max(...L.map(r=>Math.abs(r.o.pct)),.01);
+ for(const r of L){const c=r.o.gap>0?'var(--red)':'var(--grn)',w=Math.round(Math.abs(r.o.pct)/mx*48);
+  h+=`<tr data-k="${r.s.k}"><td class="nm">${r.s.n}<span class="reg">${r.s.r}${r.s.z?' · ZOEC':''}</span></td><td>${nf(r.o.a)}</td><td>${nf(r.o.t)}</td><td class="${r.o.gap>0?'up':'dn'}">${sg(r.o.gap)}</td><td><span class="bar" style="width:${w}px;background:${c}"></span><span class="${r.o.gap>0?'up':'dn'}">${pc(r.o.pct)}</span></td><td>${r.d.pct==null?'–':`<span class="${r.d.pct>0?'up':'dn'}">${pc(r.d.pct)}</span>`}</td><td>${tag(r.o.pct)}</td></tr>`}
+ if(!L.length)h+='<tr><td colspan="7" class="empty">No sites match.</td></tr>';
+ h+=`</tbody></table></div><div class="note">MTD target follows the weekly pattern (Sat–Sun, Thursday, other days) of each site, scaled so the full month equals its budget. Tap a row for the daily view.</div></div>`;
+ $('#p-ov').innerHTML=h;
+ $('#q').oninput=e=>{st.q=e.target.value;const p=e.target.selectionStart;renderOv();const q=$('#q');q.focus();q.setSelectionRange(p,p)};
+ $$('#p-ov [data-f]').forEach(b=>b.onclick=()=>{st.f=b.dataset.f;renderOv()});
+ $$('#p-ov th[data-s]').forEach(b=>b.onclick=()=>{st.sort=b.dataset.s;renderOv()});
+ $$('#p-ov tbody tr[data-k]').forEach(t=>t.onclick=()=>openSite(+t.dataset.k));
+}
+// ----- site sheet
+function chart(s){const ix=monthDays(2026,st.m).filter(i=>i<=upTo());if(!ix.length)return'';const W=700,H=170,p=26,vs=ix.map(i=>s.v[i]),ts=ix.map(i=>tgt(s,i));
+ const mx=Math.max(...vs.filter(x=>x!=null),...ts.filter(x=>x!=null),1)*1.1,bw=(W-p*2)/ix.length;
+ let g=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Daily kWh versus target">`;
+ ix.forEach((i,j)=>{const v=vs[j],t=ts[j],x=p+j*bw;if(v!=null){const hh=v/mx*(H-30);g+=`<rect x="${x+1}" y="${H-18-hh}" width="${Math.max(bw-2,2)}" height="${hh}" rx="2" fill="${t!=null&&v>t?'var(--red)':'var(--blue)'}" opacity=".85"/>`}
+  if(t!=null)g+=`<line x1="${x}" x2="${x+bw}" y1="${H-18-t/mx*(H-30)}" y2="${H-18-t/mx*(H-30)}" stroke="var(--ink)" stroke-width="1.6" opacity=".7"/>`;
+  if(j%Math.ceil(ix.length/10)==0)g+=`<text x="${x}" y="${H-4}">${D[i].getDate()}</text>`});
+ return g+'</svg>'}
+function openSite(k){const s=S.find(x=>x.k==k),o=mtd(s,2026,st.m,upTo()),p=prof[k],f=dq(s,o);
+ const gr=['we','th','ot'].map(g=>{const a=o.g[g][0],t=o.g[g][1];return`<tr><td>${GN[g]}</td><td>${nf(a)}</td><td>${nf(t)}</td><td class="${a>t?'up':'dn'}">${sg(a-t)}</td></tr>`}).join('');
+ $('#mdb').innerHTML=`<button class="x" id="cl" aria-label="Close">✕</button><h2>${s.n}</h2><div class="sub">${s.r}${s.z?' · ZOEC':''} · ${['January','February','March','April','May','June','July','August','September','October','November','December'][st.m]} budget ${nf(budget(s,st.m)||0)} kWh</div>
+ <div class="kpis" style="margin-top:14px"><div class="kpi"><div class="l">MTD actual</div><div class="v">${nf(o.a)}</div></div><div class="kpi"><div class="l">MTD target</div><div class="v">${nf(o.t)}</div></div><div class="kpi"><div class="l">Gap</div><div class="v ${o.gap>0?'up':'dn'}">${pc(o.pct)}</div></div></div>
+ ${chart(s)}<div class="note">Bars = actual kWh per day (red = above that day's target). Line = daily target.</div>
+ <h3 style="margin-top:16px">Where the gap comes from (MTD)</h3><div class="tw"><table><thead><tr><th>Day type</th><th>Actual</th><th>Target</th><th>Gap</th></tr></thead><tbody>${gr}</tbody></table></div>
+ <div class="note">Weekly pattern used: Sat–Sun ${Math.round(p.w*100)}% · Thu ${Math.round(p.t*100)}% · Mon–Wed + Fri ${Math.round(p.o*100)}% (last 8 weeks).</div>${f.length?`<div class="note"><span class="tag t-w">Check</span> ${f.join(' · ')}</div>`:''}`;
+ $('#md').classList.add('on');$('#cl').onclick=()=>$('#md').classList.remove('on')}
+$('#md').onclick=e=>{if(e.target.id=='md')$('#md').classList.remove('on')};
+// ----- daily
+function last7(s,i){let h='<span class="dots">';for(let j=i-6;j<=i;j++){const r=j>=0?dayRow(s,j):{gap:null};h+=`<i class="${r.gap==null?'':r.gap>0?'o':'g'}" title="${j>=0?fdd(D[j]):''}"></i>`}return h+'</span>'}
+function renderDy(){const i=st.dd,d=D[i];
+ let R=S.filter(inReg).map(s=>({s,r:dayRow(s,i)})).filter(x=>x.r.v!=null&&x.r.t!=null);
+ const over=R.filter(x=>x.r.gap>0).length,A=R.reduce((a,x)=>a+x.r.v,0),T=R.reduce((a,x)=>a+x.r.t,0);
+ let L=R.filter(x=>st.drf=='all'||(st.drf=='over'?x.r.gap>0:x.r.gap<=0));
+ L.sort((a,b)=>st.dsort=='pct'?b.r.pct-a.r.pct:b.r.gap-a.r.gap);
+ let h=`<div class="kpis"><div class="card kpi hl"><div class="l">${fdd(d)}</div><div class="v">${sg(A-T)}</div><div class="n">${pc(T?(A-T)/T:0)} vs daily target · ${GN[grp(d)]}</div></div><div class="card kpi"><div class="l">Actual</div><div class="v">${nf(A)}</div><div class="n">kWh, ${R.length} sites reported</div></div><div class="card kpi"><div class="l">Daily target</div><div class="v">${nf(T)}</div><div class="n">weekly-pattern target</div></div><div class="card kpi"><div class="l">Over / Within</div><div class="v"><span class="up">${over}</span> / <span class="dn">${R.length-over}</span></div></div></div>`;
+ h+=`<div class="card"><div class="row"><input type="date" id="dd" value="${RAW.dates[i]}" min="${RAW.dates[0]}" max="${RAW.dates[LAST]}">`+['all:All','over:Over','within:Within'].map(x=>{const[k,l]=x.split(':');return`<button class="chip" data-df="${k}" aria-pressed="${st.drf==k}">${l}</button>`}).join('')+`<button class="chip" data-ds="${st.dsort=='pct'?'gap':'pct'}">Sort by ${st.dsort=='pct'?'% (switch to kWh)':'kWh (switch to %)'}</button></div><div class="tw"><table><thead><tr><th>Site</th><th>Actual</th><th>Daily target</th><th>Gap kWh</th><th>Gap %</th><th>Last 7 days</th></tr></thead><tbody>`;
+ for(const x of L)h+=`<tr data-k="${x.s.k}"><td class="nm">${x.s.n}<span class="reg">${x.s.r}</span></td><td>${nf(x.r.v)}</td><td>${nf(x.r.t)}</td><td class="${x.r.gap>0?'up':'dn'}">${sg(x.r.gap)}</td><td class="${x.r.gap>0?'up':'dn'}">${pc(x.r.pct)}</td><td>${last7(x.s,i)}</td></tr>`;
+ if(!L.length)h+='<tr><td colspan="6" class="empty">No data for this day.</td></tr>';
+ h+='</tbody></table></div><div class="note">Red square = above that day\'s target, green = within. Sites with a missing reading on the day are left out.</div></div>';
+ $('#p-dy').innerHTML=h;
+ $('#dd').onchange=e=>{const j=RAW.dates.indexOf(e.target.value);if(j>=0){st.dd=j;renderDy()}};
+ $$('#p-dy [data-df]').forEach(b=>b.onclick=()=>{st.drf=b.dataset.df;renderDy()});$$('#p-dy [data-ds]').forEach(b=>b.onclick=()=>{st.dsort=b.dataset.ds;renderDy()});
+ $$('#p-dy tbody tr[data-k]').forEach(t=>t.onclick=()=>openSite(+t.dataset.k))}
+// ----- reminder (one email, two versions)
+const E={td:'padding:7px 10px;border-bottom:1px solid #e5e5ea;text-align:right;white-space:nowrap;font-size:13px',th:'padding:7px 10px;border-bottom:2px solid #1d1d1f;text-align:right;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#6e6e73'};
+const tb=(heads,rows)=>`<table style="border-collapse:collapse;width:100%;font-family:-apple-system,Segoe UI,Arial,sans-serif"><thead><tr>${heads.map((x,i)=>`<th style="${E.th}${i==0?';text-align:left':''}">${x}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map((x,i)=>`<td style="${E.td}${i==0?';text-align:left;font-weight:600;white-space:normal':''}${/^(\+|−)/.test(String(x).replace(/<[^>]+>/g,''))&&i>0?(String(x).includes('−')?';color:#16833a':';color:#d92d20'):''}">${x}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+function mailData(){const m=st.m,i=st.dd;
+ const R=S.filter(inReg).map(s=>({s,o:mtd(s,2026,m,Math.min(i,upTo())),d:dayRow(s,i)}));
+ const M=R.filter(x=>x.o.has&&x.o.n>0),mo=M.filter(x=>x.o.gap>0).sort((a,b)=>b.o.gap-a.o.gap),ms=M.filter(x=>x.o.gap<=0).sort((a,b)=>a.o.pct-b.o.pct);
+ const Dd=R.filter(x=>x.d.pct!=null),dov=Dd.filter(x=>x.d.gap>0).sort((a,b)=>b.d.pct-a.d.pct),dsv=Dd.filter(x=>x.d.gap<=0).sort((a,b)=>a.d.pct-b.d.pct);
+ return{M,mo,ms,Dd,dov,dsv,i}}
+function buildMail(){const d=mailData(),dt=D[d.i],mn=['January','February','March','April','May','June','July','August','September','October','November','December'][st.m];
+ const A=d.M.reduce((x,r)=>x+r.o.a,0),T=d.M.reduce((x,r)=>x+r.o.t,0),rg=st.reg=='all'?'All regions':st.reg;
+ const dr={we:'Sat–Sun',th:'Thu',ot:'Mon–Wed/Fri'};
+ const lastN=s=>{let n=0;for(let j=d.i-6;j>=0&&j<=d.i;j++){const r=dayRow(s,j);if(r.gap!=null&&r.gap>0)n++}return n};
+ const sub=`Electricity reminder (${rg}): MTD and daily usage vs budget, ${fd(dt)}`;
+ const p1=d.mo.length?tb(['Site','MTD actual','MTD target','Gap kWh','Gap %','Main driver'],d.mo.map(r=>[r.s.n,nf(r.o.a),nf(r.o.t),sg(r.o.gap),pc(r.o.pct),dr[drv(r.o)]||'–'])):'<p style="font-size:13px">No site is over its MTD target.</p>';
+ const p2=d.dov.length?tb(['Site','Day type','Actual','Daily target','Gap %','Days over (last 7)'],d.dov.map(r=>[r.s.n,dr[grp(dt)],nf(r.d.v),nf(r.d.t),pc(r.d.pct),lastN(r.s)+' / 7'])):'<p style="font-size:13px">No site is over its daily target.</p>';
+ const sv=(L,k)=>L.length?`<p style="font-size:13px;margin:10px 0 0"><b style="color:#16833a">Saving, thank you:</b> ${L.slice(0,6).map(r=>`${r.s.n} (${pc(r[k].pct)})`).join(', ')}${L.length>6?` and ${L.length-6} more`:''}.</p>`:'';
+ const html=`<div style="font-family:-apple-system,Segoe UI,Arial,sans-serif;color:#1d1d1f;max-width:760px"><h2 style="margin:0 0 4px;font-size:18px">Electricity reminder · ${rg}</h2><p style="margin:0 0 14px;color:#6e6e73;font-size:13px">Data to ${fdd(dt)}. Please follow up with the CM of each site below and share the reason for the increase.</p>
+ <h3 style="margin:18px 0 4px;font-size:15px">1. Over budget MTD (1–${dt.getDate()} ${MN[st.m]})</h3><p style="margin:0 0 8px;font-size:13px">${d.mo.length} of ${d.M.length} sites are over their MTD target. Total ${nf(A)} kWh vs target ${nf(T)} kWh (${sg(A-T)} kWh, ${pc(T?(A-T)/T:0)}).</p>${p1}${sv(d.ms,'o')}
+ <h3 style="margin:22px 0 4px;font-size:15px">2. Over budget on daily usage (${fdd(dt)})</h3><p style="margin:0 0 8px;font-size:13px">${d.dov.length} of ${d.Dd.length} sites used more than their daily target for a ${dr[grp(dt)]} day.</p>${p2}${sv(d.dsv,'d')}
+ <p style="margin:18px 0 0;color:#6e6e73;font-size:12px">Targets use the FY2026 kWh budget, spread over the week by each site's own pattern (Sat–Sun, Thursday premiere, other days).</p></div>`;
+ const cap=`Hi kak, reminder listrik ya. Per ${fd(dt)} (MTD) ada ${d.mo.length} site yang over budget, dan ${d.dov.length} site over di daily usage ${fdd(dt)}. Detailnya ada di email, mohon dibantu follow up ke CM masing-masing untuk reason kenaikannya ya kak 🙏${d.ms.length?` Untuk yang sudah saving (${d.ms.length} site MTD), terima kasih banyak, mohon dipertahankan ya!`:''}`;
+ return{html,cap,sub,n:[d.mo.length,d.dov.length]}}
+function renderRm(){const m=buildMail();
+ $('#p-rm').innerHTML=`<div class="card"><div class="row"><span class="sub">Region and date follow the selectors above and in Daily.</span><input type="date" id="rd" value="${RAW.dates[st.dd]}" min="${RAW.dates[0]}" max="${RAW.dates[LAST]}"></div>
+ <h3>Subject</h3><textarea id="rs" style="min-height:44px">${m.sub}</textarea><div class="row" style="margin-top:8px"><button class="btn sec" id="cs">Copy subject</button></div>
+ <h3 style="margin-top:14px">Email body (both versions)</h3><div class="mail" id="ml">${m.html}</div><div class="row" style="margin-top:10px"><button class="btn" id="ce">Copy email</button><span class="note" id="cm"></span></div>
+ <h3 style="margin-top:18px">Short caption (Indonesian)</h3><textarea id="rc">${m.cap}</textarea><div class="row" style="margin-top:8px"><button class="btn sec" id="cc">Copy caption</button></div></div>`;
+ const say=t=>{$('#cm').textContent=t;setTimeout(()=>$('#cm').textContent='',2500)};
+ const cp=async(txt,el)=>{try{await navigator.clipboard.writeText(txt);say('Copied')}catch(e){el.select();document.execCommand('copy');say('Copied')}};
+ $('#cs').onclick=()=>cp($('#rs').value,$('#rs'));$('#cc').onclick=()=>cp($('#rc').value,$('#rc'));
+ $('#ce').onclick=async()=>{const h=$('#ml').innerHTML;try{await navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([h],{type:'text/html'}),'text/plain':new Blob([$('#ml').innerText],{type:'text/plain'})})]);say('Email copied, paste into the email body')}catch(e){const r=document.createRange();r.selectNodeContents($('#ml'));const s=getSelection();s.removeAllRanges();s.addRange(r);document.execCommand('copy');say('Email copied, paste into the email body')}};
+ $('#rd').onchange=e=>{const j=RAW.dates.indexOf(e.target.value);if(j>=0){st.dd=j;renderRm()}}}
+// ----- method
+function renderMe(){const R=S.filter(inReg).sort((a,b)=>a.n<b.n?-1:1);
+ $('#p-me').innerHTML=`<div class="card"><h3>How targets are calculated</h3><ol style="margin:0 0 10px;padding-left:20px;line-height:1.7"><li>Start with the site's monthly kWh budget (FY2026 budget file).</li><li>Take the average usage of the last 8 weeks and work out what share of a normal week falls on <b>Sat–Sun</b> and on <b>Thursday</b> (new film premiere). The remaining days (Mon–Wed + Fri) share what is left equally.</li><li>Spread the month budget over the calendar with those shares, so each day gets its own target and the month adds up to the budget.</li><li><b>MTD target</b> = sum of the daily targets of the days that have data. <b>Daily target</b> = that day's share of the budget.</li></ol>
+ <div class="note">Example: 500 kWh budget → about 125 kWh per week. With Sat–Sun 45%, Thu–Fri 35%, Mon–Wed 20% the week splits 56 / 44 / 25 kWh (as in the director's example).</div></div>
+ <div class="card" style="margin-top:12px"><h3>Weekly pattern per site</h3><div class="tw"><table><thead><tr><th>Site</th><th>Sat–Sun</th><th>Thursday</th><th>Mon–Wed + Fri</th><th>Notes</th></tr></thead><tbody>${R.map(s=>{const p=prof[s.k],o=mtd(s,2026,st.m,upTo());return`<tr data-k="${s.k}"><td class="nm">${s.n}<span class="reg">${s.r}</span></td><td>${Math.round(p.w*100)}%</td><td>${Math.round(p.t*100)}%</td><td>${Math.round(p.o*100)}%</td><td style="white-space:normal;text-align:left;color:var(--mut)">${dq(s,o).join(' · ')}</td></tr>`}).join('')}</tbody></table></div></div>`;
+ $$('#p-me tbody tr[data-k]').forEach(t=>t.onclick=()=>openSite(+t.dataset.k))}
+// ----- shell
+const V={ov:renderOv,dy:renderDy,rm:renderRm,me:renderMe};let cur='ov';
+function show(p){cur=p;$$('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.p==p));['ov','dy','rm','me'].forEach(x=>$('#p-'+x).hidden=x!=p);V[p]();try{location.hash=p}catch(e){}}
+$$('.tabs button').forEach(b=>b.onclick=()=>show(b.dataset.p));
+$('#mon').onchange=e=>{st.m=+e.target.value;st.dd=Math.min(LAST,monthDays(2026,st.m).slice(-1)[0]);show(cur)};
+$('#reg').onchange=e=>{st.reg=e.target.value;show(cur)};
+$('#th').onclick=()=>{const r=document.documentElement,dk=r.dataset.theme?r.dataset.theme=='dark':matchMedia('(prefers-color-scheme:dark)').matches;r.dataset.theme=dk?'light':'dark'};
+show(['ov','dy','rm','me'].includes(location.hash.slice(1))?location.hash.slice(1):'ov');
+</script>
