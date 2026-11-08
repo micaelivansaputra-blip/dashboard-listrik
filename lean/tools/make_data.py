@@ -30,6 +30,7 @@ for k,s in sorted(S.items()):
     for j in range(n):
         xs=[row[j] for row in s['rows']]
         vals.append(None if any(x is None or x<0 for x in xs) else round(sum(xs),1))
+    vals=[None if x==0 else x for x in vals]   # 0 kWh = not filled in yet
     # outlier guard: a daily value above 6x the site's median is a meter/typing error -> treated as missing
     nz=sorted(x for x in vals if x)
     med=nz[len(nz)//2] if nz else 0
