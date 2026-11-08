@@ -39,6 +39,7 @@ td.nm{white-space:normal;min-width:170px;font-weight:600}
 .t-o{background:var(--red-s);color:var(--red)}.t-s{background:var(--grn-s);color:var(--grn)}.t-w{background:var(--amb-s);color:var(--amb)}.t-n{background:var(--s2);color:var(--mut)}
 .bar{display:inline-block;height:6px;border-radius:3px;vertical-align:middle;margin-right:6px}
 .dots{display:inline-flex;gap:3px}.dots i{width:9px;height:9px;border-radius:3px;background:var(--line)}.dots i.o{background:var(--red)}.dots i.g{background:var(--grn)}
+.si-s{position:relative;margin-bottom:12px;max-width:420px}.si-s input{width:100%;box-sizing:border-box}.sil{position:absolute;left:0;right:0;top:100%;z-index:5;background:var(--surface);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.18),inset 0 0 0 1px var(--line);margin-top:4px;overflow:hidden}.sil:empty{display:none}.sil button{display:flex;gap:8px;align-items:baseline;width:100%;text-align:left;border:0;background:none;padding:10px 12px;cursor:pointer;border-bottom:1px solid var(--line)}.sil button:hover{background:var(--s2)}.sil b{color:var(--mut);font-variant-numeric:tabular-nums}
 .note{color:var(--mut);font-size:12px;margin-top:10px}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:flex-end;justify-content:center;z-index:20}
 .modal.on{display:flex}.sheet{background:var(--surface);width:min(760px,100%);max-height:88vh;overflow:auto;border-radius:20px 20px 0 0;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px))}
@@ -58,9 +59,9 @@ svg text{fill:var(--mut);font-size:10px}
  <div><h1>Electricity Monitoring</h1><div class="sub" id="asof"></div></div>
  <div class="ctl"><select id="mon" aria-label="Month"></select><select id="reg" aria-label="Region"></select><button class="chip" id="th" aria-label="Toggle theme">Theme</button></div>
 </header>
-<nav class="tabs" role="tablist"><button role="tab" data-p="ov" aria-selected="true">Overview</button><button role="tab" data-p="dy" aria-selected="false">Daily</button><button role="tab" data-p="sh" aria-selected="false">Shows</button><button role="tab" data-p="rm" aria-selected="false">Reminder</button><button role="tab" data-p="me" aria-selected="false">Method</button></nav>
+<nav class="tabs" role="tablist"><button role="tab" data-p="ov" aria-selected="true">Overview</button><button role="tab" data-p="dy" aria-selected="false">Daily</button><button role="tab" data-p="sh" aria-selected="false">Shows</button><button role="tab" data-p="si" aria-selected="false">Site</button><button role="tab" data-p="rm" aria-selected="false">Reminder</button><button role="tab" data-p="me" aria-selected="false">Method</button></nav>
 <main>
-<section id="p-ov"></section><section id="p-dy" hidden></section><section id="p-sh" hidden></section><section id="p-rm" hidden></section><section id="p-me" hidden></section>
+<section id="p-ov"></section><section id="p-dy" hidden></section><section id="p-sh" hidden></section><section id="p-si" hidden></section><section id="p-rm" hidden></section><section id="p-me" hidden></section>
 </main>
 </div>
 <div class="modal" id="md"><div class="sheet" id="mdb"></div></div>
@@ -162,10 +163,10 @@ function openSite(k){const s=S.find(x=>x.k==k),o=mtd(s,2026,st.m,upTo()),p=prof[
  const gr=['we','th','ot'].map(g=>{const a=o.g[g][0],t=o.g[g][1];return`<tr><td>${GN[g]}</td><td>${nf(a)}</td><td>${nf(t)}</td><td class="${a>t?'up':'dn'}">${sg(a-t)}</td></tr>`}).join('');
  $('#mdb').innerHTML=`<button class="x" id="cl" aria-label="Close">✕</button><h2>${s.n}</h2><div class="sub">${s.r}${s.z?' · ZOEC':''} · ${['January','February','March','April','May','June','July','August','September','October','November','December'][st.m]} budget ${nf(budget(s,st.m)||0)} kWh</div>
  <div class="kpis" style="margin-top:14px"><div class="kpi"><div class="l">MTD actual</div><div class="v">${nf(o.a)}</div></div><div class="kpi"><div class="l">MTD target</div><div class="v">${nf(o.t)}</div></div><div class="kpi"><div class="l">Gap</div><div class="v ${o.gap>0?'up':'dn'}">${pc(o.pct)}</div></div></div>
- ${chart(s)}<div class="note">Bars = actual kWh per day (red = above that day's target). Line = daily target.</div>
+ <button class="chip" id="hs" style="margin-top:12px">View monthly history 2025–2026 →</button>${chart(s)}<div class="note">Bars = actual kWh per day (red = above that day's target). Line = daily target.</div>
  <div class="note">MTD target = month budget ÷ days in the month × days with a reading. The daily target line in the chart follows the weekly pattern.</div>
  <div class="note">Weekly pattern used: Sat–Sun ${Math.round(p.w*100)}% · Thu–Fri ${Math.round(p.t*100)}% · Mon–Wed ${Math.round(p.o*100)}% (blend of the cinema's own and the network pattern, ${Math.round(p.cf*100)}% own).</div>${f.length?`<div class="note"><span class="tag t-w">Check</span> ${f.join(' · ')}</div>`:''}`;
- $('#md').classList.add('on');$('#cl').onclick=()=>$('#md').classList.remove('on')}
+ $('#md').classList.add('on');$('#hs').onclick=()=>{st.ss=s.k;st.sq='';$('#md').classList.remove('on');show('si')};$('#cl').onclick=()=>$('#md').classList.remove('on')}
 $('#md').onclick=e=>{if(e.target.id=='md')$('#md').classList.remove('on')};
 // ----- daily
 function last7(s,i){let h='<span class="dots">';for(let j=i-6;j<=i;j++){const r=j>=0?dayRow(s,j):{gap:null};h+=`<i class="${r.gap==null?'':r.gap>0?'o':'g'}" title="${j>=0?fdd(D[j]):''}"></i>`}return h+'</span>'}
@@ -320,12 +321,58 @@ function renderSh(){
  $$('#p-sh tbody tr[data-k]').forEach(t=>t.onclick=()=>{st.sk=t.dataset.k;renderSh();scrollTo(0,0)});
  $$('#p-sh circle[data-k]').forEach(c=>c.onclick=()=>{st.sk=c.dataset.k;renderSh();scrollTo(0,0)});
  $$('#p-sh th[data-ss]').forEach(t=>t.onclick=()=>{st.shs=t.dataset.ss;renderSh()})}
+// ----- site navigator (Jan 2025 -> latest month)
+const MD=[31,28,31,30,31,30,31,31,30,31,30,31];
+st.ss=null;st.sq='';st.sv='seq';st.su='m';
+function m26(s,mo){const ix=monthDays(2026,mo).filter(i=>s.v[i]!=null);return ix.length<15?null:ix.reduce((x,i)=>x+s.v[i],0)/ix.length*MD[mo]}
+const LM=(()=>{let l=0;for(let mo=0;mo<12;mo++)if(S.some(s=>m26(s,mo)!=null))l=mo;return l})();
+const U=(x,mo)=>x==null?null:st.su=='d'?x/MD[mo]:x;
+function siSVG(L,lab,sep){const nar=innerWidth<600,W=nar?380:720,H=nar?240:250,pl=nar?44:52,pr=nar?20:22,pt=14,pb=26,n=lab.length,x=j=>pl+j*(W-pl-pr)/Math.max(n-1,1);
+ const z=L.flatMap(l=>l.v).filter(q=>q!=null);if(!z.length)return'<div class="note">No readings for this cinema.</div>';
+ let lo=Math.min(...z),hi=Math.max(...z);const pd=(hi-lo)*.15||1;lo=Math.max(0,lo-pd);hi+=pd;const y=v=>pt+(1-(v-lo)/(hi-lo))*(H-pt-pb);
+ let g=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Monthly electricity usage">`;
+ for(let k=0;k<=3;k++){const yy=pt+k*(H-pt-pb)/3;g+=`<line x1="${pl}" x2="${W-pr}" y1="${yy}" y2="${yy}" stroke="var(--line)"/><text x="${pl-6}" y="${yy+3}" text-anchor="end">${nf(hi-(hi-lo)*k/3)}</text>`}
+ lab.forEach((m,j)=>{if(nar?(j%(n>12?4:2)==0):(n<=12||j%3==0||j==n-1))g+=`<text x="${x(j)}" y="${H-6}" text-anchor="middle">${m}</text>`});
+ if(sep!=null)g+=`<line x1="${(x(sep)+x(sep+1))/2}" x2="${(x(sep)+x(sep+1))/2}" y1="${pt}" y2="${H-pb}" stroke="var(--line)" stroke-dasharray="3 3"/>`;
+ for(const l of L){let d='',pen=0;l.v.forEach((q,j)=>{if(q==null){pen=0;return}d+=(pen?'L':'M')+x(j).toFixed(1)+' '+y(q).toFixed(1)+' ';pen=1});
+  g+=`<path d="${d}" fill="none" stroke="${l.c}" stroke-width="${l.w||2.4}" ${l.dash?'stroke-dasharray="5 4"':''}/>`;
+  if(!l.nodots)g+=l.v.map((q,j)=>q==null?'':`<circle cx="${x(j)}" cy="${y(q)}" r="3.2" fill="${l.c}"><title>${lab[j]}: ${nf(q)}</title></circle>`).join('')}
+ return g+'</svg>'}
+function siMatches(q){q=q.trim().toLowerCase();if(!q)return[];return S.filter(s=>s.n.toLowerCase().includes(q)||String(s.k)==q||String(s.k).padStart(2,'0')==q).slice(0,8)}
+function siList(){const m=siMatches(st.sq);$('#sil').innerHTML=m.length?m.map(s=>`<button data-k="${s.k}"><b>${String(s.k).padStart(2,'0')}</b> ${s.n}<span class="reg">${s.r}</span></button>`).join(''):(st.sq.trim()?'<div class="note" style="margin:6px 10px">No cinema found.</div>':'');
+ $$('#sil button').forEach(b=>b.onclick=()=>{st.ss=+b.dataset.k;st.sq='';renderSi()})}
+function renderSi(){
+ const sel=S.find(x=>x.k==st.ss)||[...S].sort((a,b)=>a.n<b.n?-1:1)[0];st.ss=sel.k;
+ const A=sel.m25,B=Array.from({length:12},(_,mo)=>mo<=LM?m26(sel,mo):null),bud=sel.b;
+ const u=st.su=='d'?'kWh/day':'kWh/month',Y1=A.map((v,mo)=>U(v,mo)),Y2=B.map((v,mo)=>U(v,mo)),YB=B.map((v,mo)=>bud&&mo<=LM?U(bud[mo],mo):null);
+ let lines,lab,sep=null;
+ if(st.sv=='yoy'){lab=MN;lines=[{v:Y1,c:'var(--mut)'},{v:Y2,c:'var(--blue)'},{v:YB,c:'var(--org)',dash:1,w:1.8,nodots:1}]}
+ else{lab=[...MN.map(m=>m+' 25'),...MN.slice(0,LM+1).map(m=>m+' 26')];sep=11;lines=[{v:[...Y1,...Y2.slice(0,LM+1)],c:'var(--blue)'},{v:[...Y1.map(()=>null),...YB.slice(0,LM+1)],c:'var(--org)',dash:1,w:1.8,nodots:1}]}
+ let lm=-1;for(let mo=0;mo<=LM;mo++)if(B[mo]!=null)lm=mo;
+ const both=[];for(let mo=0;mo<=LM;mo++)if(A[mo]!=null&&B[mo]!=null)both.push(mo);
+ const a1=both.length?both.reduce((x,mo)=>x+A[mo],0)/both.length:null,a2=both.length?both.reduce((x,mo)=>x+B[mo],0)/both.length:null;
+ const all=[...A.map((v,mo)=>({v,l:MN[mo]+' 2025',mo})),...B.map((v,mo)=>({v,l:MN[mo]+' 2026',mo}))].filter(o=>o.v!=null),pk=all.sort((a,b)=>b.v-a.v)[0];
+ const yoy=lm>=0?pp(B[lm],A[lm]):null,vb=lm>=0&&bud?pp(B[lm],bud[lm]):null;
+ const rows=MN.map((m,mo)=>{const a=A[mo],b=mo<=LM?B[mo]:null,bd=bud&&mo<=LM?bud[mo]:null,sw=mo<SM.length?shw(sel,mo):null,yy=pp(b,a),vv=pp(b,bd);
+  return`<tr><td class="nm">${m}</td><td>${a==null?'–':nf(U(a,mo))}</td><td>${b==null?'–':nf(U(b,mo))}</td><td class="${yy>0?'up':'dn'}">${yy==null?'–':pc(yy)}</td><td>${bd==null?'–':nf(U(bd,mo))}</td><td class="${vv>0?'up':'dn'}">${vv==null?'–':pc(vv)}</td><td>${sw?nf(sw):'–'}</td><td>${b!=null&&sw?(b/sw).toFixed(1):'–'}</td></tr>`}).join('');
+ const nm=A.filter(q=>q==null).length;
+ const h=`<div class="si-s"><input type="search" id="siq" placeholder="Search cinema name or code…" value="${st.sq.replace(/"/g,'&quot;')}" autocomplete="off" aria-label="Search cinema"><div id="sil" class="sil"></div></div>
+ <div class="row"><h2 style="margin:0;flex:1 1 auto;min-width:0">${sel.n} <span class="reg">${sel.r}${sel.z?' · ZOEC':''}</span></h2><button class="chip" data-sv="seq" aria-pressed="${st.sv=='seq'}">Timeline</button><button class="chip" data-sv="yoy" aria-pressed="${st.sv=='yoy'}">2025 vs 2026</button><button class="chip" data-su="m" aria-pressed="${st.su=='m'}">kWh / month</button><button class="chip" data-su="d" aria-pressed="${st.su=='d'}">kWh / day</button></div>
+ <div class="kpis"><div class="card kpi hl"><div class="l">${lm>=0?MN[lm]+' 2026':'2026'}</div><div class="v">${lm>=0?nf(U(B[lm],lm)):'–'}</div><div class="n">${u}${yoy==null?'':' · '+pc(yoy)+' vs '+MN[lm]+' 2025'}</div></div>
+ <div class="card kpi"><div class="l">Avg 2026 vs 2025</div><div class="v">${a1&&a2?pc((a2-a1)/a1):'–'}</div><div class="n">${both.length} months compared, same months only</div></div>
+ <div class="card kpi"><div class="l">${lm>=0?MN[lm]+' vs budget':'vs budget'}</div><div class="v ${vb>0?'up':'dn'}">${vb==null?'–':pc(vb)}</div><div class="n">${bud&&lm>=0?'Budget '+nf(U(bud[lm],lm))+' '+u:'No budget loaded'}</div></div>
+ <div class="card kpi"><div class="l">Highest month</div><div class="v">${pk?nf(U(pk.v,pk.mo)):'–'}</div><div class="n">${pk?pk.l:''}</div></div></div>
+ <div class="card"><h3>${st.sv=='yoy'?'2025 vs 2026 by month':'Monthly usage, Jan 2025 – '+MN[LM]+' 2026'} <span class="note" style="font-weight:400">(${u})</span></h3><div class="row" style="margin-bottom:4px"><span class="note"><b style="color:${st.sv=='yoy'?'var(--mut)':'var(--blue)'}">●</b> ${st.sv=='yoy'?'2025':'Actual'} &nbsp; ${st.sv=='yoy'?'<b style="color:var(--blue)">●</b> 2026 &nbsp; ':''}<b style="color:var(--org)">- -</b> 2026 budget</span></div>${siSVG(lines,lab,sep)}<div class="note">Monthly kWh is estimated from the days that have a reading (average per day × days in month). Months with fewer than 15 reported days are left blank${nm?` (${nm} in 2025 for this cinema)`:''}. 2025 and 2026 use the same rule and the same daily source.</div></div>
+ <div class="card" style="margin-top:12px"><h3>Month by month</h3><div class="tw"><table><thead><tr><th>Month</th><th>2025</th><th>2026</th><th>YoY</th><th>Budget 2026</th><th>vs budget</th><th>Shows 2026</th><th>kWh/show</th></tr></thead><tbody>${rows}</tbody></table></div><div class="note">Values in ${u}. Shows and kWh/show use the monthly Number of Show file (kWh/show is always per month).</div></div>`;
+ $('#p-si').innerHTML=h;
+ const q=$('#siq');q.oninput=()=>{st.sq=q.value;siList()};siList();
+ $$('#p-si [data-sv]').forEach(b=>b.onclick=()=>{st.sv=b.dataset.sv;renderSi()});$$('#p-si [data-su]').forEach(b=>b.onclick=()=>{st.su=b.dataset.su;renderSi()})}
 // ----- shell
-const V={ov:renderOv,dy:renderDy,sh:renderSh,rm:renderRm,me:renderMe};let cur='ov';
-function show(p){cur=p;$$('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.p==p));['ov','dy','sh','rm','me'].forEach(x=>$('#p-'+x).hidden=x!=p);V[p]();try{location.hash=p}catch(e){}}
+const V={ov:renderOv,dy:renderDy,sh:renderSh,si:renderSi,rm:renderRm,me:renderMe};let cur='ov';
+function show(p){cur=p;$$('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.p==p));['ov','dy','sh','si','rm','me'].forEach(x=>$('#p-'+x).hidden=x!=p);V[p]();try{location.hash=p}catch(e){}}
 $$('.tabs button').forEach(b=>b.onclick=()=>show(b.dataset.p));
 $('#mon').onchange=e=>{st.m=+e.target.value;st.dd=Math.min(LAST,monthDays(2026,st.m).slice(-1)[0]);show(cur)};
 $('#reg').onchange=e=>{st.reg=e.target.value;show(cur)};
 $('#th').onclick=()=>{const r=document.documentElement,dk=r.dataset.theme?r.dataset.theme=='dark':matchMedia('(prefers-color-scheme:dark)').matches;r.dataset.theme=dk?'light':'dark'};
-show(['ov','dy','sh','rm','me'].includes(location.hash.slice(1))?location.hash.slice(1):'ov');
+show(['ov','dy','sh','si','rm','me'].includes(location.hash.slice(1))?location.hash.slice(1):'ov');
 </script>
