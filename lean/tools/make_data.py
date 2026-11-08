@@ -17,9 +17,12 @@ num=lambda s:(None if s in(None,'') else (lambda t:float(t) if re.match(r'^-?\d+
 S={}
 for r in v[3:]:
     if len(r)<8 or not re.match(r'^\d+-',r[4] or ''):continue
-    k=int(r[4].split('-')[0]);s=S.setdefault(k,{'k':k,'n':r[4].split('-',1)[1].title(),'r':(lambda x:x if x.startswith('R') and len(x)<4 else 'NA')((r[3] or '').replace('REGION ','R')),'rows':[]})
+    k=int(r[4].split('-')[0]);rg=(r[3] or '').replace('REGION ','R')
+    if k in S and S[k]['r']=='NA' and rg.startswith('R') and len(rg)<4:S[k]['r']=rg
+    s=S.setdefault(k,{'k':k,'n':r[4].split('-',1)[1].title(),'r':(lambda x:x if x.startswith('R') and len(x)<4 else 'NA')((r[3] or '').replace('REGION ','R')),'rows':[]})
     s['rows'].append([num(r[i]) if i<len(r) else None for i,_ in cols])
 B=json.load(open(ROOT.parent/'src/data/budget.json'));OV={'70':29361,'71':56985,'72':31967}
+RFIX={7:'R1',17:'R4',27:'R5'}  # region is #N/A in the sheet for these multi-floor sites
 ZO={50,34,69,7,51,39,37}
 sites=[]
 for k,s in sorted(S.items()):
@@ -36,7 +39,7 @@ for k,s in sorted(S.items()):
     if b:bm=b['m']
     elif str(k) in OV:bm=[OV[str(k)]]*12;proxy=True
     else:bm=None
-    sites.append({'k':k,'n':s['n'],'r':s['r'],'z':k in ZO,'v':vals,'b':bm,'bp':proxy})
+    sites.append({'k':k,'n':s['n'],'r':RFIX.get(k,s['r']),'z':k in ZO,'v':vals,'b':bm,'bp':proxy})
 asof=cols[-1][1]
 # last date with real data (>=1 site)
 last=max(j for j in range(len(cols)) if sum(1 for x in sites if x['v'][j])>=len(sites)*.5)
