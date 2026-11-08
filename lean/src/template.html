@@ -371,6 +371,7 @@ function renderSi(){
  const all=[...A.map((v,mo)=>({v,l:MN[mo]+' 2025',mo})),...B.map((v,mo)=>({v,l:MN[mo]+' 2026',mo}))].filter(o=>o.v!=null),pk=all.sort((a,b)=>b.v-a.v)[0];
  const yoy=lm>=0?pp(B[lm],A[lm]):null,vb=lm>=0&&bud?pp(B[lm],bud[lm]):null;
  const rows=MN.map((m,mo)=>{const a=A[mo],e=E[mo],b=mo<=LM?B[mo]:e?e.v:null,bd=bud&&mo<=LX?bud[mo]:null,sw=mo<SM.length?shw(sel,mo):null,yy=pp(b,a),vv=pp(b,bd);
+  if(mo>LX)return`<tr><td class="nm">${m}</td><td>${a==null?'–':nf(U(a,mo))}</td><td colspan="6"></td></tr>`;
   return`<tr><td class="nm">${m}</td><td>${a==null?'–':nf(U(a,mo))}</td><td${e?` title="Running month: estimated from ${e.n} daily readings"`:''}>${b==null?'–':(e?'≈ ':'')+nf(U(b,mo))}</td><td class="${yy>0?'up':'dn'}">${yy==null?'–':pc(yy)}</td><td>${bd==null?'–':nf(U(bd,mo))}</td><td class="${vv>0?'up':'dn'}">${vv==null?'–':pc(vv)}</td><td>${sw?nf(sw):'–'}</td><td>${b!=null&&sw&&!e?(b/sw).toFixed(1):'–'}</td></tr>`}).join('');
  const nm=A.filter(q=>q==null).length;
  const h=`<div class="si-s"><input type="search" id="siq" placeholder="Search cinema name or code…" value="${st.sq.replace(/"/g,'&quot;')}" autocomplete="off" aria-label="Search cinema"><div id="sil" class="sil"></div></div>
