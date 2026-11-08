@@ -89,7 +89,14 @@ const medA=a=>{const b=[...a].sort((x,y)=>x-y),n=b.length;return n%2?b[(n-1)/2]:
 const OWN={};
 for(const s of S){const A=dowSamples(s);if(A.every(x=>x.length>=6)){const mean=A.map(avgA);OWN[s.k]={mean,noise:avgA(A.map(x=>varA(x)/x.length)),n:Math.min(...A.map(x=>x.length))}}}
 const NET=(()=>{const r=[0,1,2,3,4,5,6].map(d=>medA(Object.values(OWN).map(o=>o.mean[d]))),m=avgA(r);return r.map(x=>x/m)})();
-const grpShare=idx=>{const t=idx.reduce((x,y)=>x+y,0);return{w:(idx[0]+idx[6])/t,t:(idx[4]+idx[5])/t,o:(idx[1]+idx[2]+idx[3])/t}};
+// Rule (director): per-day target Sat–Sun >= Thu–Fri >= Mon–Wed, each step at least STEP. Magnitudes come from the data;
+// where the data disagrees with the order the categories are pooled (isotonic fit) and then separated by STEP.
+const STEP=0.02;
+function orderCats(c){ // c=[monwed,thufri,satsun] per-day index, wt=[3,2,2]
+ const f=[1,1+STEP,(1+STEP)*(1+STEP)],wt=[3,2,2];let blocks=c.map((x,i)=>({v:x/f[i],w:wt[i],n:1}));
+ for(let k=0;k<blocks.length-1;){if(blocks[k].v>blocks[k+1].v){const a=blocks[k],b=blocks[k+1],w=a.w+b.w;blocks.splice(k,2,{v:(a.v*a.w+b.v*b.w)/w,w,n:a.n+b.n});k=Math.max(0,k-1)}else k++}
+ const out=[];blocks.forEach(b=>{for(let i=0;i<b.n;i++)out.push(b.v)});return out.map((x,i)=>x*f[i])}
+const grpShare=idx=>{const c=orderCats([(idx[1]+idx[2]+idx[3])/3,(idx[4]+idx[5])/2,(idx[0]+idx[6])/2]);const t=3*c[0]+2*c[1]+2*c[2];return{w:2*c[2]/t,t:2*c[1]/t,o:3*c[0]/t}};
 const NETSH=grpShare(NET);
 for(const s of S){const o=OWN[s.k];let cf=0,idx=NET;
  if(o){const signal=Math.max(varA(o.mean)-o.noise,0);cf=signal+o.noise>0?signal/(signal+o.noise):0;idx=NET.map((x,d)=>cf*o.mean[d]+(1-cf)*x)}
@@ -103,7 +110,7 @@ const normC={};
 function norm(s,y,m){const key=s.k+'|'+y+'|'+m;if(normC[key])return normC[key];return normC[key]=calDays(y,m).reduce((x,d)=>x+share(s,d),0)}
 function tgt(s,i){const d=D[i],b=budget(s,d.getMonth());return b==null?null:b*share(s,d)/norm(s,d.getFullYear(),d.getMonth())}
 function mtd(s,y,m,upTo){const o={a:0,t:0,n:0,miss:0,g:{we:[0,0],th:[0,0],ot:[0,0]},has:s.b!=null};
- for(const i of monthDays(y,m)){if(i>upTo)break;const v=s.v[i];if(v==null){o.miss++;continue}const t=tgt(s,i);o.a+=v;o.n++;if(t!=null){o.t+=t;const g=o.g[grp(D[i])];g[0]+=v;g[1]+=t}}
+ for(const i of monthDays(y,m)){if(i>upTo)break;const v=s.v[i];if(v==null){o.miss++;continue}const t=tgt(s,i);o.a+=v;o.n++;if(t!=null){o.t+=budget(s,m)/new Date(y,m+1,0).getDate();const g=o.g[grp(D[i])];g[0]+=v;g[1]+=t}}
  o.gap=o.a-o.t;o.pct=o.t?o.gap/o.t:0;return o}
 function dayRow(s,i){const v=s.v[i],t=tgt(s,i);return{v,t,gap:v==null||t==null?null:v-t,pct:v==null||!t?null:(v-t)/t}}
 function drv(o){let b=null,bv=0;for(const k of['we','th','ot']){const g=o.g[k][0]-o.g[k][1];if(g>bv){bv=g;b=k}}return b}
@@ -136,7 +143,7 @@ function renderOv(){
  for(const r of L){const c=r.o.gap>0?'var(--red)':'var(--grn)',w=Math.round(Math.abs(r.o.pct)/mx*48);
   h+=`<tr data-k="${r.s.k}"><td class="nm">${r.s.n}<span class="reg">${r.s.r}${r.s.z?' · ZOEC':''}</span></td><td>${nf(r.o.a)}</td><td>${nf(r.o.t)}</td><td class="${r.o.gap>0?'up':'dn'}">${sg(r.o.gap)}</td><td><span class="bar" style="width:${w}px;background:${c}"></span><span class="${r.o.gap>0?'up':'dn'}">${pc(r.o.pct)}</span></td><td>${r.d.pct==null?'–':`<span class="${r.d.pct>0?'up':'dn'}">${pc(r.d.pct)}</span>`}</td><td>${tag(r.o.pct)}</td></tr>`}
  if(!L.length)h+='<tr><td colspan="7" class="empty">No sites match.</td></tr>';
- h+=`</tbody></table></div><div class="note">MTD target follows the weekly pattern (Sat–Sun, Thu–Fri, Mon–Wed) of each site, scaled so the full month equals its budget. Tap a row for the daily view.</div></div>`;
+ h+=`</tbody></table></div><div class="note">MTD target = month budget ÷ days in the month × days with a reading (no day categories). Daily targets use the weekly pattern. Tap a row for the daily view.</div></div>`;
  $('#p-ov').innerHTML=h;
  $('#q').oninput=e=>{st.q=e.target.value;const p=e.target.selectionStart;renderOv();const q=$('#q');q.focus();q.setSelectionRange(p,p)};
  $$('#p-ov [data-f]').forEach(b=>b.onclick=()=>{st.f=b.dataset.f;renderOv()});
@@ -156,7 +163,7 @@ function openSite(k){const s=S.find(x=>x.k==k),o=mtd(s,2026,st.m,upTo()),p=prof[
  $('#mdb').innerHTML=`<button class="x" id="cl" aria-label="Close">✕</button><h2>${s.n}</h2><div class="sub">${s.r}${s.z?' · ZOEC':''} · ${['January','February','March','April','May','June','July','August','September','October','November','December'][st.m]} budget ${nf(budget(s,st.m)||0)} kWh</div>
  <div class="kpis" style="margin-top:14px"><div class="kpi"><div class="l">MTD actual</div><div class="v">${nf(o.a)}</div></div><div class="kpi"><div class="l">MTD target</div><div class="v">${nf(o.t)}</div></div><div class="kpi"><div class="l">Gap</div><div class="v ${o.gap>0?'up':'dn'}">${pc(o.pct)}</div></div></div>
  ${chart(s)}<div class="note">Bars = actual kWh per day (red = above that day's target). Line = daily target.</div>
- <h3 style="margin-top:16px">Where the gap comes from (MTD)</h3><div class="tw"><table><thead><tr><th>Day type</th><th>Actual</th><th>Target</th><th>Gap</th></tr></thead><tbody>${gr}</tbody></table></div>
+ <div class="note">MTD target = month budget ÷ days in the month × days with a reading. The daily target line in the chart follows the weekly pattern.</div>
  <div class="note">Weekly pattern used: Sat–Sun ${Math.round(p.w*100)}% · Thu–Fri ${Math.round(p.t*100)}% · Mon–Wed ${Math.round(p.o*100)}% (blend of the cinema's own and the network pattern, ${Math.round(p.cf*100)}% own).</div>${f.length?`<div class="note"><span class="tag t-w">Check</span> ${f.join(' · ')}</div>`:''}`;
  $('#md').classList.add('on');$('#cl').onclick=()=>$('#md').classList.remove('on')}
 $('#md').onclick=e=>{if(e.target.id=='md')$('#md').classList.remove('on')};
@@ -205,7 +212,7 @@ function buildMail(){const i=st.dd,dt=D[i],m=dt.getMonth(),rg=st.reg=='all'?'All
  const TD=agg(R.filter(r=>r.d.a!=null),'d'),TM=agg(have,'o'),tS=`${cellS};background:#1f3864;color:#fff;font-weight:700`;
  const regT=tbl(`<tr><th style="${hS};background:#fff"></th><th colspan="3" style="${hS}">DAILY (${fd(dt)})</th><th colspan="3" style="${hS}">MTD (1–${dt.getDate()} ${MN[m]})</th></tr><tr>${['REGION','Target','Actual','%','Target','Actual','%'].map(x=>th(x)).join('')}</tr>${regRows}<tr><td style="${tS};text-align:center">TOTAL</td><td style="${tS}">${nf(TD.t)}</td><td style="${tS}">${nf(TD.a)}</td><td style="${tS};text-align:center">${pcI(TD.p)}</td><td style="${tS}">${nf(TM.t)}</td><td style="${tS}">${nf(TM.a)}</td><td style="${tS};text-align:center">${pcI(TM.p)}</td></tr>`);
  const dr={we:'Sat–Sun',th:'Thu–Fri',ot:'Mon–Wed'},dn=dr[grp(dt)],rn=r=>'R'+r.s.r.replace('R','');
- const tA=mo.length?tbl(`<tr>${['Region','Cinema','MTD target','MTD actual','Gap kWh','%','Main driver'].map(x=>th(x)).join('')}</tr>`+mo.map(r=>`<tr>${txt(rn(r))}${txt('<b>'+r.s.n+'</b>')}${cell(nf(r.o.t))}${cell(nf(r.o.a))}${cell(sg(r.o.a-r.o.t))}${pcell(r.o.p)}${txt(dr[drv(r.o)]||'–')}</tr>`).join('')):'<p>No cinema is above the threshold.</p>';
+ const tA=mo.length?tbl(`<tr>${['Region','Cinema','MTD target','MTD actual','Gap kWh','%','Avg kWh/day vs budget/day'].map(x=>th(x)).join('')}</tr>`+mo.map(r=>`<tr>${txt(rn(r))}${txt('<b>'+r.s.n+'</b>')}${cell(nf(r.o.t))}${cell(nf(r.o.a))}${cell(sg(r.o.a-r.o.t))}${pcell(r.o.p)}${cell(nf(r.o.a/r.o.n)+' / '+nf(r.s.b[m]/new Date(2026,m+1,0).getDate()))}</tr>`).join('')):'<p>No cinema is above the threshold.</p>';
  const tB=dov.length?tbl(`<tr>${['Region','Cinema','Daily target','Actual','Gap kWh','%','Days over (last 7)'].map(x=>th(x)).join('')}</tr>`+dov.map(r=>`<tr>${txt(rn(r))}${txt('<b>'+r.s.n+'</b>')}${cell(nf(r.d.t))}${cell(nf(r.d.a))}${cell(sg(r.d.a-r.d.t))}${pcell(r.d.p)}${cell(r.n7+' / '+r.c7)}</tr>`).join('')):'<p>No cinema is above the threshold.</p>';
  const T=Math.round(thr*100);
  const html=`<div style="font-family:Calibri,Arial,sans-serif;color:#1d1d1f;max-width:860px;font-size:14px"><p style="margin:0 0 4px">Dear All,</p><p style="margin:0 0 12px">Please find the Daily Monitoring of Electricity for ${fd(dt)}${st.reg=='all'?'':' ('+rg+')'}. Total usage MTD is <b>${nf(TM.a)} kWh</b> vs target <b>${nf(TM.t)} kWh</b> (<b>${pcI(TM.p)}</b>). Below are the cinemas that are more than ${T}% above target and need follow up; the full detail of all cinemas is in the attached Excel.</p>
@@ -214,7 +221,7 @@ function buildMail(){const i=st.dd,dt=D[i],m=dt.getMonth(),rg=st.reg=='all'?'All
  <p style="margin:0 0 2px"><b>B. Over budget on daily usage, ${fdd(dt)} (${dn} category, more than ${T}% above target): ${dov.length} of ${R.length-miss.length} cinemas</b></p>${tB}
  ${miss.length?`<p style="margin:0 0 4px"><b>Data not yet complete for ${fd(dt)}:</b> ${miss.map(r=>r.s.n).join(', ')}. Please complete it as soon as possible.</p>`:''}
  <p style="margin:8px 0 4px">Cinemas on or below target: <b>${msv.length}</b> MTD and <b>${dsv.length}</b> on the day. Thank you, please keep it up.</p>
- <p style="margin:12px 0 4px"><b>Note:</b></p><ul style="margin:0;padding-left:20px;line-height:1.6"><li>Target = FY2026 monthly kWh budget spread over the week by each cinema's own pattern (Sat–Sun, Thu–Fri premiere, Mon–Wed). MTD target = sum of daily targets for days with data.</li><li>Please share the reason for the increase (event, equipment, operating hours, other) with your RM by end of day.</li></ul></div>`;
+ <p style="margin:12px 0 4px"><b>Note:</b></p><ul style="margin:0;padding-left:20px;line-height:1.6"><li>MTD target = FY2026 monthly kWh budget ÷ days in the month × days with data. Daily target = the budget spread over the week with Sat–Sun ≥ Thu–Fri ≥ Mon–Wed (each step at least 2%).</li><li>Please share the reason for the increase (event, equipment, operating hours, other) with your RM by end of day.</li></ul></div>`;
  const cap=`Hi kak, reminder listrik ya. Per ${fd(dt)}: ${mo.length} cinema over >${T}% secara MTD, dan ${dov.length} cinema over >${T}% di daily usage ${fdd(dt)}.${miss.length?` Data ${miss.length} cinema belum lengkap.`:''} Detail lengkap ada di Excel lampiran, mohon dibantu follow up ke CM masing-masing untuk reason kenaikannya 🙏`;
  return{html,cap,sub:`Daily Monitoring of Electricity ${fd(dt)}${st.reg=='all'?'':' – '+rg}`}}
 // data for the Excel attachment (read by the report tool)
@@ -240,8 +247,8 @@ function renderMe(){const R=S.filter(inReg).sort((a,b)=>a.n<b.n?-1:1);
  <ol style="margin:0 0 12px;padding-left:20px;line-height:1.7"><li><b>Monthly budget</b> from the FY2026 kWh budget file, e.g. 500 kWh.</li>
  <li><b>Average week</b> = monthly budget ÷ 4 weeks, e.g. 500 ÷ 4 = 125 kWh.</li>
  <li><b>Weekly shares</b>: from all months of actual usage (each day divided by its own month's average, so savings or level changes do not bend the pattern), work out how much of a normal week falls in each of 3 categories: <b>Sat–Sun</b> (weekend), <b>Thu–Fri</b> (Thursday is the new film premiere) and <b>Mon–Wed</b>. The three shares add up to 100%. A cinema's own pattern is used only as far as it is consistent; otherwise the average pattern of all cinemas is used.</li>
- <li><b>Daily target</b> = category share of the week ÷ number of days in that category. The calendar is then scaled so the whole month adds up exactly to the budget.</li>
- <li><b>MTD target</b> = sum of the daily targets for the days that already have data. <b>Gap</b> = actual − target; above 0 means over budget.</li></ol>
+ <li><b>Order rule</b>: per-day target Sat–Sun ≥ Thu–Fri ≥ Mon–Wed, each step at least 2%. Sizes come from the data; where the data disagrees with the order (for most cinemas Thu–Fri is not higher than Mon–Wed) the categories are pooled and then separated by 2%.</li><li><b>Daily target</b> = category share of the week ÷ number of days in that category. The calendar is then scaled so the whole month adds up exactly to the budget.</li>
+ <li><b>MTD target</b> needs no categories: monthly budget ÷ days in the month × days with data. <b>Gap</b> = actual − target; above 0 means over budget. The categories are used for the <b>daily</b> target only.</li></ol>
  <div class="tw"><table><thead><tr><th>Category (director's example)</th><th>Share</th><th>kWh per week</th><th>Days</th><th>Target per day</th></tr></thead><tbody>
  <tr><td>Sat–Sun</td><td>45%</td><td>${ex[0].toFixed(1)}</td><td>2</td><td>${ex[3].toFixed(1)}</td></tr>
  <tr><td>Thu–Fri</td><td>35%</td><td>${ex[1].toFixed(1)}</td><td>2</td><td>${ex[4].toFixed(1)}</td></tr>

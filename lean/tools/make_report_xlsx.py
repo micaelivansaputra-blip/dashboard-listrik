@@ -21,8 +21,8 @@ wb=Workbook()
 # ---------- Detail Cinema
 wd=wb.active;wd.title='Detail Cinema'
 wd['A1']=f'Detail Cinema, Daily and MTD to {ds}';wd['A1'].font=Font(bold=True,size=14)
-wd['A2']='Target = monthly budget spread by each cinema\'s weekly pattern (Sat-Sun, Thu-Fri, Mon-Wed). Gap, % and status are formulas.';wd['A2'].font=Font(italic=True,color='6E6E73')
-H=['Region','Site','Cinema','ZOEC','Month budget (kWh)','Daily target','Daily actual','Daily gap kWh','Daily %','MTD target','MTD actual','MTD gap kWh','MTD %','Status MTD','Status daily','Main driver (MTD)','Days over (last 7)','Days with data (last 7)','Sat-Sun actual','Sat-Sun target','Sat-Sun gap','Thu-Fri actual','Thu-Fri target','Thu-Fri gap','Mon-Wed actual','Mon-Wed target','Mon-Wed gap','Share Sat-Sun','Share Thu-Fri','Share Mon-Wed','Notes']
+wd['A2']='Daily target: budget spread by weekly pattern (Sat-Sun >= Thu-Fri >= Mon-Wed). MTD target: monthly budget / days in month x days with data. Gap, % and status are formulas.';wd['A2'].font=Font(italic=True,color='6E6E73')
+H=['Region','Site','Cinema','ZOEC','Month budget (kWh)','Daily target','Daily actual','Daily gap kWh','Daily %','MTD target','MTD actual','MTD gap kWh','MTD %','Status MTD','Status daily','Days over (last 7)','Days with data (last 7)','Share Sat-Sun','Share Thu-Fri','Share Mon-Wed','Notes']
 hdr(wd,4,1,H);wd.row_dimensions[4].height=44
 DN={'we':'Sat-Sun','th':'Thu-Fri','ot':'Mon-Wed'}
 r0=5
@@ -44,21 +44,20 @@ for i,s in enumerate(S):
       f'=IF(K{r}="","",K{r}-J{r})',f'=IF(OR(K{r}="",J{r}=0),"",K{r}/J{r}-1)',
       f'=IF(M{r}="","n/a",IF(M{r}>Summary!$C$4,"ACTION",IF(M{r}>0,"Watch","On/under")))',
       f'=IF(I{r}="","n/a",IF(I{r}>Summary!$C$4,"ACTION",IF(I{r}>0,"Watch","On/under")))',
-      DN.get(drv,'') if s['mtd']['n'] else '',s['n7'] if s['c7'] else None,s['c7'],
-      round(g['we'][0],1),round(g['we'][1],1),f'=S{r}-T{r}',round(g['th'][0],1),round(g['th'][1],1),f'=V{r}-W{r}',round(g['ot'][0],1),round(g['ot'][1],1),f'=Y{r}-Z{r}',
+      s['n7'] if s['c7'] else None,s['c7'],
       s['w'],s['t'],s['o'],'; '.join(notes)]
     for c,v in enumerate(row,1):wd.cell(r,c,v)
 rl=r0+len(S)-1;box(wd,4,rl,1,len(H))
 for r in range(r0,rl+1):
-    for c in (5,6,7,8,10,11,12,19,20,21,22,23,24,25,26,27):wd.cell(r,c).number_format='#,##0;[Red]-#,##0'
+    for c in (5,6,7,8,10,11,12):wd.cell(r,c).number_format='#,##0;[Red]-#,##0'
     for c in (9,13):wd.cell(r,c).number_format='0%'
-    for c in (28,29,30):wd.cell(r,c).number_format='0%'
+    for c in (18,19,20):wd.cell(r,c).number_format='0%'
 for col in ('I','M'):
     wd.conditional_formatting.add(f'{col}{r0}:{col}{rl}',ColorScaleRule(start_type='num',start_value=-.3,start_color='63BE7B',mid_type='num',mid_value=0,mid_color='FFEB84',end_type='num',end_value=.3,end_color='E8643A'))
 for col in ('N','O'):
     wd.conditional_formatting.add(f'{col}{r0}:{col}{rl}',CellIsRule(operator='equal',formula=['"ACTION"'],fill=PatternFill('solid',bgColor='F8CBAD',fgColor='F8CBAD'),font=Font(bold=True,color='9C0006')))
 wd.freeze_panes='D5';wd.auto_filter.ref=f'A4:{L(len(H))}{rl}'
-for c,w in zip(range(1,32),[10,6,34,6,12,10,10,10,9,11,11,11,9,11,11,13,9,9,10,10,10,10,10,10,10,10,10,9,9,9,40]):wd.column_dimensions[L(c)].width=w
+for c,w in zip(range(1,22),[10,6,34,6,12,10,10,10,9,11,11,11,9,11,11,9,9,9,9,9,40]):wd.column_dimensions[L(c)].width=w
 # ---------- Summary
 ws=wb.create_sheet('Summary',0)
 ws['A1']='Daily Monitoring of Electricity';ws['A1'].font=Font(bold=True,size=16)
@@ -100,11 +99,11 @@ wr['A1']=f'Cinemas to follow up, {ds} (above {10}% as of build; ACTION column in
 mo=sorted([s for s in S if s['mtd']['n'] and s['mtd']['t'] and s['mtd']['a']/s['mtd']['t']-1>.1],key=lambda s:-(s['mtd']['a']/s['mtd']['t']))
 dv=sorted([s for s in S if s['daily']['a'] is not None and s['daily']['a']/s['daily']['t']-1>.1],key=lambda s:-(s['daily']['a']/s['daily']['t']))
 wr['A3']=f'A. Over budget MTD ({len(mo)} cinemas)';wr['A3'].font=B
-hdr(wr,4,1,['Region','Cinema','MTD target','MTD actual','Gap kWh','%','Main driver','Reason from CM','PIC / deadline'])
+hdr(wr,4,1,['Region','Cinema','MTD target','MTD actual','Gap kWh','%','Reason from CM','PIC / deadline'])
 for i,s in enumerate(mo):
-    r=5+i;g=s['mtd']['g'];drv=max(('we','th','ot'),key=lambda k:g[k][0]-g[k][1])
-    for c,v in enumerate([reg(s),s['n'].upper(),round(s['mtd']['t'],1),round(s['mtd']['a'],1),f'=D{r}-C{r}',f'=D{r}/C{r}-1',DN[drv],'',''],1):wr.cell(r,c,v)
-e=5+len(mo)-1;box(wr,4,e,1,9)
+    r=5+i
+    for c,v in enumerate([reg(s),s['n'].upper(),round(s['mtd']['t'],1),round(s['mtd']['a'],1),f'=D{r}-C{r}',f'=D{r}/C{r}-1','',''],1):wr.cell(r,c,v)
+e=5+len(mo)-1;box(wr,4,e,1,8)
 for r in range(5,e+1):
     for c in (3,4,5):wr.cell(r,c).number_format='#,##0'
     wr.cell(r,6).number_format='0%'
@@ -122,7 +121,7 @@ wr.conditional_formatting.add(f'F{b0+2}:F{e2}',ColorScaleRule(start_type='num',s
 miss=[s for s in S if s['daily']['a'] is None]
 c0=e2+3;wr.cell(c0,1,f'C. Data not yet complete for {ds} ({len(miss)} cinemas)').font=B
 for i,s in enumerate(miss):wr.cell(c0+1+i,1,reg(s));wr.cell(c0+1+i,2,s['n'].upper())
-for c,w in zip('ABCDEFGHI',[10,34,11,11,11,8,16,34,18]):wr.column_dimensions[c].width=w
+for c,w in zip('ABCDEFGHI',[10,34,11,11,11,8,34,18,18]):wr.column_dimensions[c].width=w
 # ---------- Daily Actual / Target
 for nm,key in (('Daily Actual','da'),('Daily Target','dt')):
     w=wb.create_sheet(nm);w['A1']=f'{nm} kWh, {MN[d["month"]]} 2026 (to {ds})';w['A1'].font=Font(bold=True,size=13)
@@ -179,7 +178,7 @@ lines=['How the budget is divided (3 categories)','',
 '2. Average week = monthly budget / 4 weeks (500 / 4 = 125 kWh).',
 "3. From actual usage of all months with data (each day divided by its own month average), work out the share of a normal week for each category: Sat-Sun, Thu-Fri (Thursday = new film premiere), Mon-Wed. A cinema own pattern is used only as far as it is consistent; otherwise the average pattern of all cinemas is used. Shares add up to 100%.",
 '4. Daily target = category share / number of days in the category. The calendar of the month is then scaled so the full month equals the budget.',
-'5. MTD target = sum of daily targets for the days that have data. Gap = actual - target; above 0 = over budget.','',
+'5. MTD target needs no categories: monthly budget / days in the month x days with data. Gap = actual - target; above 0 = over budget. Categories are used for the daily target only (Sat-Sun >= Thu-Fri >= Mon-Wed, each step at least 2%).','',
 'Example (director): 125 kWh/week, Sat-Sun 45% = 56.3 kWh (28.1 per day), Thu-Fri 35% = 43.8 kWh (21.9 per day), Mon-Wed 20% = 25 kWh (8.3 per day). Dividing by 30 would give 16.7 kWh every day.','',
 'Data notes','- A reading of 0 kWh is treated as not filled in. A daily value above 6x the cinema median is treated as a meter/typing error.',
 '- Sites 70, 71, 72 use the October budget as a proxy. Cinemas with too little data per weekday use the network pattern.',
