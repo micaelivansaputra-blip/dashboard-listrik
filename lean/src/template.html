@@ -324,8 +324,8 @@ function renderSh(){
 // ----- site navigator (Jan 2025 -> latest month)
 const MD=[31,28,31,30,31,30,31,31,30,31,30,31];
 st.ss=null;st.sq='';st.sv='seq';st.su='m';
-function m26(s,mo){const ix=monthDays(2026,mo).filter(i=>s.v[i]!=null);return ix.length<15?null:ix.reduce((x,i)=>x+s.v[i],0)/ix.length*MD[mo]}
-const LM=(()=>{let l=0;for(let mo=0;mo<12;mo++)if(S.some(s=>m26(s,mo)!=null))l=mo;return l})();
+const INV=RAW.invoice||{months:[],v:{}},invv=s=>INV.v[s.k]||[];
+const LM=Math.max(0,INV.months.length-13);
 const U=(x,mo)=>x==null?null:st.su=='d'?x/MD[mo]:x;
 function siSVG(L,lab,sep){const nar=innerWidth<600,W=nar?380:720,H=nar?240:250,pl=nar?44:52,pr=nar?20:22,pt=14,pb=26,n=lab.length,x=j=>pl+j*(W-pl-pr)/Math.max(n-1,1);
  const z=L.flatMap(l=>l.v).filter(q=>q!=null);if(!z.length)return'<div class="note">No readings for this cinema.</div>';
@@ -341,9 +341,23 @@ function siSVG(L,lab,sep){const nar=innerWidth<600,W=nar?380:720,H=nar?240:250,p
 function siMatches(q){q=q.trim().toLowerCase();if(!q)return[];return S.filter(s=>s.n.toLowerCase().includes(q)||String(s.k)==q||String(s.k).padStart(2,'0')==q).slice(0,8)}
 function siList(){const m=siMatches(st.sq);$('#sil').innerHTML=m.length?m.map(s=>`<button data-k="${s.k}"><b>${String(s.k).padStart(2,'0')}</b> ${s.n}<span class="reg">${s.r}</span></button>`).join(''):(st.sq.trim()?'<div class="note" style="margin:6px 10px">No cinema found.</div>':'');
  $$('#sil button').forEach(b=>b.onclick=()=>{st.ss=+b.dataset.k;st.sq='';renderSi()})}
+
+function siStat(s){const v=invv(s),y5=v.slice(0,12),y6=v.slice(12,13+LM-0).slice(0,LM+1);
+ const sum=a=>a.reduce((x,q)=>x+q,0),full=(a,n)=>a.length>=n&&a.slice(0,n).every(q=>q!=null);
+ const t25=full(y5,12)?sum(y5):null,c25=full(y5,LM+1)?sum(y5.slice(0,LM+1)):null,c26=full(y6,LM+1)?sum(y6):null;
+ const nz=v.filter(q=>q!=null),avg=nz.length?sum(nz)/nz.length:null,sd=nz.length>1?Math.sqrt(sum(nz.map(q=>(q-avg)**2))/nz.length):null;
+ let pk=null,pi=-1;v.forEach((q,i)=>{if(q!=null&&(pk==null||q>pk)){pk=q;pi=i}});
+ return{s,t25,c25,c26,yoy:c25&&c26?(c26-c25)/c25:null,avg,cv:avg&&sd!=null?sd/avg:null,pk,pl:pi<0?'':MN[pi%12]+' '+(pi<12?25:26),n:nz.length}}
+function siTable(){const R=S.filter(inReg).map(siStat),k=st.sis||'yoy';
+ const f={name:r=>r.s.n,t25:r=>-(r.t25??-1),c26:r=>-(r.c26??-1),yoy:r=>-(r.yoy??-9),avg:r=>-(r.avg??-1),cv:r=>-(r.cv??-1)}[k];
+ R.sort((a,b)=>{const x=f(a),y=f(b);return x<y?-1:x>y?1:0});
+ const T=(g,n)=>R.filter(r=>r[g]!=null&&(n?r[n]!=null:1));
+ const cmp=R.filter(r=>r.c25!=null&&r.c26!=null),s25=cmp.reduce((x,r)=>x+r.c25,0),s26=cmp.reduce((x,r)=>x+r.c26,0);
+ const up=cmp.filter(r=>r.yoy>.05).length,dn=cmp.filter(r=>r.yoy<-.05).length;
+ return`<div class="card" style="margin-top:12px"><h3>All cinemas, Jan 2025 – ${MN[LM]} 2026</h3><div class="note" style="margin:0 0 8px">Jan–${MN[LM]} 2026 vs the same months of 2025, ${cmp.length} cinemas with a full invoice history: <b>${pc((s26-s25)/s25)}</b> in total · ${up} cinemas up more than 5% · ${dn} down more than 5%. Tap a cinema to open it.</div><div class="tw"><table><thead><tr><th data-si="name">Cinema</th><th data-si="t25">2025 total</th><th>Jan–${MN[LM]} 25</th><th>Jan–${MN[LM]} 26</th><th data-si="yoy">YoY ${k=='yoy'?'▾':''}</th><th data-si="avg">Avg / month</th><th data-si="cv">Variation</th><th>Peak month</th></tr></thead><tbody>${R.map(r=>`<tr data-k="${r.s.k}"><td class="nm">${r.s.n}<span class="reg">${r.s.r}</span></td><td>${r.t25==null?'–':nf(r.t25)}</td><td>${r.c25==null?'–':nf(r.c25)}</td><td>${r.c26==null?'–':nf(r.c26)}</td><td class="${r.yoy>0?'up':'dn'}">${r.yoy==null?'–':pc(r.yoy)}</td><td>${r.avg==null?'–':nf(r.avg)}</td><td>${r.cv==null?'–':(r.cv*100).toFixed(0)+'%'}</td><td>${r.pl}</td></tr>`).join('')}</tbody></table></div><div class="note">Variation = standard deviation ÷ average of the monthly kWh (higher = usage swings more month to month). "–" = the cinema has no invoice for every month in that range (new or not yet billed).</div></div>`}
 function renderSi(){
  const sel=S.find(x=>x.k==st.ss)||[...S].sort((a,b)=>a.n<b.n?-1:1)[0];st.ss=sel.k;
- const A=sel.m25,B=Array.from({length:12},(_,mo)=>mo<=LM?m26(sel,mo):null),bud=sel.b;
+ const iv=invv(sel),A=Array.from({length:12},(_,mo)=>iv[mo]??null),B=Array.from({length:12},(_,mo)=>mo<=LM?iv[12+mo]??null:null),bud=sel.b;
  const u=st.su=='d'?'kWh/day':'kWh/month',Y1=A.map((v,mo)=>U(v,mo)),Y2=B.map((v,mo)=>U(v,mo)),YB=B.map((v,mo)=>bud&&mo<=LM?U(bud[mo],mo):null);
  let lines,lab,sep=null;
  if(st.sv=='yoy'){lab=MN;lines=[{v:Y1,c:'var(--mut)'},{v:Y2,c:'var(--blue)'},{v:YB,c:'var(--org)',dash:1,w:1.8,nodots:1}]}
@@ -362,9 +376,10 @@ function renderSi(){
  <div class="card kpi"><div class="l">Avg 2026 vs 2025</div><div class="v">${a1&&a2?pc((a2-a1)/a1):'–'}</div><div class="n">${both.length} months compared, same months only</div></div>
  <div class="card kpi"><div class="l">${lm>=0?MN[lm]+' vs budget':'vs budget'}</div><div class="v ${vb>0?'up':'dn'}">${vb==null?'–':pc(vb)}</div><div class="n">${bud&&lm>=0?'Budget '+nf(U(bud[lm],lm))+' '+u:'No budget loaded'}</div></div>
  <div class="card kpi"><div class="l">Highest month</div><div class="v">${pk?nf(U(pk.v,pk.mo)):'–'}</div><div class="n">${pk?pk.l:''}</div></div></div>
- <div class="card"><h3>${st.sv=='yoy'?'2025 vs 2026 by month':'Monthly usage, Jan 2025 – '+MN[LM]+' 2026'} <span class="note" style="font-weight:400">(${u})</span></h3><div class="row" style="margin-bottom:4px"><span class="note"><b style="color:${st.sv=='yoy'?'var(--mut)':'var(--blue)'}">●</b> ${st.sv=='yoy'?'2025':'Actual'} &nbsp; ${st.sv=='yoy'?'<b style="color:var(--blue)">●</b> 2026 &nbsp; ':''}<b style="color:var(--org)">- -</b> 2026 budget</span></div>${siSVG(lines,lab,sep)}<div class="note">Monthly kWh is estimated from the days that have a reading (average per day × days in month). Months with fewer than 15 reported days are left blank${nm?` (${nm} in 2025 for this cinema)`:''}. 2025 and 2026 use the same rule and the same daily source.</div></div>
- <div class="card" style="margin-top:12px"><h3>Month by month</h3><div class="tw"><table><thead><tr><th>Month</th><th>2025</th><th>2026</th><th>YoY</th><th>Budget 2026</th><th>vs budget</th><th>Shows 2026</th><th>kWh/show</th></tr></thead><tbody>${rows}</tbody></table></div><div class="note">Values in ${u}. Shows and kWh/show use the monthly Number of Show file (kWh/show is always per month).</div></div>`;
- $('#p-si').innerHTML=h;
+ <div class="card"><h3>${st.sv=='yoy'?'2025 vs 2026 by month':'Monthly usage, Jan 2025 – '+MN[LM]+' 2026'} <span class="note" style="font-weight:400">(${u})</span></h3><div class="row" style="margin-bottom:4px"><span class="note"><b style="color:${st.sv=='yoy'?'var(--mut)':'var(--blue)'}">●</b> ${st.sv=='yoy'?'2025':'Actual'} &nbsp; ${st.sv=='yoy'?'<b style="color:var(--blue)">●</b> 2026 &nbsp; ':''}<b style="color:var(--org)">- -</b> 2026 budget</span></div>${siSVG(lines,lab,sep)}<div class="note">Source: actual electricity invoices (sum of kWh usage on every invoice line, as in the invoice file's pivot). Invoices follow the billing cycle, so a month here is the billed month and not exactly the calendar month. Blank = no invoice yet${nm?` (${nm} month(s) in 2025 for this cinema)`:''}.</div></div>
+ <div class="card" style="margin-top:12px"><h3>Month by month</h3><div class="tw"><table><thead><tr><th>Month</th><th>2025</th><th>2026</th><th>YoY</th><th>Budget 2026</th><th>vs budget</th><th>Shows 2026</th><th>kWh/show</th></tr></thead><tbody>${rows}</tbody></table></div><div class="note">Values in ${u} (kWh/day = invoice kWh ÷ days in month). Shows and kWh/show use the monthly Number of Show file (kWh/show is always per month).</div></div>`;
+ $('#p-si').innerHTML=h+siTable();
+ $$('#p-si th[data-si]').forEach(x=>x.onclick=()=>{st.sis=x.dataset.si;renderSi()});$$('#p-si tbody tr[data-k]').forEach(x=>x.onclick=()=>{st.ss=+x.dataset.k;st.sq='';renderSi();scrollTo(0,0)});
  const q=$('#siq');q.oninput=()=>{st.sq=q.value;siList()};siList();
  $$('#p-si [data-sv]').forEach(b=>b.onclick=()=>{st.sv=b.dataset.sv;renderSi()});$$('#p-si [data-su]').forEach(b=>b.onclick=()=>{st.su=b.dataset.su;renderSi()})}
 // ----- shell
