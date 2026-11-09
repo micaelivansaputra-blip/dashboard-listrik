@@ -59,9 +59,9 @@ svg text{fill:var(--mut);font-size:10px}
  <div><h1>Electricity Monitoring</h1><div class="sub" id="asof"></div></div>
  <div class="ctl"><select id="mon" aria-label="Month"></select><select id="reg" aria-label="Region"></select><button class="chip" id="th" aria-label="Toggle theme">Theme</button></div>
 </header>
-<nav class="tabs" role="tablist"><button role="tab" data-p="ov" aria-selected="true">Overview</button><button role="tab" data-p="dy" aria-selected="false">Daily</button><button role="tab" data-p="sh" aria-selected="false">Shows</button><button role="tab" data-p="si" aria-selected="false">Site</button><button role="tab" data-p="rm" aria-selected="false">Reminder</button><button role="tab" data-p="me" aria-selected="false">Method</button></nav>
+<nav class="tabs" role="tablist"><button role="tab" data-p="ov" aria-selected="true">Overview</button><button role="tab" data-p="dy" aria-selected="false">Daily</button><button role="tab" data-p="sh" aria-selected="false">Shows</button><button role="tab" data-p="si" aria-selected="false">Site</button><button role="tab" data-p="rm" aria-selected="false">Reminder</button></nav>
 <main>
-<section id="p-ov"></section><section id="p-dy" hidden></section><section id="p-sh" hidden></section><section id="p-si" hidden></section><section id="p-rm" hidden></section><section id="p-me" hidden></section>
+<section id="p-ov"></section><section id="p-dy" hidden></section><section id="p-sh" hidden></section><section id="p-si" hidden></section><section id="p-rm" hidden></section>
 </main>
 </div>
 <div class="modal" id="md"><div class="sheet" id="mdb"></div></div>
@@ -241,23 +241,6 @@ function renderRm(){const m=buildMail();
  $('#ce').onclick=async()=>{const h=$('#ml').innerHTML;try{await navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([h],{type:'text/html'}),'text/plain':new Blob([$('#ml').innerText],{type:'text/plain'})})]);say('Email copied, paste into the email body')}catch(e){const r=document.createRange();r.selectNodeContents($('#ml'));const s=getSelection();s.removeAllRanges();s.addRange(r);document.execCommand('copy');say('Email copied, paste into the email body')}};
  $('#rt').onchange=e=>{st.thr=+e.target.value;renderRm()};$('#rd').onchange=e=>{const j=RAW.dates.indexOf(e.target.value);if(j>=0){st.dd=j;renderRm()}}}
 // ----- method
-function renderMe(){const R=S.filter(inReg).sort((a,b)=>a.n<b.n?-1:1);
- const ex=(()=>{const w=.45,t=.35,o=.20,wk=500/4;return[wk*w,wk*t,wk*o,wk*w/2,wk*t/2,wk*o/3]})();
- $('#p-me').innerHTML=`<div class="card"><h3>How the budget is divided (3 categories)</h3>
- <p style="margin:0 0 10px">Dividing the month by 30 treats every day the same. Cinemas do not use power evenly: weekends and the new-film premiere (Thursday) are busier. So each day gets a share of the budget that follows the cinema's own weekly pattern.</p>
- <ol style="margin:0 0 12px;padding-left:20px;line-height:1.7"><li><b>Monthly budget</b> from the FY2026 kWh budget file, e.g. 500 kWh.</li>
- <li><b>Average week</b> = monthly budget ÷ 4 weeks, e.g. 500 ÷ 4 = 125 kWh.</li>
- <li><b>Weekly shares</b>: from all months of actual usage (each day divided by its own month's average, so savings or level changes do not bend the pattern), work out how much of a normal week falls in each of 3 categories: <b>Sat–Sun</b> (weekend), <b>Thu–Fri</b> (Thursday is the new film premiere) and <b>Mon–Wed</b>. The three shares add up to 100%. A cinema's own pattern is used only as far as it is consistent; otherwise the average pattern of all cinemas is used.</li>
- <li><b>Order rule</b>: per-day target Sat–Sun ≥ Thu–Fri ≥ Mon–Wed, each step at least 2%. Sizes come from the data; where the data disagrees with the order (for most cinemas Thu–Fri is not higher than Mon–Wed) the categories are pooled and then separated by 2%.</li><li><b>Daily target</b> = category share of the week ÷ number of days in that category. The calendar is then scaled so the whole month adds up exactly to the budget.</li>
- <li><b>MTD target</b> needs no categories: monthly budget ÷ days in the month × days with data. <b>Gap</b> = actual − target; above 0 means over budget. The categories are used for the <b>daily</b> target only.</li></ol>
- <div class="tw"><table><thead><tr><th>Category (director's example)</th><th>Share</th><th>kWh per week</th><th>Days</th><th>Target per day</th></tr></thead><tbody>
- <tr><td>Sat–Sun</td><td>45%</td><td>${ex[0].toFixed(1)}</td><td>2</td><td>${ex[3].toFixed(1)}</td></tr>
- <tr><td>Thu–Fri</td><td>35%</td><td>${ex[1].toFixed(1)}</td><td>2</td><td>${ex[4].toFixed(1)}</td></tr>
- <tr><td>Mon–Wed</td><td>20%</td><td>${ex[2].toFixed(1)}</td><td>3</td><td>${ex[5].toFixed(1)}</td></tr>
- <tr><td><b>Total</b></td><td><b>100%</b></td><td><b>125.0</b></td><td>7</td><td></td></tr></tbody></table></div>
- <div class="note">Compared with ÷ 30 (= 16.7 kWh every day), a Saturday target is 28.1 kWh and a Tuesday target 8.3 kWh. This is why a quiet Tuesday and a busy Saturday are no longer judged against the same number. Actual shares differ per cinema (table below); the network pattern is Sat–Sun ${Math.round(NETSH.w*100)}%, Thu–Fri ${Math.round(NETSH.t*100)}%, Mon–Wed ${Math.round(NETSH.o*100)}%. Day-of-week effects in electricity are small, so most targets stay close to budget ÷ days.</div></div>
- <div class="card" style="margin-top:12px"><h3>Weekly shares per cinema</h3><div class="tw"><table><thead><tr><th>Site</th><th>Sat–Sun</th><th>Thu–Fri</th><th>Mon–Wed</th><th>Own pattern used</th><th>Notes</th></tr></thead><tbody>${R.map(s=>{const p=prof[s.k],o=mtd(s,2026,st.m,upTo());return`<tr data-k="${s.k}"><td class="nm">${s.n}<span class="reg">${s.r}</span></td><td>${Math.round(p.w*100)}%</td><td>${Math.round(p.t*100)}%</td><td>${Math.round(p.o*100)}%</td><td>${Math.round(p.cf*100)}%</td><td style="white-space:normal;text-align:left;color:var(--mut)">${dq(s,o).join(' · ')}</td></tr>`}).join('')}</tbody></table></div></div>`;
- $$('#p-me tbody tr[data-k]').forEach(t=>t.onclick=()=>openSite(+t.dataset.k))}
 // ----- shows vs kWh
 const SM=SH.months,MLBL=m=>MN[+m.slice(5)-1],dim=m=>new Date(2026,+m.slice(5),0).getDate();
 st.sk='all';st.sm=SM.length-1;st.idx=false;
@@ -387,11 +370,11 @@ function renderSi(){
  const q=$('#siq');q.oninput=()=>{st.sq=q.value;siList()};siList();
  $$('#p-si [data-sv]').forEach(b=>b.onclick=()=>{st.sv=b.dataset.sv;renderSi()});$$('#p-si [data-su]').forEach(b=>b.onclick=()=>{st.su=b.dataset.su;renderSi()})}
 // ----- shell
-const V={ov:renderOv,dy:renderDy,sh:renderSh,si:renderSi,rm:renderRm,me:renderMe};let cur='ov';
-function show(p){cur=p;$$('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.p==p));['ov','dy','sh','si','rm','me'].forEach(x=>$('#p-'+x).hidden=x!=p);V[p]();try{location.hash=p}catch(e){}}
+const V={ov:renderOv,dy:renderDy,sh:renderSh,si:renderSi,rm:renderRm};let cur='ov';
+function show(p){cur=p;$$('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.p==p));['ov','dy','sh','si','rm'].forEach(x=>$('#p-'+x).hidden=x!=p);V[p]();try{location.hash=p}catch(e){}}
 $$('.tabs button').forEach(b=>b.onclick=()=>show(b.dataset.p));
 $('#mon').onchange=e=>{st.m=+e.target.value;st.dd=Math.min(LAST,monthDays(2026,st.m).slice(-1)[0]);show(cur)};
 $('#reg').onchange=e=>{st.reg=e.target.value;show(cur)};
 $('#th').onclick=()=>{const r=document.documentElement,dk=r.dataset.theme?r.dataset.theme=='dark':matchMedia('(prefers-color-scheme:dark)').matches;r.dataset.theme=dk?'light':'dark'};
-show(['ov','dy','sh','si','rm','me'].includes(location.hash.slice(1))?location.hash.slice(1):'ov');
+show(['ov','dy','sh','si','rm'].includes(location.hash.slice(1))?location.hash.slice(1):'ov');
 </script>
