@@ -234,16 +234,108 @@ window.exportReport=function(i){const dt=D[i],m=dt.getMonth(),R=repData(i),days=
  return{date:RAW.dates[i],month:m,generated:RAW.generated||'',days:days.map(x=>RAW.dates[x]),sites:R.map(r=>{const s=r.s,p=prof[s.k];
   return{k:s.k,n:s.n,r:s.r,z:s.z,bp:s.bp,budget:s.b[m],daily:r.d,mtd:{t:r.o.t,a:r.o.a,n:r.o.n,g:r.o.g},n7:r.n7,c7:r.c7,w:p.w,t:p.t,o:p.o,ok:p.ok,
    da:days.map(x=>s.v[x]),dt:days.map(x=>tgt(s,x)),shows:(SH.v[s.k]||[]),kwh:SM.map((_,j)=>mkwh(s,j))}})}};
+// ----- Excel download (ExcelJS is loaded only when the button is pressed)
+function loadX(){return window.ExcelJS?Promise.resolve():new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js';s.onload=ok;s.onerror=()=>no(new Error('Could not load the Excel library, please check the internet connection.'));document.head.appendChild(s)})}
+async function saveFile(blob,name){
+ try{if(window.claude&&claude.use){const dl=await claude.use('downloads');if(dl){await dl.save({filename:name,data:blob});return}}}catch(e){if(e&&e.code=='declined')return}
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500)}
+async function buildXlsx(i){await loadX();
+ const d=exportReport(i),thr=st.thr,dtt=new Date(d.date+'T00:00:00'),ds=dtt.getDate()+' '+MN[dtt.getMonth()]+' '+dtt.getFullYear();
+ const NAVY='FF1F3864',thin={style:'thin',color:{argb:'FFD9D9DE'}},BD={top:thin,left:thin,bottom:thin,right:thin};
+ const wb=new ExcelJS.Workbook();wb.creator='Operations';wb.created=new Date();
+ const col=n=>{let s='';while(n>0){const m=(n-1)%26;s=String.fromCharCode(65+m)+s;n=Math.floor((n-1)/26)}return s};
+ const put=(ws,r,c,v)=>{const x=ws.getCell(r,c);if(typeof v=='string'&&v[0]=='=')x.value={formula:v.slice(1)};else x.value=v;return x};
+ const hdr=(ws,r,c0,vals)=>vals.forEach((v,k)=>{const x=ws.getCell(r,c0+k);x.value=v;x.fill={type:'pattern',pattern:'solid',fgColor:{argb:NAVY}};x.font={bold:true,color:{argb:'FFFFFFFF'},name:'Calibri',size:11};x.alignment={horizontal:'center',vertical:'middle',wrapText:true};x.border=BD});
+ const box=(ws,r1,r2,c1,c2)=>{for(let r=r1;r<=r2;r++)for(let c=c1;c<=c2;c++){const x=ws.getCell(r,c);x.border=BD;if(!x.font||!x.font.bold)x.font=Object.assign({name:'Calibri',size:11},x.font||{})}};
+ const nfm=(ws,r1,r2,cs,f)=>{for(let r=r1;r<=r2;r++)cs.forEach(c=>ws.getCell(r,c).numFmt=f)};
+ const scale=(ws,ref)=>ws.addConditionalFormatting({ref,rules:[{type:'colorScale',cfvo:[{type:'num',value:-.3},{type:'num',value:0},{type:'num',value:.3}],color:[{argb:'FF63BE7B'},{argb:'FFFFEB84'},{argb:'FFE8643A'}]}]});
+ const scaleUp=(ws,ref)=>ws.addConditionalFormatting({ref,rules:[{type:'colorScale',cfvo:[{type:'num',value:.1},{type:'num',value:.5}],color:[{argb:'FFF6C744'},{argb:'FFE8643A'}]}]});
+ const act=(ws,ref,txt)=>ws.addConditionalFormatting({ref,rules:[{type:'cellIs',operator:'equal',formulae:['"'+txt+'"'],style:{fill:{type:'pattern',pattern:'solid',bgColor:{argb:'FFF8CBAD'}},font:{bold:true,color:{argb:'FF9C0006'}}}}]});
+ const gray={italic:true,color:{argb:'FF6E6E73'}};
+ const S=[...d.sites].sort((a,b)=>a.r<b.r?-1:a.r>b.r?1:a.k-b.k),reg=s=>'REGION '+s.r.replace('R','');
+ const wsS=wb.addWorksheet('Summary'),wsR=wb.addWorksheet('Remind list'),wd=wb.addWorksheet('Detail Cinema');
+ // ---- Detail Cinema
+ wd.getCell('A1').value='Detail Cinema, Daily and MTD to '+ds;wd.getCell('A1').font={bold:true,size:14};
+ put(wd,2,1,'Daily target: budget spread by weekly pattern (Sat-Sun >= Thu-Fri >= Mon-Wed). MTD target: monthly budget / days in month x days with data. Gap, % and status are formulas.').font=gray;
+ const H=['Region','Site','Cinema','ZOEC','Month budget (kWh)','Daily target','Daily actual','Daily gap kWh','Daily %','MTD target','MTD actual','MTD gap kWh','MTD %','Status MTD','Status daily','Days over (last 7)','Days with data (last 7)','Share Sat-Sun','Share Thu-Fri','Share Mon-Wed','Notes'];
+ hdr(wd,4,1,H);wd.getRow(4).height=44;const r0=5;
+ S.forEach((s,i)=>{const r=r0+i,dd=s.daily,n=[];if(s.bp)n.push('Oct budget used as proxy');if(!s.ok)n.push('too little data, network pattern used');if(dd.a==null)n.push('no daily reading');if(!s.mtd.n)n.push('no MTD data');
+  const row=[reg(s),s.k,s.n.toUpperCase(),s.z?'Y':'',Math.round(s.budget),dd.a==null?null:Math.round(dd.t*10)/10,dd.a,
+   `=IF(G${r}="","",G${r}-F${r})`,`=IF(OR(G${r}="",F${r}=0),"",G${r}/F${r}-1)`,s.mtd.n?Math.round(s.mtd.t*10)/10:null,s.mtd.n?Math.round(s.mtd.a*10)/10:null,
+   `=IF(K${r}="","",K${r}-J${r})`,`=IF(OR(K${r}="",J${r}=0),"",K${r}/J${r}-1)`,
+   `=IF(M${r}="","n/a",IF(M${r}>Summary!$C$4,"ACTION",IF(M${r}>0,"Watch","On/under")))`,`=IF(I${r}="","n/a",IF(I${r}>Summary!$C$4,"ACTION",IF(I${r}>0,"Watch","On/under")))`,
+   s.c7?s.n7:null,s.c7,s.w,s.t,s.o,n.join('; ')];row.forEach((v,c)=>put(wd,r,c+1,v))});
+ const rl=r0+S.length-1;box(wd,4,rl,1,H.length);
+ nfm(wd,r0,rl,[5,6,7,8,10,11,12],'#,##0;[Red]-#,##0');nfm(wd,r0,rl,[9,13,18,19,20],'0%');
+ scale(wd,`I${r0}:I${rl}`);scale(wd,`M${r0}:M${rl}`);act(wd,`N${r0}:N${rl}`,'ACTION');act(wd,`O${r0}:O${rl}`,'ACTION');
+ wd.views=[{state:'frozen',xSplit:3,ySplit:4}];wd.autoFilter={from:'A4',to:col(H.length)+rl};
+ [10,6,34,6,12,10,10,10,9,11,11,11,9,11,11,9,9,9,9,9,40].forEach((w,k)=>wd.getColumn(k+1).width=w);
+ // ---- Summary
+ wsS.getCell('A1').value='Daily Monitoring of Electricity';wsS.getCell('A1').font={bold:true,size:16};
+ wsS.getCell('A2').value='Data to '+ds+'. Source: Google Sheet RAW SUMMARY, FY2026 kWh budget.';wsS.getCell('A2').font=gray;
+ wsS.getCell('B4').value='Remind threshold (above target)';wsS.getCell('B4').font={bold:true};const c4=wsS.getCell('C4');c4.value=thr;c4.numFmt='0%';c4.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFFF2CC'}};c4.border=BD;
+ wsS.getCell('D4').value='Change this cell to change the ACTION status in the other sheets.';wsS.getCell('D4').font=gray;
+ hdr(wsS,6,2,['Region','Daily target','Daily actual','Daily %','MTD target','MTD actual','MTD %','Cinemas MTD over threshold','Cinemas daily over threshold']);wsS.getRow(6).height=32;
+ const regs=[...new Set(S.map(reg))].sort(),DR="'Detail Cinema'!";
+ regs.forEach((g,i)=>{const r=7+i,rg=`${DR}$A$5:$A$${rl}`;put(wsS,r,2,g);
+  put(wsS,r,3,`=SUMIFS(${DR}$F$5:$F$${rl},${rg},B${r},${DR}$G$5:$G$${rl},"<>")`);put(wsS,r,4,`=SUMIFS(${DR}$G$5:$G$${rl},${rg},B${r})`);put(wsS,r,5,`=IF(C${r}=0,"",D${r}/C${r}-1)`);
+  put(wsS,r,6,`=SUMIFS(${DR}$J$5:$J$${rl},${rg},B${r})`);put(wsS,r,7,`=SUMIFS(${DR}$K$5:$K$${rl},${rg},B${r})`);put(wsS,r,8,`=IF(F${r}=0,"",G${r}/F${r}-1)`);
+  put(wsS,r,9,`=COUNTIFS(${rg},B${r},${DR}$M$5:$M$${rl},">"&$C$4)`);put(wsS,r,10,`=COUNTIFS(${rg},B${r},${DR}$I$5:$I$${rl},">"&$C$4)`)});
+ const t=7+regs.length;put(wsS,t,2,'TOTAL');[3,4,6,7,9,10].forEach(c=>put(wsS,t,c,`=SUM(${col(c)}7:${col(c)}${t-1})`));put(wsS,t,5,`=IF(C${t}=0,"",D${t}/C${t}-1)`);put(wsS,t,8,`=IF(F${t}=0,"",G${t}/F${t}-1)`);
+ box(wsS,6,t,2,10);for(let c=2;c<=10;c++){const x=wsS.getCell(t,c);x.fill={type:'pattern',pattern:'solid',fgColor:{argb:NAVY}};x.font={bold:true,color:{argb:'FFFFFFFF'}}}
+ nfm(wsS,7,t,[3,4,6,7],'#,##0');nfm(wsS,7,t,[5,8],'0%');scale(wsS,`E7:E${t-1}`);scale(wsS,`H7:H${t-1}`);
+ wsS.getCell(t+2,2).value='Sheets';wsS.getCell(t+2,2).font={bold:true};
+ [['Remind list','Cinemas above the threshold, MTD and daily (what the email shows), with empty Reason / PIC columns to fill in.'],['Detail Cinema','All cinemas: target, actual, gap, status, day-type breakdown and weekly pattern.'],['Daily Actual / Daily Target','kWh per day for the month so far, per cinema.'],['Shows vs kWh','Monthly kWh against number of shows, and kWh per show.'],['Method','How the targets are calculated.']].forEach(([a,b],k)=>{wsS.getCell(t+3+k,2).value=a;wsS.getCell(t+3+k,2).font={bold:true};wsS.getCell(t+3+k,3).value=b});
+ wsS.getColumn(1).width=3;wsS.getColumn(2).width=34;for(let c=3;c<=10;c++)wsS.getColumn(c).width=15;
+ // ---- Remind list
+ const pc0=Math.round(thr*100);wsR.getCell('A1').value='Cinemas to follow up, '+ds+' (above '+pc0+'% at export time)';wsR.getCell('A1').font={bold:true,size:13};
+ const mo=S.filter(s=>s.mtd.n&&s.mtd.t&&s.mtd.a/s.mtd.t-1>thr).sort((a,b)=>b.mtd.a/b.mtd.t-a.mtd.a/a.mtd.t),dv=S.filter(s=>s.daily.a!=null&&s.daily.t&&s.daily.a/s.daily.t-1>thr).sort((a,b)=>b.daily.a/b.daily.t-a.daily.a/a.daily.t);
+ wsR.getCell('A3').value='A. Over budget MTD ('+mo.length+' cinemas)';wsR.getCell('A3').font={bold:true};hdr(wsR,4,1,['Region','Cinema','MTD target','MTD actual','Gap kWh','%','Reason from CM','PIC / deadline']);
+ mo.forEach((s,i)=>{const r=5+i;[reg(s),s.n.toUpperCase(),Math.round(s.mtd.t*10)/10,Math.round(s.mtd.a*10)/10,`=D${r}-C${r}`,`=D${r}/C${r}-1`,'',''].forEach((v,c)=>put(wsR,r,c+1,v))});
+ const e1=5+Math.max(mo.length,1)-1;box(wsR,4,e1,1,8);nfm(wsR,5,e1,[3,4,5],'#,##0');nfm(wsR,5,e1,[6],'0%');if(mo.length)scaleUp(wsR,`F5:F${e1}`);
+ const b0=e1+3;wsR.getCell(b0,1).value='B. Over budget on daily usage, '+ds+' ('+dv.length+' cinemas)';wsR.getCell(b0,1).font={bold:true};hdr(wsR,b0+1,1,['Region','Cinema','Daily target','Daily actual','Gap kWh','%','Days over (last 7)','Reason from CM','PIC / deadline']);
+ dv.forEach((s,i)=>{const r=b0+2+i;[reg(s),s.n.toUpperCase(),Math.round(s.daily.t*10)/10,s.daily.a,`=D${r}-C${r}`,`=D${r}/C${r}-1`,s.n7+' / '+s.c7,'',''].forEach((v,c)=>put(wsR,r,c+1,v))});
+ const e2=b0+2+Math.max(dv.length,1)-1;box(wsR,b0+1,e2,1,9);nfm(wsR,b0+2,e2,[3,4,5],'#,##0');nfm(wsR,b0+2,e2,[6],'0%');if(dv.length)scaleUp(wsR,`F${b0+2}:F${e2}`);
+ const miss=S.filter(s=>s.daily.a==null),c0=e2+3;wsR.getCell(c0,1).value='C. Data not yet complete for '+ds+' ('+miss.length+' cinemas)';wsR.getCell(c0,1).font={bold:true};miss.forEach((s,k)=>{wsR.getCell(c0+1+k,1).value=reg(s);wsR.getCell(c0+1+k,2).value=s.n.toUpperCase()});
+ [10,34,11,11,11,8,34,18,18].forEach((w,k)=>wsR.getColumn(k+1).width=w);
+ // ---- Daily Actual / Target
+ [['Daily Actual','da'],['Daily Target','dt']].forEach(([nm,key])=>{const w=wb.addWorksheet(nm),nd=d.days.length;w.getCell('A1').value=nm+' kWh, '+MN[d.month]+' 2026 (to '+ds+')';w.getCell('A1').font={bold:true,size:13};
+  hdr(w,3,1,['Region','Site','Cinema',...d.days.map(x=>+x.slice(8)),'Total']);
+  S.forEach((s,i)=>{const r=4+i;w.getCell(r,1).value=reg(s);w.getCell(r,2).value=s.k;w.getCell(r,3).value=s.n.toUpperCase();s[key].forEach((v,j)=>{if(v!=null)w.getCell(r,4+j).value=Math.round(v*10)/10});put(w,r,4+nd,`=SUM(D${r}:${col(3+nd)}${r})`)});
+  box(w,3,3+S.length,1,4+nd);nfm(w,4,3+S.length,Array.from({length:nd+1},(_,k)=>4+k),'#,##0');w.views=[{state:'frozen',xSplit:3,ySplit:3}];w.getColumn(3).width=34;for(let c=4;c<=4+nd;c++)w.getColumn(c).width=8;w.getColumn(4+nd).width=11});
+ // ---- Shows vs kWh
+ const jL=SH.months.length-1,jP=jL-1,ms=SH.months.map(m=>MN[+m.slice(5)-1]),wsw=wb.addWorksheet('Shows vs kWh');
+ wsw.getCell('A1').value='kWh vs number of shows (monthly)';wsw.getCell('A1').font={bold:true,size:13};
+ wsw.getCell('A2').value='kWh per month is estimated from days with a reading (average x days in month); blank when fewer than 15 days. Shows: Number of Show file. The latest month with shows is compared with the month before.';wsw.getCell('A2').font=gray;
+ hdr(wsw,4,1,['Region','Site','Cinema','kWh '+ms[jP],'kWh '+ms[jL],'Delta kWh %','Shows '+ms[jP],'Shows '+ms[jL],'Delta Shows %','kWh/show '+ms[jP],'kWh/show '+ms[jL],'kWh/show avg Jan-'+ms[jP-1],'Reading']);wsw.getRow(4).height=32;
+ const g=(a,j)=>a&&j<a.length&&a[j]?a[j]:null;
+ S.forEach((s,i)=>{const r=5+i,rr=[];for(let j=0;j<jP;j++)if(g(s.kwh,j)&&g(s.shows,j))rr.push(s.kwh[j]/s.shows[j]);
+  [reg(s),s.k,s.n.toUpperCase(),g(s.kwh,jP),g(s.kwh,jL),`=IF(OR(D${r}="",E${r}=""),"",E${r}/D${r}-1)`,g(s.shows,jP),g(s.shows,jL),`=IF(OR(G${r}="",H${r}=""),"",H${r}/G${r}-1)`,`=IF(OR(D${r}="",G${r}=""),"",D${r}/G${r})`,`=IF(OR(E${r}="",H${r}=""),"",E${r}/H${r})`,rr.length?Math.round(rr.reduce((x,y)=>x+y,0)/rr.length*100)/100:null,
+   `=IF(OR(F${r}="",I${r}=""),"n/a",IF(F${r}>0.05,IF(AND(I${r}>0,I${r}>=F${r}/2),"Driven by shows","Not explained by shows"),IF(F${r}<-0.05,IF(I${r}<=F${r}/2,"Down with shows","Efficiency gain"),"Stable")))`].forEach((v,c)=>put(wsw,r,c+1,v))});
+ box(wsw,4,4+S.length,1,13);nfm(wsw,5,4+S.length,[4,5,7,8],'#,##0');nfm(wsw,5,4+S.length,[6,9],'0.0%');nfm(wsw,5,4+S.length,[10,11,12],'0.0');act(wsw,`M5:M${4+S.length}`,'Not explained by shows');
+ wsw.views=[{state:'frozen',xSplit:3,ySplit:4}];wsw.autoFilter={from:'A4',to:'M'+(4+S.length)};[10,6,34,11,11,11,11,11,11,11,11,13,24].forEach((w,k)=>wsw.getColumn(k+1).width=w);
+ const m0=7+S.length;wsw.getCell(m0,1).value='kWh per show by month';wsw.getCell(m0,1).font={bold:true};hdr(wsw,m0+1,1,['Region','Site','Cinema',...ms]);
+ S.forEach((s,i)=>{const r=m0+2+i;wsw.getCell(r,1).value=reg(s);wsw.getCell(r,2).value=s.k;wsw.getCell(r,3).value=s.n.toUpperCase();ms.forEach((_,j)=>{const a=g(s.kwh,j),b=g(s.shows,j);if(a&&b){const x=wsw.getCell(r,4+j);x.value=Math.round(a/b*100)/100;x.numFmt='0.0'}})});
+ box(wsw,m0+1,m0+1+S.length,1,3+ms.length);
+ // ---- Method
+ const wm=wb.addWorksheet('Method');['How the targets are calculated','',
+ '1. Monthly budget: FY2026 kWh budget per cinema (example 500 kWh).','2. Average week = monthly budget / 4 weeks (500 / 4 = 125 kWh).',
+ '3. From actual usage of all months with data (each day divided by its own month average), work out the share of a normal week for each category: Sat-Sun, Thu-Fri (Thursday = new film premiere), Mon-Wed. The three shares add up to 100%. A cinema own pattern is used only as far as it is consistent; otherwise the network pattern is used.',
+ '4. Daily target = category share / number of days in the category. The calendar of the month is then scaled so the full month equals the budget.',
+ '5. MTD target needs no categories: monthly budget / days in the month x days with data. Gap = actual - target; above 0 = over budget. Categories are used for the daily target only (Sat-Sun >= Thu-Fri >= Mon-Wed, each step at least 2%).','',
+ 'Example: 125 kWh/week, Sat-Sun 45% = 56.3 kWh (28.1 per day), Thu-Fri 35% = 43.8 kWh (21.9 per day), Mon-Wed 20% = 25 kWh (8.3 per day). Dividing by 30 would give 16.7 kWh every day.','',
+ 'Data notes','- A reading of 0 kWh is treated as not filled in. A daily value above 6x the cinema median is treated as a meter/typing error.','- Sites 70, 71, 72 use the October budget as a proxy. Cinemas with too little data per weekday use the network pattern.','- ACTION status follows the threshold in Summary!C4.'].forEach((x,k)=>{const c=wm.getCell(k+1,1);c.value=x;c.alignment={wrapText:true,vertical:'top'};if(k==0||x=='Data notes')c.font={bold:true,size:k?11:13}});wm.getColumn(1).width=110;
+ const buf=await wb.xlsx.writeBuffer();return new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'})}
 function renderRm(){const m=buildMail();
  $('#p-rm').innerHTML=`<div class="card"><div class="row"><span class="sub">Region and date follow the selectors above and in Daily.</span><input type="date" id="rd" value="${RAW.dates[st.dd]}" min="${RAW.dates[0]}" max="${RAW.dates[LAST]}"><select id="rt" aria-label="Threshold">${[0,.05,.1,.2].map(x=>`<option value="${x}" ${x==st.thr?'selected':''}>Remind if above ${x*100}%</option>`).join('')}</select><select id="rn" aria-label="Rows per table">${[10,20,999].map(x=>`<option value="${x}" ${x==st.top?'selected':''}>${x==999?'All rows':'Top '+x+' rows'}</option>`).join('')}</select></div>
  <h3>Subject</h3><textarea id="rs" style="min-height:44px">${m.sub}</textarea><div class="row" style="margin-top:8px"><button class="btn sec" id="cs">Copy subject</button></div>
- <h3 style="margin-top:14px">Email body</h3><div class="mail" id="ml">${m.html}</div><div class="row" style="margin-top:10px"><button class="btn" id="ce">Copy email</button><span class="note" id="cm"></span></div>
+ <h3 style="margin-top:14px">Email body</h3><div class="mail" id="ml">${m.html}</div><div class="row" style="margin-top:10px"><button class="btn" id="ce">Copy email</button><button class="btn sec" id="dx">Download Excel (attachment)</button><span class="note" id="cm"></span></div>
  <h3 style="margin-top:18px">Short caption (Indonesian)</h3><textarea id="rc">${m.cap}</textarea><div class="row" style="margin-top:8px"><button class="btn sec" id="cc">Copy caption</button></div></div>`;
  const say=t=>{$('#cm').textContent=t;setTimeout(()=>$('#cm').textContent='',2500)};
  const cp=async(txt,el)=>{try{await navigator.clipboard.writeText(txt);say('Copied')}catch(e){el.select();document.execCommand('copy');say('Copied')}};
  $('#cs').onclick=()=>cp($('#rs').value,$('#rs'));$('#cc').onclick=()=>cp($('#rc').value,$('#rc'));
  $('#ce').onclick=async()=>{const h=$('#ml').innerHTML;try{await navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([h],{type:'text/html'}),'text/plain':new Blob([$('#ml').innerText],{type:'text/plain'})})]);say('Email copied, paste into the email body')}catch(e){const r=document.createRange();r.selectNodeContents($('#ml'));const s=getSelection();s.removeAllRanges();s.addRange(r);document.execCommand('copy');say('Email copied, paste into the email body')}};
- $('#rt').onchange=e=>{st.thr=+e.target.value;renderRm()};$('#rn').onchange=e=>{st.top=+e.target.value;renderRm()};$('#rd').onchange=e=>{const j=RAW.dates.indexOf(e.target.value);if(j>=0){st.dd=j;renderRm()}}}
+ $('#rt').onchange=e=>{st.thr=+e.target.value;renderRm()};$('#dx').onclick=async()=>{const b=$('#dx');b.disabled=true;say('Preparing Excel…');try{const f=await buildXlsx(st.dd);await saveFile(f,'Daily_Monitoring_Electricity_'+RAW.dates[st.dd]+'.xlsx');say('Excel ready')}catch(e){say(e.message||'Could not create the Excel file')}b.disabled=false};$('#rn').onchange=e=>{st.top=+e.target.value;renderRm()};$('#rd').onchange=e=>{const j=RAW.dates.indexOf(e.target.value);if(j>=0){st.dd=j;renderRm()}}}
 // ----- method
 // ----- shows vs kWh
 const SM=SH.months,MLBL=m=>MN[+m.slice(5)-1],dim=m=>new Date(2026,+m.slice(5),0).getDate();
