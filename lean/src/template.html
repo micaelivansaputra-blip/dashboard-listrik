@@ -40,6 +40,7 @@ td.nm{white-space:normal;min-width:170px;font-weight:600}
 .bar{display:inline-block;height:6px;border-radius:3px;vertical-align:middle;margin-right:6px}
 .dots{display:inline-flex;gap:3px}.dots i{width:9px;height:9px;border-radius:3px;background:var(--line)}.dots i.o{background:var(--red)}.dots i.g{background:var(--grn)}
 .si-s{position:relative;margin-bottom:12px;max-width:420px}.si-s input{width:100%;box-sizing:border-box}.sil{position:absolute;left:0;right:0;top:100%;z-index:5;background:var(--surface);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.18),inset 0 0 0 1px var(--line);margin-top:4px;overflow:hidden}.sil:empty{display:none}.sil button{display:flex;gap:8px;align-items:baseline;width:100%;text-align:left;border:0;background:none;padding:10px 12px;cursor:pointer;border-bottom:1px solid var(--line)}.sil button:hover{background:var(--s2)}.sil b{color:var(--mut);font-variant-numeric:tabular-nums}
+.mp{display:block}.land{fill:var(--s2);stroke:var(--line);stroke-width:.6}.dot{cursor:pointer;transition:r .15s}.dot:hover{stroke:var(--ink)}.mpt2{font-size:9px;fill:var(--mut)}.mpl{gap:14px}.mpl span{display:inline-flex;align-items:center;gap:6px;font-size:13px}.mpl i{width:10px;height:10px;border-radius:50%;display:inline-block}.mptip{position:absolute;z-index:5;background:var(--ink);color:var(--bg);padding:7px 10px;border-radius:10px;font-size:12px;line-height:1.4;pointer-events:none;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.25)}
 .note{color:var(--mut);font-size:12px;margin-top:10px}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:flex-end;justify-content:center;z-index:20}
 .modal.on{display:flex}.sheet{background:var(--surface);width:min(760px,100%);max-height:88vh;overflow:auto;border-radius:20px 20px 0 0;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px))}
@@ -60,9 +61,9 @@ svg text{fill:var(--mut);font-size:10px}
  <div><h1>Electricity Monitoring</h1><div class="sub" id="asof"></div></div>
  <div class="ctl"><select id="mon" aria-label="Month"></select><select id="reg" aria-label="Region"></select><button class="chip" id="th" aria-label="Toggle theme">Theme</button></div>
 </header>
-<nav class="tabs" role="tablist"><button role="tab" data-p="ov" aria-selected="true">Overview</button><button role="tab" data-p="dy" aria-selected="false">Daily</button><button role="tab" data-p="sh" aria-selected="false">Shows</button><button role="tab" data-p="si" aria-selected="false">Site</button><button role="tab" data-p="rm" aria-selected="false">Reminder</button></nav>
+<nav class="tabs" role="tablist"><button role="tab" data-p="ov" aria-selected="true">Overview</button><button role="tab" data-p="mp" aria-selected="false">Map</button><button role="tab" data-p="dy" aria-selected="false">Daily</button><button role="tab" data-p="sh" aria-selected="false">Shows</button><button role="tab" data-p="si" aria-selected="false">Site</button><button role="tab" data-p="rm" aria-selected="false">Reminder</button></nav>
 <main>
-<section id="p-ov"></section><section id="p-dy" hidden></section><section id="p-sh" hidden></section><section id="p-si" hidden></section><section id="p-rm" hidden></section>
+<section id="p-ov"></section><section id="p-mp" hidden></section><section id="p-dy" hidden></section><section id="p-sh" hidden></section><section id="p-si" hidden></section><section id="p-rm" hidden></section>
 </main>
 </div>
 <div class="modal" id="md"><div class="sheet" id="mdb"></div></div>
@@ -465,12 +466,41 @@ function renderSi(){
  $$('#p-si th[data-si]').forEach(x=>x.onclick=()=>{st.sis=x.dataset.si;renderSi()});$$('#p-si tbody tr[data-k]').forEach(x=>x.onclick=()=>{st.ss=+x.dataset.k;st.sq='';renderSi();scrollTo(0,0)});
  const q=$('#siq');q.oninput=()=>{st.sq=q.value;siList()};siList();
  $$('#p-si [data-sv]').forEach(b=>b.onclick=()=>{st.sv=b.dataset.sv;renderSi()});$$('#p-si [data-su]').forEach(b=>b.onclick=()=>{st.su=b.dataset.su;renderSi()})}
+// ----- map of cinemas (red = over target)
+st.mm='mtd';
+const GEO=RAW.geo||{loc:{},d:'',W:1000,H:385,L0:94.5,L1:141.2,T0:6.5,B0:-11.5},gx=lo=>(lo-GEO.L0)/(GEO.L1-GEO.L0)*GEO.W,gy=la=>(GEO.T0-la)/(GEO.T0-GEO.B0)*GEO.H;
+const inJava=l=>l[1]>=105.6&&l[1]<=116.2&&l[0]<=-5.6&&l[0]>=-9.3;
+function relax(P,r){for(let it=0;it<120;it++){let mv=0;for(let i=0;i<P.length;i++)for(let j=i+1;j<P.length;j++){const dx=P[j].x-P[i].x,dy=P[j].y-P[i].y,d=Math.hypot(dx,dy)||.01,m=r*2.25;if(d<m){const k=(m-d)/2/d;P[i].x-=dx*k;P[i].y-=dy*k;P[j].x+=dx*k;P[j].y+=dy*k;mv++}}if(!mv)break}}
+const mpCol=p=>p==null?'var(--mut)':p>st.thr?'var(--red)':p>0?'var(--amb)':'var(--grn)';
+function mpSVG(vb,pts,r,box,lab){const P=pts.map(x=>({x:gx(x.l[1]),y:gy(x.l[0]),o:x}));relax(P,r);
+ const ord=P.sort((a,b)=>(a.o.p==null?-2:a.o.p>st.thr?2:a.o.p>0?1:0)-(b.o.p==null?-2:b.o.p>st.thr?2:b.o.p>0?1:0));
+ return`<svg viewBox="${vb}" width="100%" role="img" aria-label="${lab}" class="mp"><path d="${GEO.d}" class="land" fill-rule="evenodd"/>${box||''}${ord.map(q=>{const c=mpCol(q.o.p),hot=q.o.p!=null&&q.o.p>st.thr;
+  return(hot?`<circle cx="${q.x.toFixed(1)}" cy="${q.y.toFixed(1)}" r="${(r*(r<3?1.55:1.9)).toFixed(1)}" fill="${c}" opacity=".18" pointer-events="none"/>`:'')+`<circle class="dot" data-k="${q.o.k}" cx="${q.x.toFixed(1)}" cy="${q.y.toFixed(1)}" r="${r}" fill="${c}" stroke="var(--surface)" stroke-width="${(r*.3).toFixed(2)}"/>`}).join('')}</svg>`}
+function renderMp(){
+ const R=repData(st.dd),loc=GEO.loc,dl=fd(D[st.dd]),mt=st.mm=='mtd';
+ const it=R.map(r=>({k:r.s.k,n:r.s.n,rg:r.s.r,l:loc[r.s.k],p:mt?r.o.p:r.d.p,a:mt?r.o.a:r.d.a,t:mt?r.o.t:r.d.t})),on=it.filter(x=>x.l),off=it.filter(x=>!x.l);
+ const red=it.filter(x=>x.p!=null&&x.p>st.thr).length,amb=it.filter(x=>x.p!=null&&x.p>0&&x.p<=st.thr).length,grn=it.filter(x=>x.p!=null&&x.p<=0).length,non=it.filter(x=>x.p==null).length;
+ const jv=on.filter(x=>inJava(x.l)),ot=on.filter(x=>!inJava(x.l));
+ const x0=gx(105.6),x1=gx(116.2),y0=gy(-4.4),y1=gy(-9.3);
+ const box=`<rect x="${x0.toFixed(1)}" y="${y0.toFixed(1)}" width="${(x1-x0).toFixed(1)}" height="${(y1-y0).toFixed(1)}" rx="3" fill="none" stroke="var(--mut)" stroke-dasharray="3 2" stroke-width=".8"/><text x="${((x0+x1)/2).toFixed(1)}" y="${(y1+9).toFixed(1)}" text-anchor="middle" class="mpt2">Java &amp; Bali, see zoom below (${jv.length})</text>`;
+ const top=[...it].filter(x=>x.p!=null&&x.p>0).sort((a,b)=>b.p-a.p).slice(0,10);
+ const sub=mt?`MTD, 1–${D[st.dd].getDate()} ${MN[D[st.dd].getMonth()]}`:`Daily, ${dl}`;
+ $('#p-mp').innerHTML=`<div class="card" style="position:relative"><div class="row"><h3 style="margin:0;flex:1 1 auto">Cinema map, ${sub}</h3><button class="chip" data-mm="mtd" aria-pressed="${mt}">MTD</button><button class="chip" data-mm="day" aria-pressed="${!mt}">Daily</button></div>
+ <div class="row mpl" style="margin:8px 0"><span><i style="background:var(--red)"></i>Over &gt;${Math.round(st.thr*100)}% <b>${red}</b></span><span><i style="background:var(--amb)"></i>Slightly over <b>${amb}</b></span><span><i style="background:var(--grn)"></i>On / under target <b>${grn}</b></span><span><i style="background:var(--mut)"></i>No data <b>${non}</b></span></div>
+ <div id="mpw" style="position:relative">${mpSVG(`0 0 ${GEO.W} ${GEO.H}`,ot,4.6,box,'Map of Indonesia')}<div id="mpt" class="mptip" hidden></div></div>
+ <h3 style="margin:14px 0 6px">Java &amp; Bali</h3><div id="mpj" style="position:relative">${mpSVG(`${x0.toFixed(1)} ${y0.toFixed(1)} ${(x1-x0).toFixed(1)} ${(y1-y0).toFixed(1)}`,jv,2.5,'','Map of Java and Bali')}</div>
+ <div class="note">Positions are placed at city level, dots that would overlap are spread apart a little. Tap a cinema to open its detail.${off.length?` Not on the map (location not set): ${off.map(x=>x.n).join(', ')}.`:''} Region and date follow the selectors above and in Daily.</div></div>
+ <div class="card" style="margin-top:12px"><h3>Highest above target, ${sub}</h3><div class="tw"><table><thead><tr><th>Cinema</th><th>Region</th><th>Target</th><th>Actual</th><th>%</th></tr></thead><tbody>${top.length?top.map(x=>`<tr data-k="${x.k}"><td class="nm">${x.n}</td><td>${x.rg}</td><td>${nf(x.t)}</td><td>${nf(x.a)}</td><td class="up">${pc(x.p)}</td></tr>`).join(''):'<tr><td colspan="5" class="note">No cinema is above target.</td></tr>'}</tbody></table></div></div>`;
+ $$('#p-mp [data-mm]').forEach(b=>b.onclick=()=>{st.mm=b.dataset.mm;renderMp()});
+ const tip=$('#mpt'),byK=Object.fromEntries(it.map(x=>[x.k,x]));
+ $$('#p-mp .dot').forEach(c=>{c.onclick=()=>openSite(+c.dataset.k);c.onmouseenter=e=>{const x=byK[c.dataset.k],w=$('#mpw').getBoundingClientRect(),b=c.getBoundingClientRect();tip.hidden=false;tip.innerHTML=`<b>${x.n}</b> · ${x.rg}<br>${x.p==null?'No data':pc(x.p)+' · '+nf(x.a)+' vs '+nf(x.t)+' kWh'}`;const tw=tip.offsetWidth;tip.style.left=Math.max(4,Math.min(w.width-tw-4,b.left-w.left+b.width/2-tw/2))+'px';tip.style.top=Math.max(0,b.top-w.top-tip.offsetHeight-8)+'px'};c.onmouseleave=()=>tip.hidden=true});
+ $$('#p-mp tbody tr[data-k]').forEach(r=>r.onclick=()=>openSite(+r.dataset.k))}
 // ----- shell
-const V={ov:renderOv,dy:renderDy,sh:renderSh,si:renderSi,rm:renderRm};let cur='ov';
-function show(p){cur=p;$$('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.p==p));['ov','dy','sh','si','rm'].forEach(x=>$('#p-'+x).hidden=x!=p);V[p]();try{location.hash=p}catch(e){}}
+const V={ov:renderOv,mp:renderMp,dy:renderDy,sh:renderSh,si:renderSi,rm:renderRm};let cur='ov';
+function show(p){cur=p;$$('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.p==p));['ov','mp','dy','sh','si','rm'].forEach(x=>$('#p-'+x).hidden=x!=p);V[p]();try{location.hash=p}catch(e){}}
 $$('.tabs button').forEach(b=>b.onclick=()=>show(b.dataset.p));
 $('#mon').onchange=e=>{st.m=+e.target.value;st.dd=Math.min(LAST,monthDays(2026,st.m).slice(-1)[0]);show(cur)};
 $('#reg').onchange=e=>{st.reg=e.target.value;show(cur)};
 $('#th').onclick=()=>{const r=document.documentElement,dk=r.dataset.theme?r.dataset.theme=='dark':matchMedia('(prefers-color-scheme:dark)').matches;r.dataset.theme=dk?'light':'dark'};
-show(['ov','dy','sh','si','rm'].includes(location.hash.slice(1))?location.hash.slice(1):'ov');
+show(['ov','mp','dy','sh','si','rm'].includes(location.hash.slice(1))?location.hash.slice(1):'ov');
 </script>
