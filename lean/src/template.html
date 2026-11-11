@@ -35,7 +35,7 @@ td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:right;white-s
 tbody tr{cursor:pointer}tbody tr:hover{background:var(--s2)}
 td.nm{white-space:normal;min-width:170px;font-weight:600}
 .reg{color:var(--mut);font-weight:500;font-size:12px;margin-left:6px}
-#p-sh svg *:not(.hit),#p-si svg *:not(.hit){pointer-events:none}.chg{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:16px}.chc{min-width:0}
+#p-sh svg *:not(.hit),#p-si svg *:not(.hit){pointer-events:none}.cvw{position:relative;height:270px}.chg{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:16px}.chc{min-width:0}
 .hit{fill:transparent;cursor:default;outline:none}.hit:hover,.hit:focus,.hit.on{fill:var(--blue);fill-opacity:.1}.ro{font-size:13px;font-weight:600;min-height:20px;margin:2px 0 6px;font-variant-numeric:tabular-nums}.ro span{color:var(--mut);font-weight:500}
 .tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700}
 .t-o{background:var(--red-s);color:var(--red)}.t-s{background:var(--grn-s);color:var(--grn)}.t-w{background:var(--amb-s);color:var(--amb)}.t-n{background:var(--s2);color:var(--mut)}
@@ -80,6 +80,7 @@ svg text{fill:var(--mut);font-size:10px}
 </main>
 </div>
 <div class="modal" id="md"><div class="sheet" id="mdb"></div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
 const RAW=/*DATA*/;
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
@@ -416,8 +417,8 @@ function renderSh(){
  const pre=[['l7','Last 7 days'],['mtd','MTD'],['lm','Last month'],['cu','Custom']].map(([k,l])=>`<button class="chip" data-sr="${k}" aria-pressed="${st.sr==k}">${l}</button>`).join('');
  const cu=st.sr=='cu'?`<div class="row"><label class="note">From <input type="date" id="shf" value="${f}" min="${SD[0]}" max="${SD[SD.length-1]}"></label><label class="note">To <input type="date" id="sht" value="${t}" min="${SD[0]}" max="${SD[SD.length-1]}"></label><label class="note">or last <input type="number" id="shn" min="1" max="${SD.length}" value="${nd}" style="width:64px"> days</label></div>`:'';
 const two=st.sp!='d',lg=(ty,a,b)=>`<b style="color:var(--blue)">${ty=='l'?'●':'▮'}</b> ${a}`;
- const cell=(id,ty,fn,note)=>`<div class="chc"><div class="ro" id="r${id}"></div><div class="note" style="margin-bottom:4px">${note(ty)}</div><div id="c${id}">${fn(ty)}</div></div>`;
- const n1=ty=>`${lg(ty,'Shows (left)')} &nbsp; <b style="color:var(--org)">●</b> kWh per show (right)`,n2=ty=>`${lg(ty,'Actual')} &nbsp; <b>${ty=='l'?'┄':'▬'}</b> Budget${noB.length?' (not available for '+noB.join(', ')+')':''}`;
+ const cell=(id,ty,fn,note)=>`<div class="chc"><div class="ro" id="r${id}"></div><div class="note" style="margin-bottom:4px">${note(ty)}</div><div class="cvw" id="c${id}"><canvas id="cv${id}" aria-label="${id[0]=='1'?'Shows and kWh per show':'Admits actual versus budget'}" role="img"></canvas></div></div>`;
+ const n1=ty=>`Click a legend item to show or hide a series`,n2=ty=>`${noB.length?'Budget not available for '+noB.join(', '):'Click a legend item to show or hide a series'}`;
  const f1=ty=>shChart(B,{bar:b=>b.sh,line:b=>b.kps,t:ty,aria:'Shows and kWh per show'}),f2=ty=>shChart(B,{bar:b=>b.ad,mark:b=>b.bd,t:ty,aria:'Admits actual versus budget'});
  const tys=two?['b','l']:[st.sct];
  const chartCards=()=>`<div class="card" style="margin-bottom:12px"><h3>Shows and kWh per show</h3><div class="chg">${tys.map(ty=>cell('1'+ty,ty,f1,n1)).join('')}</div></div>
@@ -430,11 +431,26 @@ const two=st.sp!='d',lg=(ty,a,b)=>`<b style="color:var(--blue)">${ty=='l'?'●':
  <div class="card kpi"><div class="l">Admits vs budget</div><div class="v">${vb==null?nf(T.ad):'<span class="'+(vb<0?'up':'dn')+'">'+pc(vb)+'</span>'}</div><div class="n">${nf(T.ad)} actual${T.bd?' · '+nf(T.bd)+' budget':' · no budget for '+(noB.join(', ')||'this period')}</div></div></div>
  ${chartCards()}
  <div class="card"><h3>Per cinema</h3><div class="tw"><table><thead><tr><th data-ss="name">Cinema</th><th data-ss="sh">Shows</th><th data-ss="kw">kWh</th><th data-ss="kps">kWh/show${st.shs=='kps'?' ▾':''}</th><th data-ss="dk">vs previous</th><th data-ss="ad">Admits</th><th>Budget</th><th data-ss="vb">vs budget</th></tr></thead><tbody>${rows.map(r=>{const d=pp(r.kps,r.pk);return`<tr data-k="${r.s.k}" ${sel&&sel.k==r.s.k?'style="background:var(--blue-s)"':''}><td class="nm">${r.s.n}<span class="reg">${r.s.r}</span></td><td>${nf(r.sh)}</td><td>${nf(r.kw)}</td><td>${r.kps==null?'–':r.kps.toFixed(1)}</td><td class="${d>0?'up':'dn'}">${d==null?'–':pc(d)}</td><td>${nf(r.ad)}</td><td>${r.bd?nf(r.bd):'–'}</td><td class="${r.vb<0?'up':'dn'}">${r.vb==null?'–':pc(r.vb)}</td></tr>`}).join('')}</tbody></table></div></div>`;
+ (st.chs||[]).forEach(c=>c.destroy());st.chs=[];
  $('#p-sh').innerHTML=h;
  const ro1=b=>`${b.lbl}${b.part?' (partial)':''} <span>·</span> ${nf(b.sh)} shows <span>·</span> ${b.kps==null?'–':b.kps.toFixed(1)} kWh/show <span>·</span> ${nf(b.kw)} kWh`,ro2=b=>`${b.lbl}${b.part?' (partial)':''} <span>·</span> ${nf(b.ad)} admits <span>·</span> budget ${b.bd?nf(b.bd)+' <span>·</span> '+pc(b.ad/b.bd-1):'n/a'}`;
  const T1={lbl:'Total',sh:T.sh,kps:T.kps,kw:T.kw},T2={lbl:'Total',ad:T.ad,bd:T.bd};
- tys.flatMap(ty=>[['1'+ty,ro1,T1],['2'+ty,ro2,T2]]).forEach(([n,f,d])=>{const r=$('#r'+n),c=$('#c'+n);r.innerHTML=f(d);const on=e=>{const h=e.target.closest('.hit');if(!h)return;c.querySelectorAll('.hit.on').forEach(x=>x.classList.remove('on'));h.classList.add('on');r.innerHTML=f(B[+h.dataset.i])};
-  c.addEventListener('mouseover',on);c.addEventListener('focusin',on);c.addEventListener('click',on);c.addEventListener('mouseleave',()=>{c.querySelectorAll('.hit.on').forEach(x=>x.classList.remove('on'));r.innerHTML=f(d)})});
+ if(!window.Chart){$$('#p-sh .cvw').forEach(c=>c.innerHTML='<div class="note">Charts could not load (offline?). Table below still works.</div>')}
+ else{const cs=getComputedStyle(document.documentElement),C=n=>cs.getPropertyValue(n).trim(),blue=C('--blue'),org=C('--org'),ink=C('--ink'),mut=C('--mut'),line=C('--line');
+  const al=(col,a)=>col.startsWith('#')?col+Math.round(a*255).toString(16).padStart(2,'0'):col;
+  const labels=B.map(b=>b.lbl),cross={id:'cross',beforeDatasetsDraw(ch){const i=ch.$hi;if(i==null)return;const m=ch.getDatasetMeta(0).data[i];if(!m)return;const w=ch.chartArea.width/B.length,x=m.x;ch.ctx.save();ch.ctx.fillStyle=al(blue,.1);ch.ctx.fillRect(x-w/2,ch.chartArea.top,w,ch.chartArea.height);ch.ctx.restore()}};
+  tys.flatMap(ty=>[['1'+ty,ro1,T1,1,ty],['2'+ty,ro2,T2,2,ty]]).forEach(([n,f,d,k,ty])=>{const r=$('#r'+n);r.innerHTML=f(d);
+   const bar=ty=='b',ds=k==1
+    ?[{label:'Shows',data:B.map(b=>b.sh),yAxisID:'y',type:bar?'bar':'line',borderColor:blue,backgroundColor:bar?B.map(b=>al(blue,b.part?.5:1)):blue,borderWidth:bar?0:2.4,borderRadius:bar?4:0,pointRadius:B.length>40?0:3,tension:.25,order:2},
+      {label:'kWh per show',data:B.map(b=>b.kps),yAxisID:'y1',type:'line',borderColor:org,backgroundColor:org,borderWidth:2.4,pointRadius:B.length>40?0:3,tension:.25,order:1}]
+    :[{label:'Actual',data:B.map(b=>b.ad),type:bar?'bar':'line',borderColor:blue,backgroundColor:bar?B.map(b=>al(blue,b.part?.5:1)):blue,borderWidth:bar?0:2.4,borderRadius:bar?4:0,pointRadius:B.length>40?0:3,tension:.25,order:2},
+      {label:'Budget',data:B.map(b=>b.bd),type:'line',borderColor:ink,backgroundColor:ink,borderWidth:2,borderDash:[6,4],pointRadius:B.length>40?0:3,spanGaps:false,order:1}];
+   const sc={x:{grid:{display:false},ticks:{color:mut,autoSkip:true,maxTicksLimit:10,maxRotation:0}},y:{position:'left',beginAtZero:true,grid:{color:line},ticks:{color:mut,callback:v=>nf(v)}}};
+   if(k==1)sc.y1={position:'right',grid:{drawOnChartArea:false},ticks:{color:org,callback:v=>v.toFixed(0)},suggestedMin:Math.min(...B.map(b=>b.kps).filter(v=>v!=null))*.85,suggestedMax:Math.max(...B.map(b=>b.kps).filter(v=>v!=null))*1.1};
+   const ch=new Chart($('#cv'+n),{data:{labels,datasets:ds},options:{responsive:true,maintainAspectRatio:false,animation:{duration:250},interaction:{mode:'index',intersect:false},
+    plugins:{legend:{position:'bottom',labels:{color:mut,boxWidth:12,boxHeight:12,borderRadius:3}},tooltip:{enabled:false}},scales:sc,
+    onHover:(e,_,c2)=>{const p=c2.getElementsAtEventForMode(e,'index',{intersect:false},false)[0];const i=p?p.index:null;if(i!==c2.$hi){c2.$hi=i;r.innerHTML=i==null?f(d):f(B[i]);c2.draw()}}},plugins:[cross]});
+   ch.canvas.addEventListener('mouseleave',()=>{ch.$hi=null;r.innerHTML=f(d);ch.draw()});st.chs.push(ch)})}
  $$('#p-sh [data-ct]').forEach(b=>b.onclick=()=>{st.sct=b.dataset.ct;renderSh()});
  $$('#p-sh [data-sp]').forEach(b=>b.onclick=()=>{st.sp=b.dataset.sp;renderSh()});
  $$('#p-sh [data-sr]').forEach(b=>b.onclick=()=>{if(b.dataset.sr=='cu'){st.cf=f;st.ct=t}st.sr=b.dataset.sr;renderSh()});
