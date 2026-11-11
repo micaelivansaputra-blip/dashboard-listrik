@@ -384,13 +384,13 @@ const DI=new Map(RAW.dates.map((x,i)=>[x,i])),SI=new Map(SD.map((x,i)=>[x,i]));
 const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 const pdt=s=>new Date(s+'T00:00:00'),addD=(s,n)=>{const d=pdt(s);d.setDate(d.getDate()+n);return iso(d)};
 const dimOf=x=>new Date(+x.slice(0,4),+x.slice(5,7),0).getDate();
-st.sp='d';st.sr='l7';st.sct='b';st.cf=null;st.ct=null;st.shs='kps';
-function shRange(){const last=SD[SD.length-1],first=SD[0];let f,t=last;
- if(st.sr=='l7')f=addD(last,-6);
- else if(st.sr=='mtd')f=last.slice(0,8)+'01';
- else if(st.sr=='lm'){const d=pdt(last.slice(0,8)+'01');d.setDate(0);t=iso(d);f=t.slice(0,8)+'01'}
- else{f=st.cf||addD(last,-13);t=st.ct||last}
- if(f<first)f=first;if(t>last)t=last;if(f>t)f=t;return[f,t]}
+const LAST_M=new Date(SD[SD.length-1]+'T00:00:00').getMonth();st.sp='d';st.sr='l7';st.sct='b';st.cf=null;st.ct=null;st.shs='kps';
+function shRange(){const first=SD[0],lastAll=SD[SD.length-1],ms='2026-'+String(st.m+1).padStart(2,'0')+'-01',me=iso(new Date(2026,st.m+1,0));let f,e=me<lastAll?me:lastAll,t=e;
+ if(st.sr=='l7')f=addD(e,-6);
+ else if(st.sr=='mtd')f=ms;
+ else if(st.sr=='lm'){const d=pdt(ms);d.setDate(0);t=iso(d);f=t.slice(0,8)+'01'}
+ else{f=st.cf||addD(lastAll,-13);t=st.ct||lastAll}
+ if(t>lastAll)t=lastAll;if(f<first)f=first;if(t<first||f>t)return null;return[f,t]}
 const bkey=x=>st.sp=='d'?x:st.sp=='w'?addD(x,-((pdt(x).getDay()+6)%7)):x.slice(0,7);
 // buckets of sessions, kWh (only days that have both), admits and pro-rata budget for a list of cinemas
 function shAgg(sites,days,kf){const B=new Map;
@@ -423,7 +423,8 @@ function shChart(B,o){const W=720,H=230,pl=50,pr=o.line?46:14,pt=16,pb=30,n=B.le
 function renderSh(){
  if(!SD.length){$('#p-sh').innerHTML='<div class="card empty">No show data loaded.</div>';return}
  const L=S.filter(inReg).filter(s=>SS.v[s.k]),sel=st.sk=='all'?null:L.find(s=>String(s.k)==String(st.sk));if(!sel)st.sk='all';
- const base=sel?[sel]:L,[f,t]=shRange(),days=SD.filter(x=>x>=f&&x<=t),nd=days.length;
+ const RG=shRange();if(!RG){$('#p-sh').innerHTML=`<div class="card empty">No show data for ${MN[st.m]} 2026 yet. The daily session files start on ${fd(pdt(SD[0]))} and run to ${fd(pdt(SD[SD.length-1]))}. Pick another month above, or use Custom.</div>`;return}
+ const base=sel?[sel]:L,[f,t]=RG,days=SD.filter(x=>x>=f&&x<=t),nd=days.length;
  const pt2=addD(f,-1),pf=addD(f,-nd),pdays=SD.filter(x=>x>=pf&&x<=pt2),hasP=pdays.length==nd;
  const lbl=k=>st.sp=='d'?fd(pdt(k)):st.sp=='w'?fd(pdt(k)):MN[+k.slice(5)-1]+' '+k.slice(2,4);
  const B=shAgg(base,days,bkey).map(b=>{const exp=st.sp=='w'?7:st.sp=='m'?dimOf(b.k+'-01'):1;return{...b,lbl:lbl(b.k),part:b.n<exp}});
@@ -434,7 +435,7 @@ function renderSh(){
  rows.sort((a,b)=>{const x=sk(a),y=sk(b);return x<y?-1:x>y?1:0});
  const dS=P?pp(T.sh,P.sh):null,dK=P?pp(T.kps,P.kps):null,vb=T.bd?T.ad/T.bd-1:null,dtr=[f,t].map(x=>fd(pdt(x))).join(' – ');
  const seg=[['d','Daily'],['w','Weekly'],['m','Monthly']].map(([k,l])=>`<button class="chip" data-sp="${k}" aria-pressed="${st.sp==k}">${l}</button>`).join('');
- const pre=[['l7','Last 7 days'],['mtd','MTD'],['lm','Last month'],['cu','Custom']].map(([k,l])=>`<button class="chip" data-sr="${k}" aria-pressed="${st.sr==k}">${l}</button>`).join('');
+ const pre=[['l7','Last 7 days'],['mtd',st.m==LAST_M?'MTD':'Full month'],['lm','Previous month'],['cu','Custom']].map(([k,l])=>`<button class="chip" data-sr="${k}" aria-pressed="${st.sr==k}">${l}</button>`).join('');
  const cu=st.sr=='cu'?`<div class="row"><label class="note">From <input type="date" id="shf" value="${f}" min="${SD[0]}" max="${SD[SD.length-1]}"></label><label class="note">To <input type="date" id="sht" value="${t}" min="${SD[0]}" max="${SD[SD.length-1]}"></label><label class="note">or last <input type="number" id="shn" min="1" max="${SD.length}" value="${nd}" style="width:64px"> days</label></div>`:'';
 const two=false,lg=(ty,a,b)=>`<b style="color:var(--blue)">${ty=='l'?'●':'▮'}</b> ${a}`;
  const cell=(id,ty,fn,note)=>`<div class="chc"><div class="ro" id="r${id}"></div><div class="note" style="margin-bottom:4px">${note(ty)}</div><div class="cvw" id="c${id}"><canvas id="cv${id}" aria-label="${id[0]=='1'?'Shows and kWh per show':'Admits actual versus budget'}" role="img"></canvas></div></div>`;
@@ -573,7 +574,7 @@ const PT={ov:'Overview',mp:'Map',dy:'Daily',sh:'Shows',si:'Site',rm:'Reminder'};
 function show(p){cur=p;$('#pt').textContent=PT[p];$$('.nav button').forEach(b=>b.setAttribute('aria-selected',b.dataset.p==p));['ov','mp','dy','sh','si','rm'].forEach(x=>$('#p-'+x).hidden=x!=p);V[p]();try{location.hash=p}catch(e){}}
 $$('.nav button').forEach(b=>b.onclick=()=>show(b.dataset.p));
 $('#rf').onclick=()=>location.reload();
-$('#mon').onchange=e=>{st.m=+e.target.value;st.dd=Math.min(LAST,monthDays(2026,st.m).slice(-1)[0]);show(cur)};
+$('#mon').onchange=e=>{st.m=+e.target.value;st.sr='mtd';st.dd=Math.min(LAST,monthDays(2026,st.m).slice(-1)[0]);show(cur)};
 $('#reg').onchange=e=>{st.reg=e.target.value;show(cur)};
 const setTh=v=>{const r=document.documentElement;if(v=='auto')delete r.dataset.theme;else r.dataset.theme=v;$$('.seg button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.th==v));try{localStorage.setItem('th',v)}catch(e){}if(window.Chart&&cur=='sh')renderSh();if(cur=='mp')renderMp()};
 $$('.seg button').forEach(b=>b.onclick=()=>setTh(b.dataset.th));try{const v=localStorage.getItem('th');if(v&&v!='auto')setTh(v)}catch(e){}
