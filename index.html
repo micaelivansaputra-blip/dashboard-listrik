@@ -1,35 +1,47 @@
 <meta charset="utf-8">
 <title>Electricity Monitoring</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 <style>
-:root{--bg:#f5f5f7;--surface:#fff;--s2:#f5f5f7;--ink:#1d1d1f;--mut:#6e6e73;--line:rgba(60,60,67,.12);--blue:#007aff;--blue-s:rgba(0,122,255,.1);--org:#e07b00;--red:#d92d20;--red-s:rgba(217,45,32,.1);--grn:#16833a;--grn-s:rgba(22,131,58,.1);--amb:#b45309;--amb-s:rgba(180,83,9,.1);--sh:0 0 0 .5px rgba(0,0,0,.04),0 1px 3px rgba(0,0,0,.05);--r:16px}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#000;--surface:#1c1c1e;--s2:#2c2c2e;--ink:#f5f5f7;--mut:#98989d;--line:rgba(84,84,88,.5);--blue:#0a84ff;--blue-s:rgba(10,132,255,.18);--org:#ff9f0a;--red:#ff6b61;--red-s:rgba(255,107,97,.14);--grn:#4cd37b;--grn-s:rgba(76,211,123,.14);--amb:#f5a524;--amb-s:rgba(245,165,36,.14);--sh:none;color-scheme:dark}}
-:root[data-theme="dark"]{--org:#ff9f0a;--bg:#000;--surface:#1c1c1e;--s2:#2c2c2e;--ink:#f5f5f7;--mut:#98989d;--line:rgba(84,84,88,.5);--blue:#0a84ff;--blue-s:rgba(10,132,255,.18);--red:#ff6b61;--red-s:rgba(255,107,97,.14);--grn:#4cd37b;--grn-s:rgba(76,211,123,.14);--amb:#f5a524;--amb-s:rgba(245,165,36,.14);--sh:none;color-scheme:dark}
+:root{--bg:#f4f4f5;--sb:#fafafa;--surface:#fff;--s2:#efeff1;--ink:#18181b;--mut:#71717a;--line:rgba(24,24,27,.09);--blue:#27272a;--blue-s:rgba(24,24,27,.06);--org:#d98a00;--red:#dc2626;--red-s:rgba(220,38,38,.1);--grn:#16a34a;--grn-s:rgba(22,163,74,.1);--amb:#b86e00;--amb-s:rgba(217,138,0,.12);--sh:0 1px 2px rgba(0,0,0,.04);--r:18px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0c0c0d;--sb:#111112;--surface:#171718;--s2:#212123;--ink:#f4f4f5;--mut:#8b8b92;--line:rgba(255,255,255,.08);--blue:#e9e9ec;--blue-s:rgba(255,255,255,.06);--org:#f5a524;--red:#f87171;--red-s:rgba(248,113,113,.14);--grn:#4ade80;--grn-s:rgba(74,222,128,.13);--amb:#f5a524;--amb-s:rgba(245,165,36,.14);--sh:none;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0c0c0d;--sb:#111112;--surface:#171718;--s2:#212123;--ink:#f4f4f5;--mut:#8b8b92;--line:rgba(255,255,255,.08);--blue:#e9e9ec;--blue-s:rgba(255,255,255,.06);--org:#f5a524;--red:#f87171;--red-s:rgba(248,113,113,.14);--grn:#4ade80;--grn-s:rgba(74,222,128,.13);--amb:#f5a524;--amb-s:rgba(245,165,36,.14);--sh:none;color-scheme:dark}
 *{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);font:14px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0;-webkit-font-smoothing:antialiased}
-.wrap{max-width:1120px;margin:0 auto;padding-bottom:48px}
-header{padding:22px 0 8px;display:flex;flex-wrap:wrap;gap:12px 16px;align-items:flex-end;justify-content:space-between}
-h1{margin:0;font-size:clamp(26px,4vw,32px);letter-spacing:-.03em;line-height:1.1}
-.sub{color:var(--mut);margin-top:4px}
+body{background:var(--bg);color:var(--ink);font:14px/1.5 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0;-webkit-font-smoothing:antialiased}
+.app{display:grid;grid-template-columns:232px minmax(0,1fr);gap:24px;max-width:1440px;margin:0 auto;padding-block:16px 48px}
+.sb{position:sticky;top:16px;align-self:start;max-height:calc(100vh - 32px);overflow:auto;background:var(--sb);border-radius:var(--r);box-shadow:inset 0 0 0 1px var(--line);padding:14px 10px;display:flex;flex-direction:column;gap:2px}
+.sb .gl{color:var(--mut);font-size:12px;font-weight:600;padding:10px 12px 6px}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav button{display:flex;align-items:center;gap:12px;border:0;background:none;color:var(--ink);padding:10px 12px;border-radius:12px;cursor:pointer;font-weight:500;font-size:15px;text-align:left}
+.nav button:hover{background:var(--s2)}
+.nav button[aria-selected=true]{background:var(--s2);box-shadow:inset 0 0 0 1px var(--line);font-weight:600}
+.nav svg{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.seg{display:flex;background:var(--s2);border-radius:14px;padding:4px;gap:2px;box-shadow:inset 0 0 0 1px var(--line)}
+.seg button{flex:1;border:0;background:none;color:var(--ink);padding:9px 4px;border-radius:10px;cursor:pointer;font-weight:600;font-size:14px}
+.seg button[aria-pressed=true]{background:color-mix(in srgb,var(--ink) 14%,var(--s2));box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.sb .fn{color:var(--mut);font-size:12px;padding:10px 12px 4px;line-height:1.5}
+.main{min-width:0}
+.top{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;padding:6px 0 18px}
+h1{margin:0;font-size:clamp(22px,3vw,26px);letter-spacing:-.02em;line-height:1.2;font-weight:700}
+.sub{color:var(--mut);font-size:13px;display:flex;align-items:center;gap:8px}.sub:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--grn);flex:none}
 .ctl{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.ic{border:0;background:var(--surface);color:var(--ink);width:40px;height:40px;border-radius:50%;cursor:pointer;display:grid;place-items:center;box-shadow:inset 0 0 0 1px var(--line)}.ic svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+@media(max-width:860px){.app{grid-template-columns:minmax(0,1fr);gap:12px}.sb{position:static;max-height:none;flex-direction:row;align-items:center;overflow-x:auto;padding:8px;gap:6px}.sb .gl,.sb .fn{display:none}.nav{flex-direction:row;gap:4px}.nav button{padding:8px 12px;font-size:14px;white-space:nowrap}.nav button span{display:inline}.seg{margin-left:auto;flex:none}.seg button{padding:7px 8px;font-size:13px}.sb>div{display:contents}}
 select,input,button{font:inherit;color:inherit}
-select,input[type=search],input[type=date]{background:var(--surface);border:0;box-shadow:inset 0 0 0 1px var(--line);border-radius:10px;padding:7px 10px;min-height:34px}
-.tabs{display:flex;gap:4px;background:var(--s2);padding:3px;border-radius:12px;width:max-content;max-width:100%;overflow-x:auto;margin:10px 0 16px;box-shadow:inset 0 0 0 1px var(--line)}
-.tabs button{border:0;background:none;padding:7px 14px;border-radius:9px;cursor:pointer;color:var(--mut);font-weight:600;white-space:nowrap}
-.tabs button[aria-selected=true]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
-.card{background:var(--surface);border-radius:var(--r);box-shadow:var(--sh);padding:16px;min-width:0}
+select,input[type=search],input[type=date],input[type=number]{background:var(--surface);color:var(--ink);border:0;box-shadow:inset 0 0 0 1px var(--line);border-radius:12px;padding:8px 12px;min-height:38px}
+.card{background:var(--surface);border-radius:var(--r);box-shadow:var(--sh),inset 0 0 0 1px var(--line);padding:20px;min-width:0}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:16px}
-.kpi .l{color:var(--mut);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.kpi .l{color:var(--mut);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
 .kpi .v{font-size:28px;font-weight:700;letter-spacing:-.02em;margin-top:4px;font-variant-numeric:tabular-nums}
 .kpi .n{color:var(--mut);font-size:12px;margin-top:2px}
-.kpi.hl{background:linear-gradient(160deg,#1a8cff,#0a63d8);color:#fff}.kpi.hl .l,.kpi.hl .n{color:rgba(255,255,255,.8)}
+.kpi.hl{background:var(--surface)}
 .up{color:var(--red)}.dn{color:var(--grn)}
 .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
 .chip{border:0;background:var(--s2);color:var(--mut);padding:6px 12px;border-radius:999px;cursor:pointer;font-weight:600;box-shadow:inset 0 0 0 1px var(--line)}
-.chip[aria-pressed=true]{background:var(--blue);color:#fff;box-shadow:none}
+.chip[aria-pressed=true]{background:var(--ink);color:var(--bg);box-shadow:none}
 .tw{overflow-x:auto}
 table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
-th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--mut);text-align:right;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap;cursor:pointer;user-select:none}
+th{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);text-align:right;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap;cursor:pointer;user-select:none}
 th:first-child,td:first-child{text-align:left}
 td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
 tbody tr{cursor:pointer}tbody tr:hover{background:var(--s2)}
@@ -37,7 +49,7 @@ td.nm{white-space:normal;min-width:170px;font-weight:600}
 .reg{color:var(--mut);font-weight:500;font-size:12px;margin-left:6px}
 #p-sh svg *:not(.hit),#p-si svg *:not(.hit){pointer-events:none}.cvw{position:relative;height:270px}.chg{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:16px}.chc{min-width:0}
 .hit{fill:transparent;cursor:default;outline:none}.hit:hover,.hit:focus,.hit.on{fill:var(--blue);fill-opacity:.1}.ro{font-size:13px;font-weight:600;min-height:20px;margin:2px 0 6px;font-variant-numeric:tabular-nums}.ro span{color:var(--mut);font-weight:500}
-.tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700}
+.tag{display:inline-block;padding:3px 10px;border-radius:8px;font-size:12px;font-weight:600}
 .t-o{background:var(--red-s);color:var(--red)}.t-s{background:var(--grn-s);color:var(--grn)}.t-w{background:var(--amb-s);color:var(--amb)}.t-n{background:var(--s2);color:var(--mut)}
 .bar{display:inline-block;height:6px;border-radius:3px;vertical-align:middle;margin-right:6px}
 .dots{display:inline-flex;gap:3px}.dots i{width:9px;height:9px;border-radius:3px;background:var(--line)}.dots i.o{background:var(--red)}.dots i.g{background:var(--grn)}
@@ -63,21 +75,29 @@ td.nm{white-space:normal;min-width:170px;font-weight:600}
 .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
 .mail{background:#fff;color:#1d1d1f;border-radius:12px;padding:20px;box-shadow:inset 0 0 0 1px rgba(60,60,67,.14);overflow-x:auto}
 .mail td,.mail li,.mail p{color:#1d1d1f}.mail a{color:#0a66c2}
-.btn{border:0;background:var(--blue);color:#fff;padding:8px 16px;border-radius:999px;font-weight:600;cursor:pointer}.btn.sec{background:var(--s2);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
+.btn{border:0;background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:999px;font-weight:600;cursor:pointer}.btn.sec{background:var(--s2);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
 textarea{width:100%;min-height:110px;border:0;border-radius:12px;background:var(--s2);color:var(--ink);padding:12px;font:inherit;box-shadow:inset 0 0 0 1px var(--line)}
 h3{margin:0 0 8px;font-size:15px}
 .empty{color:var(--mut);padding:24px;text-align:center}
 svg text{fill:var(--mut);font-size:10px}
 </style>
-<div class="wrap">
-<header>
- <div><h1>Electricity Monitoring</h1><div class="sub" id="asof"></div></div>
- <div class="ctl"><select id="mon" aria-label="Month"></select><select id="reg" aria-label="Region"></select><button class="chip" id="th" aria-label="Toggle theme">Theme</button></div>
-</header>
-<nav class="tabs" role="tablist"><button role="tab" data-p="ov" aria-selected="true">Overview</button><button role="tab" data-p="mp" aria-selected="false">Map</button><button role="tab" data-p="dy" aria-selected="false">Daily</button><button role="tab" data-p="sh" aria-selected="false">Shows</button><button role="tab" data-p="si" aria-selected="false">Site</button><button role="tab" data-p="rm" aria-selected="false">Reminder</button></nav>
+<div class="app">
+<aside class="sb">
+ <div class="gl">Menu</div>
+ <nav class="nav" role="tablist"><button role="tab" data-p="ov" aria-selected="true"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span>Overview</span></button><button role="tab" data-p="dy" aria-selected="false"><svg viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/></svg><span>Daily</span></button><button role="tab" data-p="sh" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M3 20V8l18-4v12"/><path d="M3 12l18-4M7 10.5l2.6-.6M12 9.3l2.6-.6M3 20h18v-4"/></svg><span>Shows</span></button><button role="tab" data-p="si" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Site</span></button></nav>
+ <div class="gl">More</div>
+ <nav class="nav" role="tablist"><button role="tab" data-p="mp" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg><span>Map</span></button><button role="tab" data-p="rm" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 21a2 2 0 0 0 4 0"/></svg><span>Reminder</span></button></nav>
+ <div style="flex:1"></div>
+ <div class="seg" role="group" aria-label="Theme"><button data-th="auto" aria-pressed="true">Auto</button><button data-th="light" aria-pressed="false">Light</button><button data-th="dark" aria-pressed="false">Dark</button></div>
+ <div class="fn">Daily kWh from the Google Sheet RAW SUMMARY, shows from the daily session files.</div>
+</aside>
+<div class="main">
+<div class="top"><div><h1 id="pt">Overview</h1></div>
+ <div class="ctl"><div class="sub" id="asof"></div><select id="mon" aria-label="Month"></select><select id="reg" aria-label="Region"></select><button class="ic" id="rf" aria-label="Reload"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.4-5.7M20 4v5h-5"/></svg></button></div></div>
 <main>
 <section id="p-ov"></section><section id="p-mp" hidden></section><section id="p-dy" hidden></section><section id="p-sh" hidden></section><section id="p-si" hidden></section><section id="p-rm" hidden></section>
 </main>
+</div>
 </div>
 <div class="modal" id="md"><div class="sheet" id="mdb"></div></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -441,10 +461,10 @@ const two=false,lg=(ty,a,b)=>`<b style="color:var(--blue)">${ty=='l'?'●':'▮'
   const labels=B.map(b=>b.lbl),cross={id:'cross',beforeDatasetsDraw(ch){const i=ch.$hi;if(i==null)return;const m=ch.getDatasetMeta(0).data[i];if(!m)return;const w=ch.chartArea.width/B.length,x=m.x;ch.ctx.save();ch.ctx.fillStyle=al(blue,.1);ch.ctx.fillRect(x-w/2,ch.chartArea.top,w,ch.chartArea.height);ch.ctx.restore()}};
   tys.flatMap(ty=>[['1'+ty,ro1,T1,1,ty],['2'+ty,ro2,T2,2,ty]]).forEach(([n,f,d,k,ty])=>{const r=$('#r'+n);r.innerHTML=f(d);
    const bar=ty=='b',ds=k==1
-    ?[{label:'Shows',data:B.map(b=>b.sh),yAxisID:'y',type:bar?'bar':'line',borderColor:blue,backgroundColor:bar?B.map(b=>al(blue,b.part?.5:1)):blue,borderWidth:bar?0:2.4,borderRadius:bar?4:0,pointRadius:B.length>40?0:3,tension:.25,order:2},
+    ?[{label:'Shows',data:B.map(b=>b.sh),yAxisID:'y',type:bar?'bar':'line',borderColor:blue,backgroundColor:bar?B.map(b=>al(blue,b.part?.5:1)):blue,borderWidth:bar?0:2.4,borderRadius:bar?5:0,maxBarThickness:56,pointRadius:B.length>40?0:3,tension:.25,order:2},
       {label:'kWh per show',data:B.map(b=>b.kps),yAxisID:'y1',type:'line',borderColor:org,backgroundColor:org,borderWidth:2.4,pointRadius:B.length>40?0:3,tension:.25,order:1}]
-    :[{label:'Actual',data:B.map(b=>b.ad),type:bar?'bar':'line',borderColor:blue,backgroundColor:bar?B.map(b=>al(blue,b.part?.5:1)):blue,borderWidth:bar?0:2.4,borderRadius:bar?4:0,pointRadius:B.length>40?0:3,tension:.25,order:2},
-      {label:'Budget',data:B.map(b=>b.bd),type:'line',borderColor:ink,backgroundColor:ink,borderWidth:2,borderDash:[6,4],pointRadius:B.length>40?0:3,spanGaps:false,order:1}];
+    :[{label:'Actual',data:B.map(b=>b.ad),type:bar?'bar':'line',borderColor:blue,backgroundColor:bar?B.map(b=>al(blue,b.part?.5:1)):blue,borderWidth:bar?0:2.4,borderRadius:bar?5:0,maxBarThickness:56,pointRadius:B.length>40?0:3,tension:.25,order:2},
+      {label:'Budget',data:B.map(b=>b.bd),type:'line',borderColor:mut,backgroundColor:mut,borderWidth:2,borderDash:[6,4],pointRadius:B.length>40?0:3,spanGaps:false,order:1}];
    const sc={x:{grid:{display:false},ticks:{color:mut,autoSkip:true,maxTicksLimit:10,maxRotation:0}},y:{position:'left',beginAtZero:true,grid:{color:line},ticks:{color:mut,callback:v=>nf(v)}}};
    if(k==1)sc.y1={position:'right',grid:{drawOnChartArea:false},ticks:{color:org,callback:v=>v.toFixed(0)},suggestedMin:Math.min(...B.map(b=>b.kps).filter(v=>v!=null))*.85,suggestedMax:Math.max(...B.map(b=>b.kps).filter(v=>v!=null))*1.1};
    const ch=new Chart($('#cv'+n),{data:{labels,datasets:ds},options:{responsive:true,maintainAspectRatio:false,animation:{duration:250},interaction:{mode:'index',intersect:false},
@@ -549,10 +569,14 @@ function renderMp(){
  if(st.pk&&byK[st.pk]&&on.includes(byK[st.pk])){const g=$(`#gp .pin[data-k="${st.pk}"]`);g?open(g):close()}else close()}
 // ----- shell
 const V={ov:renderOv,mp:renderMp,dy:renderDy,sh:renderSh,si:renderSi,rm:renderRm};let cur='ov';
-function show(p){cur=p;$$('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.p==p));['ov','mp','dy','sh','si','rm'].forEach(x=>$('#p-'+x).hidden=x!=p);V[p]();try{location.hash=p}catch(e){}}
-$$('.tabs button').forEach(b=>b.onclick=()=>show(b.dataset.p));
+const PT={ov:'Overview',mp:'Map',dy:'Daily',sh:'Shows',si:'Site',rm:'Reminder'};
+function show(p){cur=p;$('#pt').textContent=PT[p];$$('.nav button').forEach(b=>b.setAttribute('aria-selected',b.dataset.p==p));['ov','mp','dy','sh','si','rm'].forEach(x=>$('#p-'+x).hidden=x!=p);V[p]();try{location.hash=p}catch(e){}}
+$$('.nav button').forEach(b=>b.onclick=()=>show(b.dataset.p));
+$('#rf').onclick=()=>location.reload();
 $('#mon').onchange=e=>{st.m=+e.target.value;st.dd=Math.min(LAST,monthDays(2026,st.m).slice(-1)[0]);show(cur)};
 $('#reg').onchange=e=>{st.reg=e.target.value;show(cur)};
-$('#th').onclick=()=>{const r=document.documentElement,dk=r.dataset.theme?r.dataset.theme=='dark':matchMedia('(prefers-color-scheme:dark)').matches;r.dataset.theme=dk?'light':'dark'};
+const setTh=v=>{const r=document.documentElement;if(v=='auto')delete r.dataset.theme;else r.dataset.theme=v;$$('.seg button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.th==v));try{localStorage.setItem('th',v)}catch(e){}if(window.Chart&&cur=='sh')renderSh();if(cur=='mp')renderMp()};
+$$('.seg button').forEach(b=>b.onclick=()=>setTh(b.dataset.th));try{const v=localStorage.getItem('th');if(v&&v!='auto')setTh(v)}catch(e){}
+matchMedia('(prefers-color-scheme:dark)').addEventListener('change',()=>{if(!document.documentElement.dataset.theme&&cur=='sh')renderSh()});
 show(['ov','mp','dy','sh','si','rm'].includes(location.hash.slice(1))?location.hash.slice(1):'ov');
 </script>
