@@ -35,7 +35,7 @@ td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:right;white-s
 tbody tr{cursor:pointer}tbody tr:hover{background:var(--s2)}
 td.nm{white-space:normal;min-width:170px;font-weight:600}
 .reg{color:var(--mut);font-weight:500;font-size:12px;margin-left:6px}
-.hit{fill:transparent;cursor:default;outline:none}.hit:hover,.hit:focus,.hit.on{fill:var(--blue);fill-opacity:.1}.ro{font-size:13px;font-weight:600;min-height:20px;margin:2px 0 6px;font-variant-numeric:tabular-nums}.ro span{color:var(--mut);font-weight:500}
+#p-sh svg *:not(.hit),#p-si svg *:not(.hit){pointer-events:none}.hit{fill:transparent;cursor:default;outline:none}.hit:hover,.hit:focus,.hit.on{fill:var(--blue);fill-opacity:.1}.ro{font-size:13px;font-weight:600;min-height:20px;margin:2px 0 6px;font-variant-numeric:tabular-nums}.ro span{color:var(--mut);font-weight:500}
 .tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700}
 .t-o{background:var(--red-s);color:var(--red)}.t-s{background:var(--grn-s);color:var(--grn)}.t-w{background:var(--amb-s);color:var(--amb)}.t-n{background:var(--s2);color:var(--mut)}
 .bar{display:inline-block;height:6px;border-radius:3px;vertical-align:middle;margin-right:6px}
@@ -362,7 +362,7 @@ const DI=new Map(RAW.dates.map((x,i)=>[x,i])),SI=new Map(SD.map((x,i)=>[x,i]));
 const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 const pdt=s=>new Date(s+'T00:00:00'),addD=(s,n)=>{const d=pdt(s);d.setDate(d.getDate()+n);return iso(d)};
 const dimOf=x=>new Date(+x.slice(0,4),+x.slice(5,7),0).getDate();
-st.sp='d';st.sr='l7';st.cf=null;st.ct=null;st.shs='kps';
+st.sp='d';st.sr='l7';st.ct='b';st.cf=null;st.ct=null;st.shs='kps';
 function shRange(){const last=SD[SD.length-1],first=SD[0];let f,t=last;
  if(st.sr=='l7')f=addD(last,-6);
  else if(st.sr=='mtd')f=last.slice(0,8)+'01';
@@ -387,11 +387,13 @@ function shChart(B,o){const W=720,H=230,pl=50,pr=o.line?46:14,pt=16,pb=30,n=B.le
  for(let q=0;q<=3;q++){const yy=pt+q*(H-pt-pb)/3;g+=`<line x1="${pl}" x2="${W-pr}" y1="${yy}" y2="${yy}" stroke="var(--line)"/><text x="${pl-6}" y="${yy+3}" text-anchor="end" fill="var(--mut)" font-size="10">${nf(mx-mx*q/3)}</text>${o.line&&lz.length?`<text x="${W-pr+6}" y="${yy+3}" fill="var(--org)" font-size="10">${(hi-(hi-lo)*q/3).toFixed(0)}</text>`:''}`}
  const st2=Math.ceil(n/8);
  B.forEach((b,i)=>{const x0=pl+i*bw,v=bars[i];
-  if(v!=null)g+=`<rect x="${(x0+bw*.14).toFixed(1)}" y="${y(v).toFixed(1)}" width="${Math.max(1,bw*.72).toFixed(1)}" height="${Math.max(0,H-pb-y(v)).toFixed(1)}" rx="${bw>8?3:1}" fill="var(--blue)" opacity="${b.part?.5:1}"/>`;
-  if(n<=10&&v!=null)g+=`<text x="${x0+bw/2}" y="${y(v)-4}" text-anchor="middle" fill="var(--ink)" font-size="10" font-weight="600">${nf(v)}</text>`;
-  if(mk[i]!=null)g+=`<line x1="${(x0+bw*.06).toFixed(1)}" x2="${(x0+bw*.94).toFixed(1)}" y1="${y(mk[i]).toFixed(1)}" y2="${y(mk[i]).toFixed(1)}" stroke="var(--ink)" stroke-width="2.6"></line>`;
+  if(v!=null&&st.ct!='l')g+=`<rect x="${(x0+bw*.14).toFixed(1)}" y="${y(v).toFixed(1)}" width="${Math.max(1,bw*.72).toFixed(1)}" height="${Math.max(0,H-pb-y(v)).toFixed(1)}" rx="${bw>8?3:1}" fill="var(--blue)" opacity="${b.part?.5:1}"/>`;
+  if(n<=10&&v!=null&&st.ct!='l')g+=`<text x="${x0+bw/2}" y="${y(v)-4}" text-anchor="middle" fill="var(--ink)" font-size="10" font-weight="600">${nf(v)}</text>`;
+  if(mk[i]!=null&&st.ct!='l')g+=`<line x1="${(x0+bw*.06).toFixed(1)}" x2="${(x0+bw*.94).toFixed(1)}" y1="${y(mk[i]).toFixed(1)}" y2="${y(mk[i]).toFixed(1)}" stroke="var(--ink)" stroke-width="2.6"></line>`;
   if(i%st2==0)g+=`<text x="${x0+bw/2}" y="${H-10}" text-anchor="middle" fill="var(--mut)" font-size="10">${b.lbl}</text>`;
   g+=`<rect class="hit" data-i="${i}" x="${x0.toFixed(1)}" y="${pt}" width="${bw.toFixed(1)}" height="${H-pt-pb}" tabindex="0"/>`});
+ if(st.ct=='l'){const P=(arr,c,dash)=>{let d='',pen=0;arr.forEach((v,i)=>{if(v==null){pen=0;return}d+=(pen?'L':'M')+(pl+i*bw+bw/2).toFixed(1)+' '+y(v).toFixed(1)+' ';pen=1});return `<path d="${d}" fill="none" stroke="${c}" stroke-width="2.4" stroke-linejoin="round" ${dash?'stroke-dasharray="5 4"':''}/>`+(n<=40?arr.map((v,i)=>v==null?'':`<circle cx="${(pl+i*bw+bw/2).toFixed(1)}" cy="${y(v).toFixed(1)}" r="3" fill="${c}"/>`).join(''):'')};
+  g+=P(bars,'var(--blue)');if(mk.some(v=>v!=null))g+=P(mk,'var(--ink)',1)}
  if(lz.length){let d='',pen=0;ln.forEach((v,i)=>{if(v==null){pen=0;return}d+=(pen?'L':'M')+(pl+i*bw+bw/2).toFixed(1)+' '+yl(v).toFixed(1)+' ';pen=1});
   g+=`<path d="${d}" fill="none" stroke="var(--org)" stroke-width="2.2" stroke-linejoin="round"/>`;
   if(n<=31)ln.forEach((v,i)=>{if(v!=null)g+=`<circle cx="${(pl+i*bw+bw/2).toFixed(1)}" cy="${yl(v).toFixed(1)}" r="2.6" fill="var(--org)"></circle>`})}
@@ -412,20 +414,21 @@ function renderSh(){
  const seg=[['d','Daily'],['w','Weekly'],['m','Monthly']].map(([k,l])=>`<button class="chip" data-sp="${k}" aria-pressed="${st.sp==k}">${l}</button>`).join('');
  const pre=[['l7','Last 7 days'],['mtd','MTD'],['lm','Last month'],['cu','Custom']].map(([k,l])=>`<button class="chip" data-sr="${k}" aria-pressed="${st.sr==k}">${l}</button>`).join('');
  const cu=st.sr=='cu'?`<div class="row"><label class="note">From <input type="date" id="shf" value="${f}" min="${SD[0]}" max="${SD[SD.length-1]}"></label><label class="note">To <input type="date" id="sht" value="${t}" min="${SD[0]}" max="${SD[SD.length-1]}"></label><label class="note">or last <input type="number" id="shn" min="1" max="${SD.length}" value="${nd}" style="width:64px"> days</label></div>`:'';
- let h=`<div class="card" style="margin-bottom:12px"><div class="row"><div class="row" style="margin:0;gap:4px">${seg}</div><span style="width:1px;height:22px;background:var(--line)"></span><div class="row" style="margin:0;gap:4px">${pre}</div></div>${cu}
+ let h=`<div class="card" style="margin-bottom:12px"><div class="row"><div class="row" style="margin:0;gap:4px">${seg}</div><span style="width:1px;height:22px;background:var(--line)"></span><div class="row" style="margin:0;gap:4px">${pre}</div><span style="width:1px;height:22px;background:var(--line)"></span><div class="row" style="margin:0;gap:4px"><button class="chip" data-ct="b" aria-pressed="${st.ct=='b'}">Bar</button><button class="chip" data-ct="l" aria-pressed="${st.ct=='l'}">Line</button></div></div>${cu}
  <div class="row" style="margin-bottom:6px"><select id="shr" aria-label="Region"><option value="all">All regions</option>${regs.map(r=>`<option ${r==st.reg?'selected':''}>${r}</option>`).join('')}</select><select id="shs2" aria-label="Cinema"><option value="all">${st.reg=='all'?'All cinemas':'All in '+st.reg} (${L.length})</option>${[...L].sort((a,b)=>a.n<b.n?-1:1).map(s=>`<option value="${s.k}" ${sel&&s.k==sel.k?'selected':''}>${s.n}</option>`).join('')}</select></div>
  <div class="note">${dtr} ${t.slice(0,4)} · ${nd} day${nd>1?'s':''} · ${sel?sel.n:base.length+' cinemas'}${P?' · compared with the previous '+nd+' day'+(nd>1?'s':''):''}</div></div>
  <div class="kpis"><div class="card kpi hl"><div class="l">Number of shows</div><div class="v">${nf(T.sh)}</div><div class="n">${nf(T.sh/nd)} per day${dS==null?'':' · '+pc(dS)+' vs previous'}</div></div>
  <div class="card kpi"><div class="l">kWh per show</div><div class="v">${T.kps==null?'–':T.kps.toFixed(1)}</div><div class="n">${nf(T.kw)} kWh${dK==null?'':' · <span class="'+(dK>0?'up':'dn')+'">'+pc(dK)+'</span> vs previous'}</div></div>
  <div class="card kpi"><div class="l">Admits vs budget</div><div class="v">${vb==null?nf(T.ad):'<span class="'+(vb<0?'up':'dn')+'">'+pc(vb)+'</span>'}</div><div class="n">${nf(T.ad)} actual${T.bd?' · '+nf(T.bd)+' budget':' · no budget for '+(noB.join(', ')||'this period')}</div></div></div>
- <div class="card" style="margin-bottom:12px"><h3>Shows and kWh per show</h3><div class="ro" id="r1"></div><div class="note" style="margin-bottom:4px"><b style="color:var(--blue)">▮</b> Shows (left) &nbsp; <b style="color:var(--org)">●</b> kWh per show (right)</div><div id="c1">${shChart(B,{bar:b=>b.sh,line:b=>b.kps,aria:'Shows and kWh per show'})}</div></div>
- <div class="card" style="margin-bottom:12px"><h3>Admits: actual vs budget</h3><div class="ro" id="r2"></div><div class="note" style="margin-bottom:4px"><b style="color:var(--blue)">▮</b> Actual &nbsp; <b>▬</b> Budget${noB.length?' (not available for '+noB.join(', ')+')':''}</div><div id="c2">${shChart(B,{bar:b=>b.ad,mark:b=>b.bd,aria:'Admits actual versus budget'})}</div><div class="note">Daily and weekly budget = monthly budget spread evenly across the days of the month. Lighter bars = incomplete ${st.sp=='w'?'week':st.sp=='m'?'month':'day'}. kWh per show uses only days with both a kWh reading and shows.</div></div>
+ <div class="card" style="margin-bottom:12px"><h3>Shows and kWh per show</h3><div class="ro" id="r1"></div><div class="note" style="margin-bottom:4px"><b style="color:var(--blue)">${st.ct=='l'?'●':'▮'}</b> Shows (left) &nbsp; <b style="color:var(--org)">●</b> kWh per show (right)</div><div id="c1">${shChart(B,{bar:b=>b.sh,line:b=>b.kps,aria:'Shows and kWh per show'})}</div></div>
+ <div class="card" style="margin-bottom:12px"><h3>Admits: actual vs budget</h3><div class="ro" id="r2"></div><div class="note" style="margin-bottom:4px"><b style="color:var(--blue)">${st.ct=='l'?'●':'▮'}</b> Actual &nbsp; <b>${st.ct=='l'?'┄':'▬'}</b> Budget${noB.length?' (not available for '+noB.join(', ')+')':''}</div><div id="c2">${shChart(B,{bar:b=>b.ad,mark:b=>b.bd,aria:'Admits actual versus budget'})}</div><div class="note">Daily and weekly budget = monthly budget spread evenly across the days of the month. Lighter bars = incomplete ${st.sp=='w'?'week':st.sp=='m'?'month':'day'}. kWh per show uses only days with both a kWh reading and shows.</div></div>
  <div class="card"><h3>Per cinema</h3><div class="tw"><table><thead><tr><th data-ss="name">Cinema</th><th data-ss="sh">Shows</th><th data-ss="kw">kWh</th><th data-ss="kps">kWh/show${st.shs=='kps'?' ▾':''}</th><th data-ss="dk">vs previous</th><th data-ss="ad">Admits</th><th>Budget</th><th data-ss="vb">vs budget</th></tr></thead><tbody>${rows.map(r=>{const d=pp(r.kps,r.pk);return`<tr data-k="${r.s.k}" ${sel&&sel.k==r.s.k?'style="background:var(--blue-s)"':''}><td class="nm">${r.s.n}<span class="reg">${r.s.r}</span></td><td>${nf(r.sh)}</td><td>${nf(r.kw)}</td><td>${r.kps==null?'–':r.kps.toFixed(1)}</td><td class="${d>0?'up':'dn'}">${d==null?'–':pc(d)}</td><td>${nf(r.ad)}</td><td>${r.bd?nf(r.bd):'–'}</td><td class="${r.vb<0?'up':'dn'}">${r.vb==null?'–':pc(r.vb)}</td></tr>`}).join('')}</tbody></table></div></div>`;
  $('#p-sh').innerHTML=h;
  const ro1=b=>`${b.lbl}${b.part?' (partial)':''} <span>·</span> ${nf(b.sh)} shows <span>·</span> ${b.kps==null?'–':b.kps.toFixed(1)} kWh/show <span>·</span> ${nf(b.kw)} kWh`,ro2=b=>`${b.lbl}${b.part?' (partial)':''} <span>·</span> ${nf(b.ad)} admits <span>·</span> budget ${b.bd?nf(b.bd)+' <span>·</span> '+pc(b.ad/b.bd-1):'n/a'}`;
  const T1={lbl:'Total',sh:T.sh,kps:T.kps,kw:T.kw},T2={lbl:'Total',ad:T.ad,bd:T.bd};
  [['1',ro1,T1],['2',ro2,T2]].forEach(([n,f,d])=>{const r=$('#r'+n),c=$('#c'+n);r.innerHTML=f(d);const on=e=>{const h=e.target.closest('.hit');if(!h)return;c.querySelectorAll('.hit.on').forEach(x=>x.classList.remove('on'));h.classList.add('on');r.innerHTML=f(B[+h.dataset.i])};
   c.addEventListener('mouseover',on);c.addEventListener('focusin',on);c.addEventListener('click',on);c.addEventListener('mouseleave',()=>{c.querySelectorAll('.hit.on').forEach(x=>x.classList.remove('on'));r.innerHTML=f(d)})});
+ $$('#p-sh [data-ct]').forEach(b=>b.onclick=()=>{st.ct=b.dataset.ct;renderSh()});
  $$('#p-sh [data-sp]').forEach(b=>b.onclick=()=>{st.sp=b.dataset.sp;renderSh()});
  $$('#p-sh [data-sr]').forEach(b=>b.onclick=()=>{if(b.dataset.sr=='cu'){st.cf=f;st.ct=t}st.sr=b.dataset.sr;renderSh()});
  $('#shr').onchange=e=>{st.reg=e.target.value;$('#reg').value=st.reg;st.sk='all';renderSh()};
