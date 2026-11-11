@@ -35,6 +35,7 @@ td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:right;white-s
 tbody tr{cursor:pointer}tbody tr:hover{background:var(--s2)}
 td.nm{white-space:normal;min-width:170px;font-weight:600}
 .reg{color:var(--mut);font-weight:500;font-size:12px;margin-left:6px}
+.hit{fill:transparent;cursor:default;outline:none}.hit:hover,.hit:focus,.hit.on{fill:var(--blue);fill-opacity:.1}.ro{font-size:13px;font-weight:600;min-height:20px;margin:2px 0 6px;font-variant-numeric:tabular-nums}.ro span{color:var(--mut);font-weight:500}
 .tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700}
 .t-o{background:var(--red-s);color:var(--red)}.t-s{background:var(--grn-s);color:var(--grn)}.t-w{background:var(--amb-s);color:var(--amb)}.t-n{background:var(--s2);color:var(--mut)}
 .bar{display:inline-block;height:6px;border-radius:3px;vertical-align:middle;margin-right:6px}
@@ -386,13 +387,14 @@ function shChart(B,o){const W=720,H=230,pl=50,pr=o.line?46:14,pt=16,pb=30,n=B.le
  for(let q=0;q<=3;q++){const yy=pt+q*(H-pt-pb)/3;g+=`<line x1="${pl}" x2="${W-pr}" y1="${yy}" y2="${yy}" stroke="var(--line)"/><text x="${pl-6}" y="${yy+3}" text-anchor="end" fill="var(--mut)" font-size="10">${nf(mx-mx*q/3)}</text>${o.line&&lz.length?`<text x="${W-pr+6}" y="${yy+3}" fill="var(--org)" font-size="10">${(hi-(hi-lo)*q/3).toFixed(0)}</text>`:''}`}
  const st2=Math.ceil(n/8);
  B.forEach((b,i)=>{const x0=pl+i*bw,v=bars[i];
-  if(v!=null)g+=`<rect x="${(x0+bw*.14).toFixed(1)}" y="${y(v).toFixed(1)}" width="${Math.max(1,bw*.72).toFixed(1)}" height="${Math.max(0,H-pb-y(v)).toFixed(1)}" rx="${bw>8?3:1}" fill="var(--blue)" opacity="${b.part?.5:1}"><title>${b.lbl}: ${nf(v)}${b.part?' (partial)':''}</title></rect>`;
+  if(v!=null)g+=`<rect x="${(x0+bw*.14).toFixed(1)}" y="${y(v).toFixed(1)}" width="${Math.max(1,bw*.72).toFixed(1)}" height="${Math.max(0,H-pb-y(v)).toFixed(1)}" rx="${bw>8?3:1}" fill="var(--blue)" opacity="${b.part?.5:1}"/>`;
   if(n<=10&&v!=null)g+=`<text x="${x0+bw/2}" y="${y(v)-4}" text-anchor="middle" fill="var(--ink)" font-size="10" font-weight="600">${nf(v)}</text>`;
-  if(mk[i]!=null)g+=`<line x1="${(x0+bw*.06).toFixed(1)}" x2="${(x0+bw*.94).toFixed(1)}" y1="${y(mk[i]).toFixed(1)}" y2="${y(mk[i]).toFixed(1)}" stroke="var(--ink)" stroke-width="2.6"><title>${b.lbl} budget: ${nf(mk[i])}</title></line>`;
-  if(i%st2==0)g+=`<text x="${x0+bw/2}" y="${H-10}" text-anchor="middle" fill="var(--mut)" font-size="10">${b.lbl}</text>`});
+  if(mk[i]!=null)g+=`<line x1="${(x0+bw*.06).toFixed(1)}" x2="${(x0+bw*.94).toFixed(1)}" y1="${y(mk[i]).toFixed(1)}" y2="${y(mk[i]).toFixed(1)}" stroke="var(--ink)" stroke-width="2.6"></line>`;
+  if(i%st2==0)g+=`<text x="${x0+bw/2}" y="${H-10}" text-anchor="middle" fill="var(--mut)" font-size="10">${b.lbl}</text>`;
+  g+=`<rect class="hit" data-i="${i}" x="${x0.toFixed(1)}" y="${pt}" width="${bw.toFixed(1)}" height="${H-pt-pb}" tabindex="0"/>`});
  if(lz.length){let d='',pen=0;ln.forEach((v,i)=>{if(v==null){pen=0;return}d+=(pen?'L':'M')+(pl+i*bw+bw/2).toFixed(1)+' '+yl(v).toFixed(1)+' ';pen=1});
   g+=`<path d="${d}" fill="none" stroke="var(--org)" stroke-width="2.2" stroke-linejoin="round"/>`;
-  if(n<=31)ln.forEach((v,i)=>{if(v!=null)g+=`<circle cx="${(pl+i*bw+bw/2).toFixed(1)}" cy="${yl(v).toFixed(1)}" r="2.6" fill="var(--org)"><title>${B[i].lbl}: ${v.toFixed(1)} kWh/show</title></circle>`})}
+  if(n<=31)ln.forEach((v,i)=>{if(v!=null)g+=`<circle cx="${(pl+i*bw+bw/2).toFixed(1)}" cy="${yl(v).toFixed(1)}" r="2.6" fill="var(--org)"></circle>`})}
  return g+'</svg>'}
 function renderSh(){
  if(!SD.length){$('#p-sh').innerHTML='<div class="card empty">No show data loaded.</div>';return}
@@ -416,10 +418,14 @@ function renderSh(){
  <div class="kpis"><div class="card kpi hl"><div class="l">Number of shows</div><div class="v">${nf(T.sh)}</div><div class="n">${nf(T.sh/nd)} per day${dS==null?'':' · '+pc(dS)+' vs previous'}</div></div>
  <div class="card kpi"><div class="l">kWh per show</div><div class="v">${T.kps==null?'–':T.kps.toFixed(1)}</div><div class="n">${nf(T.kw)} kWh${dK==null?'':' · <span class="'+(dK>0?'up':'dn')+'">'+pc(dK)+'</span> vs previous'}</div></div>
  <div class="card kpi"><div class="l">Admits vs budget</div><div class="v">${vb==null?nf(T.ad):'<span class="'+(vb<0?'up':'dn')+'">'+pc(vb)+'</span>'}</div><div class="n">${nf(T.ad)} actual${T.bd?' · '+nf(T.bd)+' budget':' · no budget for '+(noB.join(', ')||'this period')}</div></div></div>
- <div class="card" style="margin-bottom:12px"><h3>Shows and kWh per show</h3><div class="note" style="margin-bottom:4px"><b style="color:var(--blue)">▮</b> Shows (left) &nbsp; <b style="color:var(--org)">●</b> kWh per show (right)</div>${shChart(B,{bar:b=>b.sh,line:b=>b.kps,aria:'Shows and kWh per show',})}</div>
- <div class="card" style="margin-bottom:12px"><h3>Admits: actual vs budget</h3><div class="note" style="margin-bottom:4px"><b style="color:var(--blue)">▮</b> Actual &nbsp; <b>▬</b> Budget${noB.length?' (not available for '+noB.join(', ')+')':''}</div>${shChart(B,{bar:b=>b.ad,mark:b=>b.bd,aria:'Admits actual versus budget'})}<div class="note">Daily and weekly budget = monthly budget spread evenly across the days of the month. Lighter bars = incomplete ${st.sp=='w'?'week':st.sp=='m'?'month':'day'}. kWh per show uses only days with both a kWh reading and shows.</div></div>
+ <div class="card" style="margin-bottom:12px"><h3>Shows and kWh per show</h3><div class="ro" id="r1"></div><div class="note" style="margin-bottom:4px"><b style="color:var(--blue)">▮</b> Shows (left) &nbsp; <b style="color:var(--org)">●</b> kWh per show (right)</div><div id="c1">${shChart(B,{bar:b=>b.sh,line:b=>b.kps,aria:'Shows and kWh per show'})}</div></div>
+ <div class="card" style="margin-bottom:12px"><h3>Admits: actual vs budget</h3><div class="ro" id="r2"></div><div class="note" style="margin-bottom:4px"><b style="color:var(--blue)">▮</b> Actual &nbsp; <b>▬</b> Budget${noB.length?' (not available for '+noB.join(', ')+')':''}</div><div id="c2">${shChart(B,{bar:b=>b.ad,mark:b=>b.bd,aria:'Admits actual versus budget'})}</div><div class="note">Daily and weekly budget = monthly budget spread evenly across the days of the month. Lighter bars = incomplete ${st.sp=='w'?'week':st.sp=='m'?'month':'day'}. kWh per show uses only days with both a kWh reading and shows.</div></div>
  <div class="card"><h3>Per cinema</h3><div class="tw"><table><thead><tr><th data-ss="name">Cinema</th><th data-ss="sh">Shows</th><th data-ss="kw">kWh</th><th data-ss="kps">kWh/show${st.shs=='kps'?' ▾':''}</th><th data-ss="dk">vs previous</th><th data-ss="ad">Admits</th><th>Budget</th><th data-ss="vb">vs budget</th></tr></thead><tbody>${rows.map(r=>{const d=pp(r.kps,r.pk);return`<tr data-k="${r.s.k}" ${sel&&sel.k==r.s.k?'style="background:var(--blue-s)"':''}><td class="nm">${r.s.n}<span class="reg">${r.s.r}</span></td><td>${nf(r.sh)}</td><td>${nf(r.kw)}</td><td>${r.kps==null?'–':r.kps.toFixed(1)}</td><td class="${d>0?'up':'dn'}">${d==null?'–':pc(d)}</td><td>${nf(r.ad)}</td><td>${r.bd?nf(r.bd):'–'}</td><td class="${r.vb<0?'up':'dn'}">${r.vb==null?'–':pc(r.vb)}</td></tr>`}).join('')}</tbody></table></div></div>`;
  $('#p-sh').innerHTML=h;
+ const ro1=b=>`${b.lbl}${b.part?' (partial)':''} <span>·</span> ${nf(b.sh)} shows <span>·</span> ${b.kps==null?'–':b.kps.toFixed(1)} kWh/show <span>·</span> ${nf(b.kw)} kWh`,ro2=b=>`${b.lbl}${b.part?' (partial)':''} <span>·</span> ${nf(b.ad)} admits <span>·</span> budget ${b.bd?nf(b.bd)+' <span>·</span> '+pc(b.ad/b.bd-1):'n/a'}`;
+ const T1={lbl:'Total',sh:T.sh,kps:T.kps,kw:T.kw},T2={lbl:'Total',ad:T.ad,bd:T.bd};
+ [['1',ro1,T1],['2',ro2,T2]].forEach(([n,f,d])=>{const r=$('#r'+n),c=$('#c'+n);r.innerHTML=f(d);const on=e=>{const h=e.target.closest('.hit');if(!h)return;c.querySelectorAll('.hit.on').forEach(x=>x.classList.remove('on'));h.classList.add('on');r.innerHTML=f(B[+h.dataset.i])};
+  c.addEventListener('mouseover',on);c.addEventListener('focusin',on);c.addEventListener('click',on);c.addEventListener('mouseleave',()=>{c.querySelectorAll('.hit.on').forEach(x=>x.classList.remove('on'));r.innerHTML=f(d)})});
  $$('#p-sh [data-sp]').forEach(b=>b.onclick=()=>{st.sp=b.dataset.sp;renderSh()});
  $$('#p-sh [data-sr]').forEach(b=>b.onclick=()=>{if(b.dataset.sr=='cu'){st.cf=f;st.ct=t}st.sr=b.dataset.sr;renderSh()});
  $('#shr').onchange=e=>{st.reg=e.target.value;$('#reg').value=st.reg;st.sk='all';renderSh()};
@@ -427,71 +433,40 @@ function renderSh(){
  if($('#shf')){$('#shf').onchange=e=>{st.cf=e.target.value||f;renderSh()};$('#sht').onchange=e=>{st.ct=e.target.value||t;renderSh()};$('#shn').onchange=e=>{const q=Math.max(1,Math.min(SD.length,+e.target.value||1));st.ct=SD[SD.length-1];st.cf=addD(st.ct,-(q-1));renderSh()}}
  $$('#p-sh tbody tr[data-k]').forEach(r=>r.onclick=()=>{st.sk=st.sk==r.dataset.k?'all':r.dataset.k;renderSh();scrollTo(0,0)});
  $$('#p-sh th[data-ss]').forEach(c=>c.onclick=()=>{st.shs=c.dataset.ss;renderSh()})}
-// ----- site navigator (Jan 2025 -> latest month)
-const MD=[31,28,31,30,31,30,31,31,30,31,30,31];
-st.ss=null;st.sq='';st.sv='seq';st.su='m';
-const INV=RAW.invoice||{months:[],v:{}},invv=s=>INV.v[s.k]||[];
-const LM=Math.max(0,INV.months.length-13);
-// running month(s) after the last invoice: estimated from the daily sheet (avg per day x days in month, needs >=3 days)
-function mEst(s,mo){const ix=monthDays(2026,mo).filter(i=>s.v[i]!=null);return ix.length<3?null:{v:ix.reduce((x,i)=>x+s.v[i],0)/ix.length*MD[mo],n:ix.length}}
-const LX=(()=>{let l=LM;for(let mo=LM+1;mo<12;mo++)if(S.some(s=>mEst(s,mo)))l=mo;return l})();
-const U=(x,mo)=>x==null?null:st.su=='d'?x/MD[mo]:x;
-function siSVG(L,lab,sep){const nar=innerWidth<600,W=nar?380:720,H=nar?240:250,pl=nar?44:52,pr=nar?20:22,pt=14,pb=26,n=lab.length,x=j=>pl+j*(W-pl-pr)/Math.max(n-1,1);
- const z=L.flatMap(l=>l.v).filter(q=>q!=null);if(!z.length)return'<div class="note">No readings for this cinema.</div>';
- let lo=Math.min(...z),hi=Math.max(...z);const pd=(hi-lo)*.15||1;lo=Math.max(0,lo-pd);hi+=pd;const y=v=>pt+(1-(v-lo)/(hi-lo))*(H-pt-pb);
- let g=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Monthly electricity usage">`;
- for(let k=0;k<=3;k++){const yy=pt+k*(H-pt-pb)/3;g+=`<line x1="${pl}" x2="${W-pr}" y1="${yy}" y2="${yy}" stroke="var(--line)"/><text x="${pl-6}" y="${yy+3}" text-anchor="end">${nf(hi-(hi-lo)*k/3)}</text>`}
- lab.forEach((m,j)=>{if(nar?(j%(n>12?4:2)==0):(n<=12||(j%3==0&&j!=n-2)||j==n-1))g+=`<text x="${x(j)}" y="${H-6}" text-anchor="middle">${m}</text>`});
- if(sep!=null)g+=`<line x1="${(x(sep)+x(sep+1))/2}" x2="${(x(sep)+x(sep+1))/2}" y1="${pt}" y2="${H-pb}" stroke="var(--line)" stroke-dasharray="3 3"/>`;
- for(const l of L){let d='',pen=0;l.v.forEach((q,j)=>{if(q==null){pen=0;return}d+=(pen?'L':'M')+x(j).toFixed(1)+' '+y(q).toFixed(1)+' ';pen=1});
-  g+=`<path d="${d}" fill="none" stroke="${l.c}" stroke-width="${l.w||2.4}" ${l.dash?'stroke-dasharray="5 4"':''}/>`;
-  if(!l.nodots)g+=l.v.map((q,j)=>q==null?'':`<circle cx="${x(j)}" cy="${y(q)}" r="3.6" fill="${l.hol&&l.hol.includes(j)?'var(--surface)':l.c}" stroke="${l.c}" stroke-width="${l.hol&&l.hol.includes(j)?2:0}"><title>${lab[j]}: ${nf(q)}</title></circle>`).join('')}
- return g+'</svg>'}
+// ----- site: one cinema, selected month only
+st.ss=null;st.sq='';
 function siMatches(q){q=q.trim().toLowerCase();if(!q)return[];return S.filter(s=>s.n.toLowerCase().includes(q)||String(s.k)==q||String(s.k).padStart(2,'0')==q).slice(0,8)}
 function siList(){const m=siMatches(st.sq);$('#sil').innerHTML=m.length?m.map(s=>`<button data-k="${s.k}"><b>${String(s.k).padStart(2,'0')}</b> ${s.n}<span class="reg">${s.r}</span></button>`).join(''):(st.sq.trim()?'<div class="note" style="margin:6px 10px">No cinema found.</div>':'');
  $$('#sil button').forEach(b=>b.onclick=()=>{st.ss=+b.dataset.k;st.sq='';renderSi()})}
 
-function siStat(s){const v=invv(s),y5=v.slice(0,12),y6=v.slice(12,13+LM-0).slice(0,LM+1);
- const sum=a=>a.reduce((x,q)=>x+q,0),full=(a,n)=>a.length>=n&&a.slice(0,n).every(q=>q!=null);
- const t25=full(y5,12)?sum(y5):null,c25=full(y5,LM+1)?sum(y5.slice(0,LM+1)):null,c26=full(y6,LM+1)?sum(y6):null;
- const nz=v.filter(q=>q!=null),avg=nz.length?sum(nz)/nz.length:null,sd=nz.length>1?Math.sqrt(sum(nz.map(q=>(q-avg)**2))/nz.length):null;
- let pk=null,pi=-1;v.forEach((q,i)=>{if(q!=null&&(pk==null||q>pk)){pk=q;pi=i}});
- return{s,t25,c25,c26,yoy:c25&&c26?(c26-c25)/c25:null,avg,cv:avg&&sd!=null?sd/avg:null,pk,pl:pi<0?'':MN[pi%12]+' '+(pi<12?25:26),n:nz.length}}
-function siTable(){const R=S.filter(inReg).map(siStat),k=st.sis||'yoy';
- const f={name:r=>r.s.n,t25:r=>-(r.t25??-1),c26:r=>-(r.c26??-1),yoy:r=>-(r.yoy??-9),avg:r=>-(r.avg??-1),cv:r=>-(r.cv??-1)}[k];
- R.sort((a,b)=>{const x=f(a),y=f(b);return x<y?-1:x>y?1:0});
- const T=(g,n)=>R.filter(r=>r[g]!=null&&(n?r[n]!=null:1));
- const cmp=R.filter(r=>r.c25!=null&&r.c26!=null),s25=cmp.reduce((x,r)=>x+r.c25,0),s26=cmp.reduce((x,r)=>x+r.c26,0);
- const up=cmp.filter(r=>r.yoy>.05).length,dn=cmp.filter(r=>r.yoy<-.05).length;
- return`<div class="card" style="margin-top:12px"><h3>All cinemas, Jan 2025 – ${MN[LM]} 2026</h3><div class="note" style="margin:0 0 8px">Jan–${MN[LM]} 2026 vs the same months of 2025, ${cmp.length} cinemas with a full invoice history: <b>${pc((s26-s25)/s25)}</b> in total · ${up} cinemas up more than 5% · ${dn} down more than 5%. Tap a cinema to open it.</div><div class="tw"><table><thead><tr><th data-si="name">Cinema</th><th data-si="t25">2025 total</th><th>Jan–${MN[LM]} 25</th><th>Jan–${MN[LM]} 26</th><th data-si="yoy">YoY ${k=='yoy'?'▾':''}</th><th data-si="avg">Avg / month</th><th data-si="cv">Variation</th><th>Peak month</th></tr></thead><tbody>${R.map(r=>`<tr data-k="${r.s.k}"><td class="nm">${r.s.n}<span class="reg">${r.s.r}</span></td><td>${r.t25==null?'–':nf(r.t25)}</td><td>${r.c25==null?'–':nf(r.c25)}</td><td>${r.c26==null?'–':nf(r.c26)}</td><td class="${r.yoy>0?'up':'dn'}">${r.yoy==null?'–':pc(r.yoy)}</td><td>${r.avg==null?'–':nf(r.avg)}</td><td>${r.cv==null?'–':(r.cv*100).toFixed(0)+'%'}</td><td>${r.pl}</td></tr>`).join('')}</tbody></table></div><div class="note">Variation = standard deviation ÷ average of the monthly kWh (higher = usage swings more month to month). "–" = the cinema has no invoice for every month in that range (new or not yet billed).</div></div>`}
 function renderSi(){
  const sel=S.find(x=>x.k==st.ss)||[...S].sort((a,b)=>a.n<b.n?-1:1)[0];st.ss=sel.k;
- const iv=invv(sel),A=Array.from({length:12},(_,mo)=>iv[mo]??null),B=Array.from({length:12},(_,mo)=>mo<=LM?iv[12+mo]??null:null),bud=sel.b,E=Array.from({length:12},(_,mo)=>mo>LM&&mo<=LX?mEst(sel,mo):null),en=E.find(q=>q);
- const u=st.su=='d'?'kWh/day':'kWh/month',Y1=A.map((v,mo)=>U(v,mo)),Y2=B.map((v,mo)=>U(v,mo)),YB=B.map((v,mo)=>bud&&mo<=LX?U(bud[mo],mo):null),Y3=E.map((q,mo)=>q?U(q.v,mo):null),hol=Y3.map((q,mo)=>q!=null?mo:-1).filter(q=>q>=0),Ye=Y3.map((q,mo)=>q!=null||mo==LM?(q!=null?q:Y2[LM]):null);
- let lines,lab,sep=null;
- if(st.sv=='yoy'){lab=MN;lines=[{v:Y1,c:'var(--mut)'},{v:Y2,c:'var(--blue)'},{v:Ye,c:'var(--blue)',dash:1,hol},{v:YB,c:'var(--org)',dash:1,w:1.8,nodots:1}]}
- else{lab=[...MN.map(m=>m+' 25'),...MN.slice(0,LX+1).map(m=>m+' 26')];sep=11;lines=[{v:[...Y1,...Y2.slice(0,LM+1)],c:'var(--blue)'},{v:[...Y1.map(()=>null),...Ye.slice(0,LX+1)],c:'var(--blue)',dash:1,w:2.4,hol:hol.map(q=>q+12)},{v:[...Y1.map(()=>null),...YB.slice(0,LX+1)],c:'var(--org)',dash:1,w:1.8,nodots:1}]}
- let lm=-1;for(let mo=0;mo<=LM;mo++)if(B[mo]!=null)lm=mo;
- const both=[];for(let mo=0;mo<=LM;mo++)if(A[mo]!=null&&B[mo]!=null)both.push(mo);
- const a1=both.length?both.reduce((x,mo)=>x+A[mo],0)/both.length:null,a2=both.length?both.reduce((x,mo)=>x+B[mo],0)/both.length:null;
- const all=[...A.map((v,mo)=>({v,l:MN[mo]+' 2025',mo})),...B.map((v,mo)=>({v,l:MN[mo]+' 2026',mo}))].filter(o=>o.v!=null),pk=all.sort((a,b)=>b.v-a.v)[0];
- const yoy=lm>=0?pp(B[lm],A[lm]):null,vb=lm>=0&&bud?pp(B[lm],bud[lm]):null;
- const rows=MN.map((m,mo)=>{const a=A[mo],e=E[mo],b=mo<=LM?B[mo]:e?e.v:null,bd=bud&&mo<=LX?bud[mo]:null,sw=mo<SM.length?shw(sel,mo):null,yy=pp(b,a),vv=pp(b,bd);
-  if(mo>LX)return`<tr><td class="nm">${m}</td><td>${a==null?'–':nf(U(a,mo))}</td><td colspan="6"></td></tr>`;
-  return`<tr><td class="nm">${m}</td><td>${a==null?'–':nf(U(a,mo))}</td><td${e?` title="Running month: estimated from ${e.n} daily readings"`:''}>${b==null?'–':(e?'≈ ':'')+nf(U(b,mo))}</td><td class="${yy>0?'up':'dn'}">${yy==null?'–':pc(yy)}</td><td>${bd==null?'–':nf(U(bd,mo))}</td><td class="${vv>0?'up':'dn'}">${vv==null?'–':pc(vv)}</td><td>${sw?nf(sw):'–'}</td><td>${b!=null&&sw&&!e?(b/sw).toFixed(1):'–'}</td></tr>`}).join('');
- const nm=A.filter(q=>q==null).length;
+ const m=st.m,ix=monthDays(2026,m).filter(i=>i<=upTo()),o=mtd(sel,2026,m,upTo()),sess=(RAW.sessions||{dates:[],v:{}});
+ const R=ix.map(i=>{const r=dayRow(sel,i),x=D[i],iso0=RAW.dates[i],si=sess.dates.indexOf(iso0),sh=si>=0?(sess.v[sel.k]||[])[si]:null;return{i,x,...r,sh,kps:r.v!=null&&sh?r.v/sh:null}});
+ const paired=R.filter(r=>r.v!=null&&r.sh),tk=paired.reduce((a,r)=>a+r.v,0),ts=paired.reduce((a,r)=>a+r.sh,0),nrd=R.filter(r=>r.v!=null).length;
+ const cl=p=>p==null?'var(--mut)':p>st.thr?'var(--red)':p>0?'var(--amb)':'var(--grn)';
+ const W=720,H=230,pl=50,pr=14,pt=14,pb=28,n=Math.max(R.length,1),bw=(W-pl-pr)/n,mx=Math.max(1,...R.map(r=>Math.max(r.v||0,r.t||0)))*1.1,y=v=>pt+(1-v/mx)*(H-pt-pb);
+ let g=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Daily kWh versus target" style="display:block">`;
+ for(let q=0;q<=3;q++){const yy=pt+q*(H-pt-pb)/3;g+=`<line x1="${pl}" x2="${W-pr}" y1="${yy}" y2="${yy}" stroke="var(--line)"/><text x="${pl-6}" y="${yy+3}" text-anchor="end" fill="var(--mut)" font-size="10">${nf(mx-mx*q/3)}</text>`}
+ R.forEach((r,j)=>{const x0=pl+j*bw;
+  if(r.v!=null)g+=`<rect x="${(x0+bw*.14).toFixed(1)}" y="${y(r.v).toFixed(1)}" width="${(bw*.72).toFixed(1)}" height="${(H-pb-y(r.v)).toFixed(1)}" rx="3" fill="${cl(r.pct)}" opacity=".85"/>`;
+  if(r.t!=null)g+=`<line x1="${(x0+bw*.06).toFixed(1)}" x2="${(x0+bw*.94).toFixed(1)}" y1="${y(r.t).toFixed(1)}" y2="${y(r.t).toFixed(1)}" stroke="var(--ink)" stroke-width="2.4"/>`;
+  g+=`<text x="${x0+bw/2}" y="${H-10}" text-anchor="middle" fill="var(--mut)" font-size="10">${r.x.getDate()}</text><rect class="hit" data-i="${j}" x="${x0.toFixed(1)}" y="${pt}" width="${bw.toFixed(1)}" height="${H-pt-pb}" tabindex="0"/>`});
+ g+='</svg>';
+ const ro=r=>`${fdd(r.x)} <span>·</span> ${r.v==null?'no reading':nf(r.v)+' kWh'} <span>·</span> target ${r.t==null?'n/a':nf(r.t)}${r.pct==null?'':' <span>·</span> '+pc(r.pct)}${r.sh?' <span>·</span> '+r.sh+' shows <span>·</span> '+(r.kps==null?'–':r.kps.toFixed(1))+' kWh/show':''}`;
+ const tot=`${MN[m]} MTD <span>·</span> ${nf(o.a)} kWh <span>·</span> target ${nf(o.t)}${o.t?' <span>·</span> '+pc(o.pct):''}`;
  const h=`<div class="si-s"><input type="search" id="siq" placeholder="Search cinema name or code…" value="${st.sq.replace(/"/g,'&quot;')}" autocomplete="off" aria-label="Search cinema"><div id="sil" class="sil"></div></div>
- <div class="row"><h2 style="margin:0;flex:1 1 auto;min-width:0">${sel.n} <span class="reg">${sel.r}${sel.z?' · ZOEC':''}</span></h2><button class="chip" data-sv="seq" aria-pressed="${st.sv=='seq'}">Timeline</button><button class="chip" data-sv="yoy" aria-pressed="${st.sv=='yoy'}">2025 vs 2026</button><button class="chip" data-su="m" aria-pressed="${st.su=='m'}">kWh / month</button><button class="chip" data-su="d" aria-pressed="${st.su=='d'}">kWh / day</button></div>
- <div class="kpis"><div class="card kpi hl"><div class="l">${lm>=0?MN[lm]+' 2026':'2026'}</div><div class="v">${lm>=0?nf(U(B[lm],lm)):'–'}</div><div class="n">${u}${yoy==null?'':' · '+pc(yoy)+' vs '+MN[lm]+' 2025'}</div></div>
- <div class="card kpi"><div class="l">Avg 2026 vs 2025</div><div class="v">${a1&&a2?pc((a2-a1)/a1):'–'}</div><div class="n">${both.length} months compared, same months only</div></div>
- <div class="card kpi"><div class="l">${lm>=0?MN[lm]+' vs budget':'vs budget'}</div><div class="v ${vb>0?'up':'dn'}">${vb==null?'–':pc(vb)}</div><div class="n">${bud&&lm>=0?'Budget '+nf(U(bud[lm],lm))+' '+u:'No budget loaded'}</div></div>
- <div class="card kpi"><div class="l">Highest month</div><div class="v">${pk?nf(U(pk.v,pk.mo)):'–'}</div><div class="n">${pk?pk.l:''}</div></div></div>
- <div class="card"><h3>${st.sv=='yoy'?'2025 vs 2026 by month':'Monthly usage, Jan 2025 – '+MN[LX]+' 2026'} <span class="note" style="font-weight:400">(${u})</span></h3><div class="row" style="margin-bottom:4px"><span class="note"><b style="color:${st.sv=='yoy'?'var(--mut)':'var(--blue)'}">●</b> ${st.sv=='yoy'?'2025':'Actual'} &nbsp; ${st.sv=='yoy'?'<b style="color:var(--blue)">●</b> 2026 &nbsp; ':''}<b style="color:var(--org)">- -</b> 2026 budget${en?` &nbsp; <b style="color:var(--blue)">○</b> ${MN[LX]} 2026 running month (estimate)`:''}</span></div>${siSVG(lines,lab,sep)}<div class="note">Source: actual electricity invoices (sum of kWh usage on every invoice line, as in the invoice file's pivot). Invoices follow the billing cycle, so a month here is the billed month and not exactly the calendar month. Closed months come from invoices.${en?` ${MN[LX]} 2026 is still running: the hollow point is an estimate from the daily sheet (average per day × days in month, ${en.n} day(s) so far) and is replaced by the invoice once it arrives.`:''} Blank = no invoice yet${nm?` (${nm} month(s) in 2025 for this cinema)`:''}.</div></div>
- <div class="card" style="margin-top:12px"><h3>Month by month</h3><div class="tw"><table><thead><tr><th>Month</th><th>2025</th><th>2026</th><th>YoY</th><th>Budget 2026</th><th>vs budget</th><th>Shows 2026</th><th>kWh/show</th></tr></thead><tbody>${rows}</tbody></table></div><div class="note">Values in ${u} (kWh/day = invoice kWh ÷ days in month). Shows and kWh/show use the monthly Number of Show file (kWh/show is always per month).</div></div>`;
- $('#p-si').innerHTML=h+siTable();
- $$('#p-si th[data-si]').forEach(x=>x.onclick=()=>{st.sis=x.dataset.si;renderSi()});$$('#p-si tbody tr[data-k]').forEach(x=>x.onclick=()=>{st.ss=+x.dataset.k;st.sq='';renderSi();scrollTo(0,0)});
+ <div class="row"><h2 style="margin:0;flex:1 1 auto;min-width:0">${sel.n} <span class="reg">${sel.r}${sel.z?' · ZOEC':''}</span></h2><span class="note">${MN[m]} 2026, day 1–${ix.length?D[ix[ix.length-1]].getDate():0}</span></div>
+ <div class="kpis"><div class="card kpi hl"><div class="l">MTD vs target</div><div class="v">${o.t?pc(o.pct):'–'}</div><div class="n">${nf(o.a)} kWh actual · ${nf(o.t)} target</div></div>
+ <div class="card kpi"><div class="l">Average per day</div><div class="v">${nrd?nf(o.a/nrd):'–'}</div><div class="n">kWh · ${nrd} days with a reading</div></div>
+ <div class="card kpi"><div class="l">Shows</div><div class="v">${ts?nf(ts):'–'}</div><div class="n">${paired.length?nf(ts/paired.length)+' per day':'no show data for this month'}</div></div>
+ <div class="card kpi"><div class="l">kWh per show</div><div class="v">${ts?(tk/ts).toFixed(1):'–'}</div><div class="n">${nf(tk)} kWh ÷ ${nf(ts)} shows</div></div></div>
+ <div class="card" style="margin-bottom:12px"><h3>Daily kWh vs target</h3><div class="ro" id="rs"></div><div class="note" style="margin-bottom:4px"><b style="color:var(--red)">▮</b> over ${st.thr*100}% &nbsp;<b style="color:var(--amb)">▮</b> slightly over &nbsp;<b style="color:var(--grn)">▮</b> on or under target &nbsp;<b>▬</b> daily target</div><div id="cs">${g}</div></div>
+ <div class="card"><h3>Day by day</h3><div class="tw"><table><thead><tr><th>Date</th><th>kWh</th><th>Target</th><th>Gap</th><th>Shows</th><th>kWh/show</th></tr></thead><tbody>${[...R].reverse().map(r=>`<tr style="cursor:default"><td class="nm">${fdd(r.x)}</td><td>${r.v==null?'–':nf(r.v)}</td><td>${r.t==null?'–':nf(r.t)}</td><td style="color:${cl(r.pct)}">${r.pct==null?'–':pc(r.pct)}</td><td>${r.sh==null?'–':nf(r.sh)}</td><td>${r.kps==null?'–':r.kps.toFixed(1)}</td></tr>`).join('')}</tbody></table></div><div class="note" style="margin-top:8px">Target follows the weekly pattern (Sat–Sun, Thu–Fri, Mon–Wed) of the monthly budget. Shows come from the daily session files.</div></div>`;
+ $('#p-si').innerHTML=h;
  const q=$('#siq');q.oninput=()=>{st.sq=q.value;siList()};siList();
- $$('#p-si [data-sv]').forEach(b=>b.onclick=()=>{st.sv=b.dataset.sv;renderSi()});$$('#p-si [data-su]').forEach(b=>b.onclick=()=>{st.su=b.dataset.su;renderSi()})}
+ const r0=$('#rs'),c=$('#cs');r0.innerHTML=tot;const on=e=>{const x=e.target.closest('.hit');if(!x)return;c.querySelectorAll('.hit.on').forEach(z=>z.classList.remove('on'));x.classList.add('on');r0.innerHTML=ro(R[+x.dataset.i])};
+ c.addEventListener('mouseover',on);c.addEventListener('focusin',on);c.addEventListener('click',on);c.addEventListener('mouseleave',()=>{c.querySelectorAll('.hit.on').forEach(z=>z.classList.remove('on'));r0.innerHTML=tot})}
 // ----- map of cinemas (red = over target), 2D / 3D like the MH DW productivity alert map
 st.mm='mtd';st.m3=true;st.tl=null;st.vk='all';st.vz=1;st.fx=null;st.fy=null;st.pk=null;
 const GEO=RAW.geo||{loc:{},prov:[],pv:{},W:1000,H:385,L0:94.5,L1:141.2,T0:6.5,B0:-11.5},gx=lo=>(lo-GEO.L0)/(GEO.L1-GEO.L0)*GEO.W,gy=la=>(GEO.T0-la)/(GEO.T0-GEO.B0)*GEO.H;
