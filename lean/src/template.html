@@ -416,7 +416,7 @@ function renderSh(){
  const seg=[['d','Daily'],['w','Weekly'],['m','Monthly']].map(([k,l])=>`<button class="chip" data-sp="${k}" aria-pressed="${st.sp==k}">${l}</button>`).join('');
  const pre=[['l7','Last 7 days'],['mtd','MTD'],['lm','Last month'],['cu','Custom']].map(([k,l])=>`<button class="chip" data-sr="${k}" aria-pressed="${st.sr==k}">${l}</button>`).join('');
  const cu=st.sr=='cu'?`<div class="row"><label class="note">From <input type="date" id="shf" value="${f}" min="${SD[0]}" max="${SD[SD.length-1]}"></label><label class="note">To <input type="date" id="sht" value="${t}" min="${SD[0]}" max="${SD[SD.length-1]}"></label><label class="note">or last <input type="number" id="shn" min="1" max="${SD.length}" value="${nd}" style="width:64px"> days</label></div>`:'';
-const two=st.sp!='d',lg=(ty,a,b)=>`<b style="color:var(--blue)">${ty=='l'?'●':'▮'}</b> ${a}`;
+const two=false,lg=(ty,a,b)=>`<b style="color:var(--blue)">${ty=='l'?'●':'▮'}</b> ${a}`;
  const cell=(id,ty,fn,note)=>`<div class="chc"><div class="ro" id="r${id}"></div><div class="note" style="margin-bottom:4px">${note(ty)}</div><div class="cvw" id="c${id}"><canvas id="cv${id}" aria-label="${id[0]=='1'?'Shows and kWh per show':'Admits actual versus budget'}" role="img"></canvas></div></div>`;
  const n1=ty=>`Click a legend item to show or hide a series`,n2=ty=>`${noB.length?'Budget not available for '+noB.join(', '):'Click a legend item to show or hide a series'}`;
  const f1=ty=>shChart(B,{bar:b=>b.sh,line:b=>b.kps,t:ty,aria:'Shows and kWh per show'}),f2=ty=>shChart(B,{bar:b=>b.ad,mark:b=>b.bd,t:ty,aria:'Admits actual versus budget'});
@@ -448,7 +448,7 @@ const two=st.sp!='d',lg=(ty,a,b)=>`<b style="color:var(--blue)">${ty=='l'?'●':
    const sc={x:{grid:{display:false},ticks:{color:mut,autoSkip:true,maxTicksLimit:10,maxRotation:0}},y:{position:'left',beginAtZero:true,grid:{color:line},ticks:{color:mut,callback:v=>nf(v)}}};
    if(k==1)sc.y1={position:'right',grid:{drawOnChartArea:false},ticks:{color:org,callback:v=>v.toFixed(0)},suggestedMin:Math.min(...B.map(b=>b.kps).filter(v=>v!=null))*.85,suggestedMax:Math.max(...B.map(b=>b.kps).filter(v=>v!=null))*1.1};
    const ch=new Chart($('#cv'+n),{data:{labels,datasets:ds},options:{responsive:true,maintainAspectRatio:false,animation:{duration:250},interaction:{mode:'index',intersect:false},
-    plugins:{legend:{position:'bottom',labels:{color:mut,boxWidth:12,boxHeight:12,borderRadius:3}},tooltip:{enabled:false}},scales:sc,
+    plugins:{legend:{position:'bottom',labels:{color:mut,boxWidth:12,boxHeight:12,borderRadius:3}},tooltip:{enabled:true,mode:'nearest',intersect:true,position:'nearest',caretPadding:8,displayColors:true,callbacks:{title:i=>B[i[0].dataIndex].lbl+(B[i[0].dataIndex].part?' (partial)':''),label:c=>' '+c.dataset.label+': '+(c.raw==null?'n/a':(c.dataset.yAxisID=='y1'?c.raw.toFixed(1):nf(c.raw)))}}},scales:sc,
     onHover:(e,_,c2)=>{const p=c2.getElementsAtEventForMode(e,'index',{intersect:false},false)[0];const i=p?p.index:null;if(i!==c2.$hi){c2.$hi=i;r.innerHTML=i==null?f(d):f(B[i]);c2.draw()}}},plugins:[cross]});
    ch.canvas.addEventListener('mouseleave',()=>{ch.$hi=null;r.innerHTML=f(d);ch.draw()});st.chs.push(ch)})}
  $$('#p-sh [data-ct]').forEach(b=>b.onclick=()=>{st.sct=b.dataset.ct;renderSh()});
