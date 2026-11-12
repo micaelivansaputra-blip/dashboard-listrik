@@ -1,6 +1,7 @@
 <meta charset="utf-8">
 <title>Electricity Monitoring</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%2064%2064%22%20aria-hidden%3D%22true%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22gf%22%20x1%3D%2214%22%20y1%3D%228%22%20x2%3D%2250%22%20y2%3D%2258%22%20gradientUnits%3D%22userSpaceOnUse%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%239ee7e0%22/%3E%3Cstop%20offset%3D%22.28%22%20stop-color%3D%22%23c9a8f0%22/%3E%3Cstop%20offset%3D%22.55%22%20stop-color%3D%22%23f4a6c8%22/%3E%3Cstop%20offset%3D%22.78%22%20stop-color%3D%22%23f7d3b0%22/%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23a9c7f5%22/%3E%3C/linearGradient%3E%3ClinearGradient%20id%3D%22ef%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23fff%22%20stop-opacity%3D%22.95%22/%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23bfe9f5%22%20stop-opacity%3D%22.6%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2215%22%20fill%3D%22%230e1b4d%22/%3E%3Cpath%20d%3D%22M36.5%208%2015%2035.5h13L24.5%2056%2049%2026.5H35.5z%22%20fill%3D%22url%28%23gf%29%22%20stroke%3D%22url%28%23ef%29%22%20stroke-width%3D%221.6%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 <style>
 :root{--bg:#f4f4f5;--sb:#fafafa;--surface:#fff;--s2:#efeff1;--ink:#18181b;--mut:#71717a;--line:rgba(24,24,27,.09);--blue:#27272a;--blue-s:rgba(24,24,27,.06);--org:#d98a00;--red:#dc2626;--red-s:rgba(220,38,38,.1);--grn:#16a34a;--grn-s:rgba(22,163,74,.1);--amb:#b86e00;--amb-s:rgba(217,138,0,.12);--sh:0 1px 2px rgba(0,0,0,.04);--r:18px}
@@ -19,6 +20,7 @@ body{background:var(--bg);color:var(--ink);font:14px/1.5 Inter,-apple-system,Bli
 .seg{display:flex;background:var(--s2);border-radius:14px;padding:4px;gap:2px;box-shadow:inset 0 0 0 1px var(--line)}
 .seg button{flex:1;border:0;background:none;color:var(--ink);padding:9px 4px;border-radius:10px;cursor:pointer;font-weight:600;font-size:14px}
 .seg button[aria-pressed=true]{background:color-mix(in srgb,var(--ink) 14%,var(--s2));box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.brand{display:flex;align-items:center;gap:12px;padding:6px 8px 12px}.brand svg{width:40px;height:40px;flex:none;border-radius:11px;box-shadow:0 2px 10px rgba(14,27,77,.35)}.brand b{display:block;font-size:15px;letter-spacing:-.01em;line-height:1.2}.brand span{display:block;color:var(--mut);font-size:12.5px;margin-top:1px}
 .sb .fn{color:var(--mut);font-size:12px;padding:10px 12px 4px;line-height:1.5}
 .main{min-width:0}
 .top{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;padding:6px 0 18px}
@@ -26,7 +28,7 @@ h1{margin:0;font-size:clamp(22px,3vw,26px);letter-spacing:-.02em;line-height:1.2
 .sub{color:var(--mut);font-size:13px;display:flex;align-items:center;gap:8px}.sub:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--grn);flex:none}
 .ctl{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .ic{border:0;background:var(--surface);color:var(--ink);width:40px;height:40px;border-radius:50%;cursor:pointer;display:grid;place-items:center;box-shadow:inset 0 0 0 1px var(--line)}.ic svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-@media(max-width:860px){.app{grid-template-columns:minmax(0,1fr);gap:12px}.sb{position:static;max-height:none;flex-direction:row;align-items:center;overflow-x:auto;padding:8px;gap:6px}.sb .gl,.sb .fn{display:none}.nav{flex-direction:row;gap:4px}.nav button{padding:8px 12px;font-size:14px;white-space:nowrap}.nav button span{display:inline}.seg{margin-left:auto;flex:none}.seg button{padding:7px 8px;font-size:13px}.sb>div{display:contents}}
+@media(max-width:860px){.app{grid-template-columns:minmax(0,1fr);gap:12px}.sb{position:static;max-height:none;flex-direction:row;align-items:center;overflow-x:auto;padding:8px;gap:6px}.sb .gl,.sb .fn,.brand span{display:none}.brand{padding:0 6px 0 2px}.brand svg{width:34px;height:34px}.brand b{font-size:13px;white-space:nowrap}.nav{flex-direction:row;gap:4px}.nav button{padding:8px 12px;font-size:14px;white-space:nowrap}.nav button span{display:inline}.seg{margin-left:auto;flex:none}.seg button{padding:7px 8px;font-size:13px}.sb>div{display:contents}}
 select,input,button{font:inherit;color:inherit}
 select,input[type=search],input[type=date],input[type=number]{background:var(--surface);color:var(--ink);border:0;box-shadow:inset 0 0 0 1px var(--line);border-radius:12px;padding:8px 12px;min-height:38px}
 .card{background:var(--surface);border-radius:var(--r);box-shadow:var(--sh),inset 0 0 0 1px var(--line);padding:20px;min-width:0}
@@ -83,13 +85,13 @@ svg text{fill:var(--mut);font-size:10px}
 </style>
 <div class="app">
 <aside class="sb">
+ <div class="brand"><svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="gs" x1="14" y1="8" x2="50" y2="58" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#9ee7e0"/><stop offset=".28" stop-color="#c9a8f0"/><stop offset=".55" stop-color="#f4a6c8"/><stop offset=".78" stop-color="#f7d3b0"/><stop offset="1" stop-color="#a9c7f5"/></linearGradient><linearGradient id="es" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset="1" stop-color="#bfe9f5" stop-opacity=".6"/></linearGradient></defs><rect width="64" height="64" rx="15" fill="#0e1b4d"/><path d="M36.5 8 15 35.5h13L24.5 56 49 26.5H35.5z" fill="url(#gs)" stroke="url(#es)" stroke-width="1.6" stroke-linejoin="round"/></svg><div><b>Electricity</b><span>Operations Monitoring</span></div></div>
  <div class="gl">Menu</div>
  <nav class="nav" role="tablist"><button role="tab" data-p="ov" aria-selected="true"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span>Overview</span></button><button role="tab" data-p="dy" aria-selected="false"><svg viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/></svg><span>Daily</span></button><button role="tab" data-p="sh" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M3 20V8l18-4v12"/><path d="M3 12l18-4M7 10.5l2.6-.6M12 9.3l2.6-.6M3 20h18v-4"/></svg><span>Shows</span></button><button role="tab" data-p="si" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Site</span></button></nav>
  <div class="gl">More</div>
  <nav class="nav" role="tablist"><button role="tab" data-p="mp" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg><span>Map</span></button><button role="tab" data-p="rm" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 21a2 2 0 0 0 4 0"/></svg><span>Reminder</span></button></nav>
  <div style="flex:1"></div>
  <div class="seg" role="group" aria-label="Theme"><button data-th="auto" aria-pressed="true">Auto</button><button data-th="light" aria-pressed="false">Light</button><button data-th="dark" aria-pressed="false">Dark</button></div>
- <div class="fn">Daily kWh from the Google Sheet RAW SUMMARY, shows from the daily session files.</div>
 </aside>
 <div class="main">
 <div class="top"><div><h1 id="pt">Overview</h1></div>
@@ -154,7 +156,7 @@ function drv(o){let b=null,bv=0;for(const k of['we','th','ot']){const g=o.g[k][0
 const dq=(s,o)=>{const f=[];if(o.miss>=3)f.push(o.miss+' days missing');if(!prof[s.k].ok)f.push('too little data, network pattern used');if(s.bp)f.push('Oct budget used');return f}
 const st={m:null,y:2026,reg:'all',f:'all',sort:'gap',q:'',dd:LAST,drf:'all',dsort:'pct'};
 // ----- header
-$('#asof').textContent='Data to '+fdd(ASOF)+' · source: Google Sheet RAW SUMMARY'+(RAW.generated?' · refreshed '+RAW.generated:'');
+$('#asof').textContent='Data to '+fdd(ASOF);
 const months=[...new Set(D.map(d=>d.getMonth()))];
 $('#mon').innerHTML=months.map(m=>`<option value="${m}">${['January','February','March','April','May','June','July','August','September','October','November','December'][m]} 2026</option>`).join('');
 st.m=ASOF.getMonth();$('#mon').value=st.m;
