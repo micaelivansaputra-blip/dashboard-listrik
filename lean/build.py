@@ -9,7 +9,7 @@ ip=R/'data/invoice.json'
 if ip.exists():d['invoice']=json.load(open(ip))
 gp=R/'data/geo.json'
 if gp.exists():d['geo']=json.load(open(gp))
-for nm in('sessions','budget'):
+for nm in('sessions','budget','regions'):
     q=R/f'data/{nm}.json'
     if q.exists():d[nm]=json.load(open(q))
 html=(R/'src/template.html').read_text().replace('/*DATA*/',json.dumps(d,separators=(',',':')))

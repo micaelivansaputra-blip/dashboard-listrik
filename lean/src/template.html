@@ -160,7 +160,7 @@ $('#asof').textContent='Data to '+fdd(ASOF);
 const months=[...new Set(D.map(d=>d.getMonth()))];
 $('#mon').innerHTML=months.map(m=>`<option value="${m}">${['January','February','March','April','May','June','July','August','September','October','November','December'][m]} 2026</option>`).join('');
 st.m=ASOF.getMonth();$('#mon').value=st.m;
-const regs=[...new Set(S.map(s=>s.r))].sort();
+const regs=[...new Set(S.map(s=>s.r))].sort(),OFF=(RAW.regions||{sites:{}}).sites,OFFL=Object.entries(OFF).map(([k,v])=>({k:+k,n:v.n,r:v.r})),MON=new Set(S.map(s=>s.k)),NOMON=OFFL.filter(x=>!MON.has(x.k)).sort((a,b)=>a.r<b.r?-1:a.r>b.r?1:a.k-b.k);
 $('#reg').innerHTML='<option value="all">All regions</option>'+regs.map(r=>`<option>${r}</option>`).join('');
 const inReg=s=>st.reg=='all'||s.r==st.reg;
 const upTo=()=>st.m==ASOF.getMonth()?LAST:monthDays(2026,st.m).slice(-1)[0];
@@ -171,14 +171,14 @@ function renderOv(){
  const R=rows(),A=R.reduce((x,r)=>x+r.o.a,0),T=R.reduce((x,r)=>x+r.o.t,0),over=R.filter(r=>r.o.gap>0).length,sav=R.length-over;
  const B=R.reduce((x,r)=>x+budget(r.s,st.m),0);
  const RA=S.map(s=>({s,o:mtd(s,2026,st.m,upTo())})).filter(r=>r.o.has&&r.o.n>0);
- const regRow=g=>{const L=RA.filter(r=>r.s.r==g),a=L.reduce((x,r)=>x+r.o.a,0),tt=L.reduce((x,r)=>x+r.o.t,0),ov=L.filter(r=>r.o.gap>0).length;return{g,n:L.length,a,t:tt,gap:a-tt,pct:tt?(a-tt)/tt:0,ov}};
+ const regRow=g=>{const L=RA.filter(r=>r.s.r==g),a=L.reduce((x,r)=>x+r.o.a,0),tt=L.reduce((x,r)=>x+r.o.t,0),ov=L.filter(r=>r.o.gap>0).length;return{g,n:L.length,tot:OFFL.filter(x=>x.r==g).length||S.filter(s=>s.r==g).length,mon:S.filter(s=>s.r==g).length,a,t:tt,gap:a-tt,pct:tt?(a-tt)/tt:0,ov}};
  const RR=regs.map(regRow).filter(r=>r.n);
  let h=`<div class="row" id="rgb" role="group" aria-label="Region">`+['all',...regs].map(r=>`<button class="chip" data-rg="${r}" aria-pressed="${st.reg==r}">${r=='all'?'All regions':r}</button>`).join('')+`</div>
  <div class="kpis"><div class="card kpi hl"><div class="l">MTD gap vs target</div><div class="v">${sg(A-T)}</div><div class="n">${pc(T?(A-T)/T:0)} · kWh</div></div>
  <div class="card kpi"><div class="l">MTD actual</div><div class="v">${nf(A)}</div><div class="n">kWh, ${R.length} sites</div></div>
  <div class="card kpi"><div class="l">MTD target</div><div class="v">${nf(T)}</div><div class="n">${B?Math.round(T/B*100)+'% of month budget '+nf(B):''}</div></div>
  <div class="card kpi"><div class="l">Over / Saving</div><div class="v"><span class="up">${over}</span> / <span class="dn">${sav}</span></div><div class="n">sites vs MTD target</div></div></div>`;
- h+=`<div class="card"><h3>By region</h3><div class="tw"><table><thead><tr><th>Region</th><th>Sites</th><th>MTD actual</th><th>MTD target</th><th>Gap kWh</th><th>Gap %</th><th>Over / Saving</th></tr></thead><tbody>`+RR.map(r=>`<tr data-rg="${r.g}" style="cursor:pointer${st.reg==r.g?';background:var(--s2)':''}"><td class="nm">${r.g}</td><td>${r.n}</td><td>${nf(r.a)}</td><td>${nf(r.t)}</td><td class="${r.gap>0?'up':'dn'}">${sg(r.gap)}</td><td class="${r.gap>0?'up':'dn'}">${pc(r.pct)}</td><td><span class="up">${r.ov}</span> / <span class="dn">${r.n-r.ov}</span></td></tr>`).join('')+`</tbody></table></div><div class="note">Tap a region to filter every page. Tap again to show all regions.</div></div>`;
+ h+=`<div class="card"><h3>By region</h3><div class="tw"><table><thead><tr><th>Region</th><th>Sites with data / total</th><th>MTD actual</th><th>MTD target</th><th>Gap kWh</th><th>Gap %</th><th>Over / Saving</th></tr></thead><tbody>`+RR.map(r=>`<tr data-rg="${r.g}" style="cursor:pointer${st.reg==r.g?';background:var(--s2)':''}"><td class="nm">${r.g}</td><td>${r.n} / ${r.tot}</td><td>${nf(r.a)}</td><td>${nf(r.t)}</td><td class="${r.gap>0?'up':'dn'}">${sg(r.gap)}</td><td class="${r.gap>0?'up':'dn'}">${pc(r.pct)}</td><td><span class="up">${r.ov}</span> / <span class="dn">${r.n-r.ov}</span></td></tr>`).join('')+`</tbody></table></div><div class="note">Tap a region to filter every page. Tap again to show all regions. Region follows the official cinema list (Monthly Budget &amp; Actual).${NOMON.length?` Not in the electricity sheet yet, so no kWh data: ${NOMON.map(x=>x.n+' ('+x.r+')').join(', ')}.`:''}</div></div>`;
  h+=`<div class="card"><div class="row"><input type="search" id="q" placeholder="Search site" value="${st.q}">`+['all:All','over:Over','sav:Saving','zoec:ZOEC'].map(x=>{const[k,l]=x.split(':');return`<button class="chip" data-f="${k}" aria-pressed="${st.f==k}">${l}</button>`}).join('')+`</div><div class="tw"><table><thead><tr><th data-s="name">Site</th><th data-s="a">MTD actual</th><th data-s="t">MTD target</th><th data-s="gap">Gap kWh ▾</th><th data-s="pct">Gap %</th><th>Last day</th><th>Status</th></tr></thead><tbody>`;
  let L=R.filter(r=>(st.f=='over'?r.o.gap>0:st.f=='sav'?r.o.gap<=0:st.f=='zoec'?r.s.z:true)&&(!st.q||r.s.n.toLowerCase().includes(st.q.toLowerCase())));
  const key={name:r=>r.s.n,a:r=>-r.o.a,t:r=>-r.o.t,gap:r=>-r.o.gap,pct:r=>-r.o.pct}[st.sort];

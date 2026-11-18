@@ -1,0 +1,261 @@
+{
+"note": "Official cinema list and region, from Cinema_Monthly_Budget_Actual (Monthly Raw Data)",
+"sites": {
+"2": {
+"n": "Lippo Mall Nusantara",
+"r": "R3"
+},
+"3": {
+"n": "Palembang Icon",
+"r": "R2"
+},
+"4": {
+"n": "Lippo Plaza Manado",
+"r": "R6"
+},
+"5": {
+"n": "Ponorogo City Center",
+"r": "R5"
+},
+"6": {
+"n": "Lm Kuta",
+"r": "R6"
+},
+"7": {
+"n": "Sun Plaza",
+"r": "R1"
+},
+"8": {
+"n": "Lippo Plaza Medan",
+"r": "R1"
+},
+"10": {
+"n": "Lippo Plaza Jogja",
+"r": "R5"
+},
+"11": {
+"n": "Maxxbox Lippo Village",
+"r": "R2"
+},
+"12": {
+"n": "Mall Wtc Matahari",
+"r": "R2"
+},
+"13": {
+"n": "Lippo Plaza Jambi",
+"r": "R2"
+},
+"14": {
+"n": "Mall Lippo Cikarang",
+"r": "R4"
+},
+"15": {
+"n": "Metropolis Town Square",
+"r": "R2"
+},
+"16": {
+"n": "Lippo Plaza Buton",
+"r": "R6"
+},
+"17": {
+"n": "Lippo Plaza Ekalokasari",
+"r": "R4"
+},
+"19": {
+"n": "Lippo Plaza Kupang",
+"r": "R6"
+},
+"20": {
+"n": "Mall Of Serang",
+"r": "R2"
+},
+"21": {
+"n": "Lippo Plaza Kendari",
+"r": "R6"
+},
+"22": {
+"n": "Java Supermal",
+"r": "R5"
+},
+"24": {
+"n": "Lippo Plaza Batu",
+"r": "R5"
+},
+"26": {
+"n": "Istana Plaza",
+"r": "R4"
+},
+"27": {
+"n": "Malang Town Square",
+"r": "R5"
+},
+"28": {
+"n": "Citimall Sampit",
+"r": "R3"
+},
+"29": {
+"n": "Star Square Manado",
+"r": "R6"
+},
+"30": {
+"n": "Plaza Renon",
+"r": "R6"
+},
+"31": {
+"n": "Living Plaza Balikpapan",
+"r": "R3"
+},
+"32": {
+"n": "Pluit Village",
+"r": "R3"
+},
+"33": {
+"n": "Lippo Plaza Lubuk Linggau",
+"r": "R2"
+},
+"34": {
+"n": "Pacific Mall Tegal",
+"r": "R5"
+},
+"35": {
+"n": "Lippo Plaza Keboen Raya Bogor",
+"r": "R4"
+},
+"37": {
+"n": "Mall Phinisi Point",
+"r": "R6"
+},
+"38": {
+"n": "Depok Town Square",
+"r": "R4"
+},
+"39": {
+"n": "Cibubur Junction",
+"r": "R4"
+},
+"40": {
+"n": "Kalibata City Square",
+"r": "R2"
+},
+"41": {
+"n": "Plaza Medan Fair",
+"r": "R1"
+},
+"42": {
+"n": "Citimall Ketapang",
+"r": "R3"
+},
+"43": {
+"n": "Lippo Plaza Jember",
+"r": "R5"
+},
+"44": {
+"n": "Tamini Square",
+"r": "R4"
+},
+"45": {
+"n": "Q Mall Banjarbaru",
+"r": "R3"
+},
+"47": {
+"n": "Citimall Prabumulih",
+"r": "R2"
+},
+"49": {
+"n": "Living World Pekanbaru",
+"r": "R1"
+},
+"50": {
+"n": "Mal Botania 2",
+"r": "R1"
+},
+"51": {
+"n": "Lippo Plaza Sunset",
+"r": "R6"
+},
+"52": {
+"n": "Sidewalk Jimbaran",
+"r": "R6"
+},
+"53": {
+"n": "City Of Tomorrow",
+"r": "R5"
+},
+"54": {
+"n": "Mal Mandau City",
+"r": "R1"
+},
+"55": {
+"n": "Bellanova Country Mall",
+"r": "R4"
+},
+"56": {
+"n": "Gajah Mada Plaza",
+"r": "R2"
+},
+"57": {
+"n": "Distrik 1 Meikarta",
+"r": "R4"
+},
+"58": {
+"n": "Binjai Supermall",
+"r": "R1"
+},
+"59": {
+"n": "Mataram Mall",
+"r": "R6"
+},
+"60": {
+"n": "Lippo Plaza Sidoarjo",
+"r": "R5"
+},
+"61": {
+"n": "Mangga Dua Square",
+"r": "R2"
+},
+"62": {
+"n": "The Park Pejaten",
+"r": "R3"
+},
+"63": {
+"n": "Blu Plaza Bekasi",
+"r": "R4"
+},
+"64": {
+"n": "Siantar City Square",
+"r": "R1"
+},
+"65": {
+"n": "Mall Pekanbaru",
+"r": "R1"
+},
+"66": {
+"n": "Pondok Kelapa Town Square",
+"r": "R4"
+},
+"67": {
+"n": "Kebayoran Park Mall",
+"r": "R3"
+},
+"68": {
+"n": "Citiplaza Kutabumi",
+"r": "R2"
+},
+"69": {
+"n": "Senayan Park",
+"r": "R3"
+},
+"70": {
+"n": "Mall The Galeria",
+"r": "R3"
+},
+"71": {
+"n": "K-Square Batam",
+"r": "R1"
+},
+"72": {
+"n": "Paragon Square Mall",
+"r": "R6"
+}
+}
+}

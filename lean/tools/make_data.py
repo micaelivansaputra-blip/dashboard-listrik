@@ -22,7 +22,8 @@ for r in v[3:]:
     s=S.setdefault(k,{'k':k,'n':r[4].split('-',1)[1].title(),'r':(lambda x:x if x.startswith('R') and len(x)<4 else 'NA')((r[3] or '').replace('REGION ','R')),'rows':[]})
     s['rows'].append([num(r[i]) if i<len(r) else None for i,_ in cols]);s.setdefault('ty',[]).append((r[6] if len(r)>6 and r[6] else '').strip().upper())
 B=json.load(open(ROOT.parent/'src/data/budget.json'));OV={'70':29361,'71':56985,'72':31967}
-RFIX={7:'R1',17:'R4',27:'R5'}  # region is #N/A in the sheet for these multi-floor sites
+OFF=json.load(open(ROOT/'data/regions.json'))['sites']  # official region per cinema (budget file); overrides the sheet, which is #N/A or wrong for some sites
+RFIX={int(k):v['r'] for k,v in OFF.items()}
 ZO={50,34,69,7,51,39,37}
 sites=[]
 for k,s in sorted(S.items()):
