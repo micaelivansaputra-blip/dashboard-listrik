@@ -17,7 +17,9 @@ def parse(fobj,ds=None):
     wb=openpyxl.load_workbook(fobj,read_only=True,data_only=True)
     ws=pick(wb,ds) if ds else wb.active
     agg=collections.OrderedDict();c=None
-    for r in list(ws.iter_rows(values_only=True))[1:]:
+    allr=list(ws.iter_rows(values_only=True));nob=bool(allr) and str(allr[0][0]).strip()=='CinemaSite'  # some exports omit the BusinessPeriod column
+    for r in allr[1:]:
+        r=([None]+list(r)) if nob else r
         y,cs,sc,st,hm,ad,ns=(list(r)+[None]*7)[:7]
         if cs:c=cs
         if cs=='Grand Total' or y=='Grand Total':continue
