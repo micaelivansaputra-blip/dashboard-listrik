@@ -583,18 +583,18 @@ function renderMp(){
  if(st.pk&&byK[st.pk]&&on.includes(byK[st.pk])){const g=$(`#gp .pin[data-k="${st.pk}"]`);g?open(g):close()}else close()}
 // ----- empty shows (0 admits) from the daily session files
 const OPS=RAW.ops||{days:{},z:{}},OD=Object.keys(OPS.days).sort();
-st.of=OD[Math.max(0,OD.length-14)]||'';st.ot=OD[OD.length-1]||'';st.oq='';
+st.of=OD[Math.max(0,OD.length-14)]||'';st.ot=OD[OD.length-1]||'';st.oq='';st.oh=0;st.odur=120;
 const hmm=m=>String(Math.floor(Math.round(m)/60)%24).padStart(2,'0')+':'+String(Math.round(m)%60).padStart(2,'0');
 const fdw=s=>fdd(new Date(s+'T00:00:00'));
 const nmOf=k=>(S.find(x=>x.k==k)||{}).n||(OFF[k]||{}).n||('Cinema '+k),rgOf=k=>(S.find(x=>x.k==k)||{}).r||(OFF[k]||{}).r||'';
 function emptyData(){
  const win=OD.filter(d=>d>=st.of&&d<=st.ot),by={};
  for(const d of win){const dz=(OPS.z||{})[d]||{};
-  for(const k in OPS.days[d]){if(!inReg({r:rgOf(k)}))continue;const e=OPS.days[d][k],o=by[k]=by[k]||{k,n:nmOf(k),r:rgOf(k),sh:0,z:0,days:0,list:[],perDay:{}};
+  for(const k in OPS.days[d]){if(!inReg({r:rgOf(k)}))continue;const e=OPS.days[d][k],o=by[k]=by[k]||{k,n:nmOf(k),r:rgOf(k),sh:0,z:0,days:0,list:[],perDay:{},F:[],La:[]};o.F.push(e[3]);o.La.push(e[5]);
    o.sh+=e[0];const L=dz[k]||[];o.z+=L.length?L.reduce((x,r)=>x+r[3],0):0;if(L.length)o.days++;
    o.perDay[d]=L.reduce((x,r)=>x+r[3],0);
    for(const r of L)o.list.push({d,scr:r[0],t:r[1],seats:r[2],n:r[3]})}}
- return{win,rows:Object.values(by).filter(o=>o.z>0).sort((a,b)=>b.z-a.z)}}
+ const rows=Object.values(by).filter(o=>o.z>0).sort((a,b)=>b.z-a.z);for(const o of rows){o.fM=medA(o.F);o.lM=medA(o.La)}return{win,rows}}
 function renderOp(){
  if(!OD.length){$('#p-op').innerHTML='<div class="card">No session data yet.</div>';return}
  const {win,rows}=emptyData(),tz=rows.reduce((x,o)=>x+o.z,0),ts=Object.values(emptyData.all||{}).length;
@@ -603,15 +603,16 @@ function renderOp(){
  const pre=[7,14,OD.length].map(n=>`<button class="chip" data-on="${n}" aria-pressed="${st.of==OD[Math.max(0,OD.length-n)]&&st.ot==OD[OD.length-1]}">${n==OD.length?'All '+n+' days':'Last '+n+' days'}</button>`).join('');
  let h=`<div class="card" style="margin-bottom:12px"><div class="row">${pre}<label class="sub" style="margin-left:6px">From <input type="date" id="of" value="${st.of}" min="${OD[0]}" max="${OD[OD.length-1]}"></label><label class="sub">To <input type="date" id="ot" value="${st.ot}" min="${OD[0]}" max="${OD[OD.length-1]}"></label></div>
  <div class="kpis" style="margin:0;grid-template-columns:repeat(auto-fit,minmax(160px,1fr))"><div class="kpi"><div class="l">Shows with 0 admits</div><div class="v">${nf(tz)}</div><div class="n">${allSh?(tz/allSh*100).toFixed(1):'0'}% of ${nf(allSh)} shows</div></div><div class="kpi"><div class="l">Cinemas affected</div><div class="v">${rows.length}</div><div class="n">${win.length} days · ${win.length?fdd(new Date(win[0]+'T00:00:00')):''} – ${win.length?fdd(new Date(win[win.length-1]+'T00:00:00')):''}</div></div></div></div>
- <div class="card"><div class="row"><input type="search" id="oq" placeholder="Search cinema" value="${st.oq}"><button class="chip" id="ocsv">Download list (CSV)</button></div>
- <div class="tw"><table><thead><tr><th>Cinema</th><th>Empty shows</th><th>Days</th><th>% of shows</th></tr></thead><tbody>${L.map(o=>`<tr data-k="${o.k}" style="cursor:pointer"><td class="nm">${o.n}<span class="reg">${o.r}</span></td><td><b>${o.z}</b></td><td>${o.days} / ${win.length}</td><td>${o.sh?(o.z/o.sh*100).toFixed(0):0}%</td></tr>`).join('')||'<tr><td colspan="4" class="note">No empty shows in this period.</td></tr>'}</tbody></table></div>
- <div class="note">Empty show = a scheduled show with no tickets sold (screen can stay off, AC can be set to 25°C). Tap a cinema to see the date, time and screen of each one.</div></div>`;
+ <div class="card"><div class="row"><input type="search" id="oq" placeholder="Search cinema" value="${st.oq}"><button class="chip" id="ocsv">Download list (CSV)</button><button class="chip" id="oh" aria-pressed="${!!st.oh}">Show start &amp; end time</button>${st.oh?`<label class="sub">Show length <input type="number" id="odur" min="30" max="240" step="5" value="${st.odur}" style="width:70px"> min</label>`:''}</div>
+ <div class="tw"><table><thead><tr><th>Cinema</th><th>Empty shows</th><th>Days</th><th>% of shows</th>${st.oh?'<th>First show starts</th><th>Last show starts</th><th>Last show ends</th>':''}</tr></thead><tbody>${L.map(o=>`<tr data-k="${o.k}" style="cursor:pointer"><td class="nm">${o.n}<span class="reg">${o.r}</span></td><td><b>${o.z}</b></td><td>${o.days} / ${win.length}</td><td>${o.sh?(o.z/o.sh*100).toFixed(0):0}%</td>${st.oh?`<td>${hmm(o.fM)}</td><td>${hmm(o.lM)}</td><td>${hmm(o.lM+st.odur)}</td>`:''}</tr>`).join('')||'<tr><td colspan="${st.oh?7:4}" class="note">No empty shows in this period.</td></tr>'}</tbody></table></div>
+ <div class="note">Empty show = a scheduled show with no tickets sold (screen can stay off, AC can be set to 25°C). Tap a cinema to see the date, time and screen of each one.${st.oh?` First / last show = typical (median) start time over the period. The data only has start times, so end = start + ${st.odur} min (change the show length above).`:''}</div></div>`;
  $('#p-op').innerHTML=h;
  $$('#p-op [data-on]').forEach(b=>b.onclick=()=>{st.of=OD[Math.max(0,OD.length-+b.dataset.on)];st.ot=OD[OD.length-1];renderOp()});
  $('#of').onchange=e=>{if(e.target.value)st.of=e.target.value;if(st.of>st.ot)st.ot=st.of;renderOp()};
  $('#ot').onchange=e=>{if(e.target.value)st.ot=e.target.value;if(st.ot<st.of)st.of=st.ot;renderOp()};
  $('#oq').oninput=e=>{st.oq=e.target.value;const p=e.target.selectionStart;renderOp();const x=$('#oq');x.focus();x.setSelectionRange(p,p)};
- $('#ocsv').onclick=()=>{const ln=['Date,Cinema,Region,Screen,Show time,Seats'];for(const o of rows)for(const r of o.list)ln.push([r.d,'"'+o.n+'"',o.r,r.scr,hmm(r.t),r.seats].join(','));
+ $('#oh').onclick=()=>{st.oh=st.oh?0:1;renderOp()};if($('#odur'))$('#odur').onchange=e=>{const v=+e.target.value;if(v>=30&&v<=240)st.odur=v;renderOp()};
+ $('#ocsv').onclick=()=>{const ln=['Date,Cinema,Region,Screen,Start'+(st.oh?',End (est.)':'')+',Seats'];for(const o of rows)for(const r of o.list)ln.push([r.d,'"'+o.n+'"',o.r,r.scr,hmm(r.t)].concat(st.oh?[hmm(r.t+st.odur)]:[],[r.seats]).join(','));
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([ln.join('\n')],{type:'text/csv'}));a.download='empty-shows_'+st.of+'_'+st.ot+'.csv';a.click()};
  $$('#p-op tbody tr[data-k]').forEach(t=>t.onclick=()=>openOp(t.dataset.k))}
 function bars(vals,lab,W,H){const mx=Math.max(...vals,1),bw=(W-8)/vals.length;let g=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img">`;
@@ -620,7 +621,7 @@ function openOp(k){const o=emptyData().rows.find(x=>x.k==k);if(!o)return;
  const days=Object.keys(o.perDay).sort(),L=[...o.list].sort((a,b)=>a.d<b.d?1:a.d>b.d?-1:a.t-b.t);
  $('#mdb').innerHTML=`<button class="x" id="cl" aria-label="Close">✕</button><h2>${o.n}</h2><div class="sub">${o.r} · ${fd(new Date(st.of+'T00:00:00'))} – ${fd(new Date(st.ot+'T00:00:00'))} · ${o.z} empty shows on ${o.days} days</div>
  <h3 style="margin:14px 0 4px;font-size:14px">Empty shows per day</h3>${bars(days.map(d=>o.perDay[d]),days.map((d,j)=>j%Math.ceil(days.length/8)==0?+d.slice(8):''),560,120)}
- <h3 style="margin:14px 0 4px;font-size:14px">Each empty show</h3><div class="tw"><table><thead><tr><th>Date</th><th>Show time</th><th>Screen</th><th>Seats</th></tr></thead><tbody>${L.map(r=>`<tr><td>${fdw(r.d)}</td><td>${hmm(r.t)}</td><td>${r.scr}</td><td>${r.seats}</td></tr>`).join('')}</tbody></table></div>`;
+ <h3 style="margin:14px 0 4px;font-size:14px">Each empty show</h3><div class="tw"><table><thead><tr><th>Date</th><th>Start</th>${st.oh?'<th>End (est.)</th>':''}<th>Screen</th><th>Seats</th></tr></thead><tbody>${L.map(r=>`<tr><td>${fdw(r.d)}</td><td>${hmm(r.t)}</td>${st.oh?`<td>${hmm(r.t+st.odur)}</td>`:''}<td>${r.scr}</td><td>${r.seats}</td></tr>`).join('')}</tbody></table></div>`;
  $('#md').classList.add('on');$('#cl').onclick=()=>$('#md').classList.remove('on')}
 // ----- shell
 const V={op:renderOp,ov:renderOv,mp:renderMp,dy:renderDy,sh:renderSh,si:renderSi,rm:renderRm};let cur='ov';
