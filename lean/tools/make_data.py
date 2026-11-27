@@ -25,8 +25,10 @@ B=json.load(open(ROOT.parent/'src/data/budget.json'));OV={'70':29361,'71':56985,
 OFF=json.load(open(ROOT/'data/regions.json'))['sites']  # official region per cinema (budget file); overrides the sheet, which is #N/A or wrong for some sites
 RFIX={int(k):v['r'] for k,v in OFF.items()}
 ZO={50,34,69,7,51,39,37}
+EXCL={69}  # Senayan Park: not filled in on the spreadsheet, left out of the dashboard and reminder
 sites=[]
 for k,s in sorted(S.items()):
+    if k in EXCL:continue
     n=len(cols);vals=[]
     for j in range(n):
         xs=[row[j] for row in s['rows']]
